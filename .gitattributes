@@ -1,0 +1,9 @@
+# Always use LF for all text files
+* text=auto eol=lf
+
+# Force LF for specific file types (optional)
+*.ts text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.sh text eol=lf
