@@ -21,7 +21,9 @@
     "prepare": "husky",
     "gateway:build": "nest build gateway",
     "gateway:start": "node dist/apps/gateway/main",
-    "gateway:start:dev": "cross-env NODE_ENV=development nest start gateway --watch"
+    "gateway:start:dev": "cross-env NODE_ENV=development nest start gateway --watch",
+    "gateway:test": "jest --testPathPattern=apps/gateway --passWithNoTests",
+    "gateway:test:e2e": "jest --config ./apps/gateway/test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
