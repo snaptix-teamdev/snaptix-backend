@@ -1,0 +1,37 @@
+branch_name=$(git symbolic-ref --short HEAD)
+
+case "$branch_name" in
+  main|dev|develop|master)
+    exit 0
+    ;;
+esac
+
+# Допустимые типы веток
+pattern='^(feature|bugfix|hotfix|chore|refactor|test)/SNAP-[0-9]+$'
+
+if ! echo "$branch_name" | grep -qE "$pattern";
+then
+  echo "❌ Название ветки '$branch_name' не соответствует шаблону."
+  echo "\
+==========================
+
+Придерживайтесь формата:
+<тип>/SNAP-<номер>
+
+ПРИМЕР:
+feature/SNAP-5
+
+Типы:
+- feature: новая функциональность
+- bugfix: исправление ошибки
+- hotfix: срочное исправление
+- chore: обслуживание проекта
+- refactor: рефакторинг без изменения поведения
+- test: добавление или изменение тестов
+
+==========================
+"
+  exit 1
+fi
+
+echo "✅ Ветка '$branch_name' соответствует шаблону"
