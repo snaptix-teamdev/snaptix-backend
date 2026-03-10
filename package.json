@@ -18,7 +18,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/gateway/test/jest-e2e.json",
-    "prepare": "husky"
+    "prepare": "husky",
+    "gateway:build": "nest build gateway",
+    "gateway:start": "node dist/apps/gateway/main",
+    "gateway:start:dev": "cross-env NODE_ENV=development nest start gateway --watch"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
