@@ -17,6 +17,13 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {}
+    "paths": {
+      "@snaptix/common": ["libs/common/src"],
+      "@snaptix/common/*": ["libs/common/src/*"],
+      "@snaptix/contracts": ["libs/contracts/src"],
+      "@snaptix/contracts/*": ["libs/contracts/src/*"],
+      "@snaptix/core": ["libs/core/src"],
+      "@snaptix/core/*": ["libs/core/src/*"]
+    }
   }
 }
