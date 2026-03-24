@@ -1,0 +1,44 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { IsArray, IsEnum, IsNumber } from 'class-validator';
+import {
+  configValidationUtility,
+  Environments,
+  parseCommaSeparatedStringToArrayUtil,
+} from '@snaptix/common';
+
+@Injectable()
+export class CoreConfig {
+  @IsNumber(
+    {},
+    {
+      message: 'Set Env variable PORT, example: 3000',
+    },
+  )
+  port: number;
+
+  @IsEnum(Environments, {
+    message:
+      'Set correct NODE_ENV value, available values: ' +
+      configValidationUtility.getEnumValues(Environments).join(', '),
+  })
+  env: Environments;
+
+  @IsArray({
+    message:
+      'Set Env variable CORS_ALLOWED_ORIGINS, example: https://ya.ru,https://google.com',
+  })
+  corsAllowedOrigins: string[];
+
+  constructor(private configService: ConfigService<any, true>) {
+    this.port = parseInt(this.configService.get<string>('PORT'));
+
+    this.env = this.configService.get('NODE_ENV');
+
+    this.corsAllowedOrigins = parseCommaSeparatedStringToArrayUtil(
+      this.configService.get<string>('CORS_ALLOWED_ORIGINS'),
+    );
+
+    configValidationUtility.validateConfig(this);
+  }
+}

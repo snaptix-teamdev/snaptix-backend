@@ -1,11 +1,29 @@
 {
-  "name": "gateway",
+  "name": "snaptix-backend",
   "version": "0.0.1",
   "description": "",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "gateway:build": "nest build gateway",
+    "gateway:start": "node dist/apps/gateway/main",
+    "gateway:start:dev": "cross-env NODE_ENV=development nest start gateway --watch",
+    "---------------------": "",
+    "user-accounts:start:dev": "cross-env NODE_ENV=development nest start user-accounts --watch",
+    "user-accounts:prisma:generate": "prisma generate --schema=apps/user-accounts/prisma/schema.prisma",
+    "user-accounts:prisma:migrate:dev": "pnpm user-accounts:prisma-wrapper:dev \"prisma migrate dev --config=apps/user-accounts/prisma/prisma.config.ts\"",
+    "user-accounts:prisma:deploy:dev": "pnpm user-accounts:prisma-wrapper:dev \"prisma migrate deploy --config=apps/user-accounts/prisma/prisma.config.ts\"",
+    "user-accounts:prisma:studio:dev": "pnpm user-accounts:prisma-wrapper:dev \"prisma studio --config=apps/user-accounts/prisma/prisma.config.ts\"",
+    "user-accounts:prisma-wrapper:dev": "cross-env NODE_ENV=development ts-node scripts/prisma/prisma-wrapper.ts \"apps/user-accounts\"",
+    "user-accounts:prisma:deploy:prod": "prisma migrate deploy --config=apps/user-accounts/prisma/prisma.config.ts",
+    "user-accounts:docker:up": "docker compose -f ./apps/user-accounts/docker-compose.yml up -d --wait",
+    "user-accounts:docker:stop": "docker compose -f ./apps/user-accounts/docker-compose.yml stop",
+    "user-accounts:docker:down": "docker compose -f ./apps/user-accounts/docker-compose.yml down -v --remove-orphans",
+    "preuser-accounts:start:dev": "pnpm user-accounts:docker:up && pnpm user-accounts:prisma:generate && pnpm user-accounts:prisma:deploy:dev",
+    "user-accounts:build": "nest build user-accounts",
+    "user-accounts:start": "node dist/apps/user-accounts/main",
+    "----------------------": "",
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
@@ -18,15 +36,20 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/gateway/test/jest-e2e.json",
-    "prepare": "husky",
-    "gateway:build": "nest build gateway",
-    "gateway:start": "node dist/apps/gateway/main",
-    "gateway:start:dev": "cross-env NODE_ENV=development nest start gateway --watch"
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.2.6",
+    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/client": "^7.4.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "cookie-parser": "^1.4.7",
+    "pg": "^8.20.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -38,10 +61,13 @@
     "@nestjs/testing": "^11.0.1",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.3.1",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
@@ -50,6 +76,7 @@
     "jest": "^29.7.0",
     "lint-staged": "^16.3.2",
     "prettier": "^3.4.2",
+    "prisma": "^7.4.2",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
@@ -86,7 +113,13 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
-    ]
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@snaptix/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@snaptix/contracts(|/.*)$": "<rootDir>/libs/contracts/src/$1",
+      "^@snaptix/core(|/.*)$": "<rootDir>/libs/core/src/$1"
+    }
   }
 }

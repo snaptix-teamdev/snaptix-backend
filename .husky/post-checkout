@@ -7,7 +7,7 @@ case "$branch_name" in
 esac
 
 # Допустимые типы веток
-pattern='^(feature|bugfix|hotfix|chore|refactor|test)/SNAP-[0-9]+$'
+pattern='^(feature|bugfix|hotfix|chore|refactor|test)/SNAP-[0-9]+(-[a-zA-Z0-9._-]+)*$'
 
 if ! echo "$branch_name" | grep -qE "$pattern";
 then
@@ -16,10 +16,11 @@ then
 ==========================
 
 Придерживайтесь формата:
-<тип>/SNAP-<номер>
+<тип>/SNAP-<номер>[-описание]
 
-ПРИМЕР:
-feature/SNAP-5
+ПРИМЕРЫ:
+chore/SNAP-19
+chore/SNAP-19-repository-configuration
 
 Типы:
 - feature: новая функциональность
