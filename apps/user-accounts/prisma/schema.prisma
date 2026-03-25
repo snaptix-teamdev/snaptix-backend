@@ -13,3 +13,42 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id                String                 @id @default(uuid(7)) @db.Uuid
+  email             String                 @unique @map("email")
+  username          String                 @unique @map("username")
+  passwordHash      String                 @map("password_hash") @db.VarChar()
+  updatedAt         DateTime               @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt         DateTime               @default(now()) @map("created_at") @db.Timestamptz()
+  deletedAt         DateTime?              @map("deleted_at") @db.Timestamptz()
+  emailConfirmation UserEmailConfirmation? @relation("UserEmailConfirmation")
+  recoveryPassword  UserRecoveryPassword?  @relation("UserRecoveryPassword")
+
+  @@map("users")
+}
+
+model UserEmailConfirmation {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  code       String   @unique @default(uuid(4)) @map("code") @db.Uuid
+  isVerified Boolean  @default(false) @map("is_verified") @db.Boolean
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz()
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  userId     String   @unique @map("user_id") @db.Uuid
+  user       User     @relation(fields: [userId], references: [id], name: "UserEmailConfirmation")
+
+  @@map("user_email_confirmation")
+}
+
+model UserRecoveryPassword {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  code      String   @unique @default(uuid(4)) @map("code") @db.Uuid
+  expiresAt DateTime @map("expires_at") @db.Timestamptz()
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  userId    String   @unique @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], name: "UserRecoveryPassword")
+
+  @@map("user_recovery_password")
+}
