@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IsArray, IsEnum, IsNumber } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
 import {
   configValidationUtility,
   Environments,
@@ -30,6 +30,11 @@ export class CoreConfig {
   })
   corsAllowedOrigins: string[];
 
+  @IsNotEmpty({
+    message: 'Set Env variable RECAPTCHA_SECRET, dangerous for security!',
+  })
+  recaptchaSecret: string;
+
   constructor(private configService: ConfigService<any, true>) {
     this.port = parseInt(this.configService.get<string>('PORT'));
 
@@ -38,6 +43,8 @@ export class CoreConfig {
     this.corsAllowedOrigins = parseCommaSeparatedStringToArrayUtil(
       this.configService.get<string>('CORS_ALLOWED_ORIGINS'),
     );
+
+    this.recaptchaSecret = this.configService.get('RECAPTCHA_SECRET');
 
     configValidationUtility.validateConfig(this);
   }
