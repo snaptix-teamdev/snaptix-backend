@@ -9,6 +9,8 @@
     "gateway:build": "nest build gateway",
     "gateway:start": "node dist/apps/gateway/main",
     "gateway:start:dev": "cross-env NODE_ENV=development nest start gateway --watch",
+    "gateway:test": "jest --testPathPattern=apps/gateway --passWithNoTests",
+    "gateway:test:e2e": "jest --config ./apps/gateway/test/jest-e2e.json",
     "---------------------": "",
     "user-accounts:start:dev": "cross-env NODE_ENV=development nest start user-accounts --watch",
     "user-accounts:start:debug": "cross-env NODE_ENV=development nest start user-accounts --debug --watch",
