@@ -17,6 +17,8 @@ async function bootstrap() {
   await app.startAllMicroservices();
 
   initSetup(app);
+  app.setGlobalPrefix('api');
+  app.enableCors();
 
   await app.listen(process.env.port ?? 3000, () => {
     console.log(
