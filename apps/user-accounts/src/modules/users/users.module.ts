@@ -1,10 +1,17 @@
 import { Module } from '@nestjs/common';
 import { UserConverter } from './converter/user.converter';
-import { CreateUserUseCase } from './application/create-user.usecase';
-import { UserRepository } from './infrastructure/user.repository';
+import { UsersRepository } from './infrastructure/users.repository';
+import { UserController } from './api/user.controller';
+import { CryptoService } from '../auth/application/crypto.service';
+import { RegisterUserUseCase } from '../auth/application/commands/register-user.usecase';
 
 @Module({
-  controllers: [],
-  providers: [UserConverter, CreateUserUseCase, UserRepository],
+  controllers: [UserController],
+  providers: [
+    UserConverter,
+    RegisterUserUseCase,
+    UsersRepository,
+    CryptoService,
+  ],
 })
 export class UsersModule {}
