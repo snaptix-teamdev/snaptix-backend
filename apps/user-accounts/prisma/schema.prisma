@@ -14,6 +14,20 @@ datasource db {
   provider = "postgresql"
 }
 
+model Session {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  userId     String   @unique @map("user_id") @db.Uuid
+  user       User     @relation(fields: [userId], references: [id], name: "Session")
+  deviceId   String   @unique @default(uuid(7)) @map("device_id") @db.Uuid
+  deviceName String   @map("device_name")
+  ip         String   @db.Inet
+  issuedAt   DateTime @map("issued_at") @db.Timestamptz()
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz()
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("sessions")
+}
+
 model User {
   id                String                 @id @default(uuid(7)) @db.Uuid
   email             String                 @unique @map("email")
@@ -24,6 +38,7 @@ model User {
   deletedAt         DateTime?              @map("deleted_at") @db.Timestamptz()
   emailConfirmation UserEmailConfirmation? @relation("UserEmailConfirmation")
   recoveryPassword  UserRecoveryPassword?  @relation("UserRecoveryPassword")
+  Session           Session?               @relation("Session")
 
   @@map("users")
 }
