@@ -8,7 +8,7 @@ import {
 import { Request } from 'express';
 import { PassRecoveryInputDto } from '../api/input-dto/pass-recovery.input-dto';
 import axios, { AxiosResponse } from 'axios';
-import { CoreConfig } from '../../core/config/core.config';
+import { CoreConfig } from '../../../core/config/core.config';
 
 type RecaptchaResponse = {
   success: boolean;

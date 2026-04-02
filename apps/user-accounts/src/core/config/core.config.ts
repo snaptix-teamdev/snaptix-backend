@@ -17,6 +17,21 @@ export class CoreConfig {
   )
   port: number;
 
+  @IsNumber(
+    {},
+    {
+      message:
+        'Set Env variable MICROSERVICE_USER_ACCOUNTS_PORT, example: 3000',
+    },
+  )
+  microserviceUserAccountsPort: number;
+
+  @IsNotEmpty({
+    message:
+      'Set Env variable MICROSERVICE_USER_ACCOUNTS_HOST, example: 0.0.0.0',
+  })
+  microserviceUserAccountsHost: string;
+
   @IsEnum(Environments, {
     message:
       'Set correct NODE_ENV value, available values: ' +
@@ -37,6 +52,14 @@ export class CoreConfig {
 
   constructor(private configService: ConfigService<any, true>) {
     this.port = parseInt(this.configService.get<string>('PORT'));
+
+    this.microserviceUserAccountsPort = parseInt(
+      this.configService.get<string>('MICROSERVICE_USER_ACCOUNTS_PORT'),
+    );
+
+    this.microserviceUserAccountsHost = this.configService.get(
+      'MICROSERVICE_USER_ACCOUNTS_HOST',
+    );
 
     this.env = this.configService.get('NODE_ENV');
 
