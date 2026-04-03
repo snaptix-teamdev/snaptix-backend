@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IsArray, IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+} from 'class-validator';
 import {
   configValidationUtility,
   Environments,
@@ -21,7 +27,7 @@ export class CoreConfig {
     {},
     {
       message:
-        'Set Env variable MICROSERVICE_USER_ACCOUNTS_PORT, example: 3000',
+        'Set Env variable MICROSERVICE_USER_ACCOUNTS_PORT, example: 3001',
     },
   )
   microserviceUserAccountsPort: number;
@@ -50,6 +56,12 @@ export class CoreConfig {
   })
   recaptchaSecret: string;
 
+  @IsBoolean({
+    message:
+      'Set Env variable IS_SWAGGER_ENABLED to enable/disable Swagger, example: true, available values: true, false, 1, 0',
+  })
+  isSwaggerEnabled: boolean;
+
   constructor(private configService: ConfigService<any, true>) {
     this.port = parseInt(this.configService.get<string>('PORT'));
 
@@ -68,6 +80,10 @@ export class CoreConfig {
     );
 
     this.recaptchaSecret = this.configService.get('RECAPTCHA_SECRET');
+
+    this.isSwaggerEnabled = configValidationUtility.convertToBoolean(
+      this.configService.get('IS_SWAGGER_ENABLED'),
+    ) as boolean;
 
     configValidationUtility.validateConfig(this);
   }

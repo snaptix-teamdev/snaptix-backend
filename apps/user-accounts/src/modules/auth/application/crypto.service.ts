@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import argon, { Algorithm } from '@node-rs/argon2';
+import { Algorithm, hash, verify } from '@node-rs/argon2';
 
 @Injectable()
 export class CryptoService {
   async generateHash(password: string): Promise<string> {
-    return argon.hash(password, {
+    return hash(password, {
       algorithm: Algorithm.Argon2id,
       parallelism: 1,
       memoryCost: 1024 * 20, //20mb
@@ -13,6 +13,6 @@ export class CryptoService {
   }
 
   async compareHash(password: string, hash: string): Promise<boolean> {
-    return argon.verify(hash, password);
+    return verify(hash, password);
   }
 }

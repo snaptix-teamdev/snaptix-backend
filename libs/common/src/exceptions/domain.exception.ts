@@ -1,12 +1,8 @@
-import { IError } from '@snaptix/common/interfaces';
+import { IDomainError } from '@snaptix/common/interfaces';
 import { RpcException } from '@nestjs/microservices';
 
 export class DomainException extends RpcException {
-  public code: string;
-  public httpCode: number;
-
-  constructor(exception: IError) {
+  constructor(exception: IDomainError<any>) {
     super(exception);
-    this.name = DomainException.name;
   }
 }
