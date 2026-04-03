@@ -3,11 +3,10 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
-  HttpStatus,
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { IDomainError } from '@snaptix/common';
+import { HttpStatus, IDomainError } from '@snaptix/common';
 import { COMMON_ERRORS, ERRORS } from '@snaptix/contracts';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
@@ -52,7 +51,7 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
       response.status(exception.getStatus()).json({
         statusCode: exception.getStatus(),
         error: COMMON_ERRORS.VALIDATION_ERROR.code,
-        message: exception.message,
+        message: COMMON_ERRORS.VALIDATION_ERROR.code,
         errors,
       });
       return;
@@ -77,6 +76,22 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
 
     if (isDomainException(exception)) {
       this.logger.error({ type: 'DomainException', exception });
+
+      if (exception.httpCode === HttpStatus.CONFLICT) {
+        response.status(exception.httpCode).json({
+          statusCode: COMMON_ERRORS.CONFLICT_ERROR.httpCode,
+          error: COMMON_ERRORS.CONFLICT_ERROR.code,
+          message: COMMON_ERRORS.CONFLICT_ERROR.message,
+          errors: [
+            {
+              field: exception.field,
+              code: exception.code,
+              message: exception.message,
+            },
+          ],
+        });
+        return;
+      }
 
       response.status(exception.httpCode).json({
         statusCode: exception.httpCode,
