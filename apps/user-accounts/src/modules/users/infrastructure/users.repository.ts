@@ -44,6 +44,14 @@ export class UsersRepository {
   async update(entity: UserEntity): Promise<void> {
     const model = this.userConverter.fromEntityToPrismaModel(entity);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { userId: ecUserId, ...emailConfirmation } = model.emailConfirmation;
+
+    const recoveryPassword = model.recoveryPassword
+      ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (({ userId, ...rest }) => rest)(model.recoveryPassword)
+      : null;
+
     await this.prisma.user.update({
       where: {
         id: model.id,
@@ -51,10 +59,10 @@ export class UsersRepository {
       data: {
         ...model,
         emailConfirmation: {
-          update: model.emailConfirmation,
+          update: emailConfirmation,
         },
         recoveryPassword: {
-          update: model.recoveryPassword ?? undefined,
+          update: recoveryPassword ?? undefined,
         },
       },
     });
@@ -102,6 +110,34 @@ export class UsersRepository {
     const result = await this.prisma.user.findUnique({
       where: {
         email,
+      },
+      include: {
+        emailConfirmation: true,
+        recoveryPassword: true,
+      },
+    });
+
+    if (!result) {
+      return null;
+    }
+
+    if (!result.emailConfirmation) {
+      throw new Error('user email confirmation is missing');
+    }
+
+    return this.userConverter.fromPrismaModelToEntity({
+      ...result,
+      emailConfirmation: result.emailConfirmation,
+      recoveryPassword: result.recoveryPassword,
+    });
+  }
+
+  async findByEmailCode(code: string): Promise<UserEntity | null> {
+    const result = await this.prisma.user.findFirst({
+      where: {
+        emailConfirmation: {
+          code,
+        },
       },
       include: {
         emailConfirmation: true,

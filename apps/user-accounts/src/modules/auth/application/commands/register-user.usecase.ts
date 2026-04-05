@@ -4,6 +4,8 @@ import { UsersRepository } from '../../../users/infrastructure/users.repository'
 import { UserEntity } from '../../../users/domain/user.entity';
 import { USER_ACCOUNTS_ERRORS } from '@snaptix/contracts';
 import { CryptoService } from '../crypto.service';
+import { AuthConfig } from '../../auth.config';
+import { USER_EVENTS } from '@snaptix/contracts/constants/events';
 
 class RegisterUserCommandRequest {
   email: string;
@@ -11,9 +13,7 @@ class RegisterUserCommandRequest {
   username: string;
 }
 
-type RegisterUserCommandResponse = Pick<IUser, 'id'>;
-
-export class RegisterUserCommand extends Command<RegisterUserCommandResponse> {
+export class RegisterUserCommand extends Command<void> {
   constructor(public dto: RegisterUserCommandRequest) {
     super();
   }
@@ -22,16 +22,15 @@ export class RegisterUserCommand extends Command<RegisterUserCommandResponse> {
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserUseCase implements ICommandHandler<
   RegisterUserCommand,
-  RegisterUserCommandResponse
+  void
 > {
   constructor(
     private usersRepository: UsersRepository,
     private cryptoService: CryptoService,
+    private authConfig: AuthConfig,
   ) {}
 
-  async execute({
-    dto,
-  }: RegisterUserCommand): Promise<RegisterUserCommandResponse> {
+  async execute({ dto }: RegisterUserCommand): Promise<void> {
     await this.checkExistsEmailOrUsername({
       username: dto.username,
       email: dto.email,
@@ -39,17 +38,18 @@ export class RegisterUserUseCase implements ICommandHandler<
 
     const passwordHash = await this.cryptoService.generateHash(dto.password);
 
-    const user: UserEntity = UserEntity.create({
-      username: dto.username,
-      email: dto.email,
-      passwordHash,
-    });
+    const user: UserEntity = UserEntity.create(
+      {
+        username: dto.username,
+        email: dto.email,
+        passwordHash,
+      },
+      this.authConfig.EMAIL_CONFIRMATION_CODE_TTL_MINUTES,
+    );
 
     const savedUserWithId = await this.usersRepository.create(user);
 
-    // await this.emitUserCreated(savedUserWithId);
-
-    return { id: savedUserWithId.id };
+    this.emitUserCreated(savedUserWithId);
   }
 
   private async checkExistsEmailOrUsername(payload: {
@@ -72,7 +72,13 @@ export class RegisterUserUseCase implements ICommandHandler<
     }
   }
 
-  // private async emitUserCreated(createdUser: IUser) {
-  //await sendToRabbitMQ(USER_EVENTS.USER_CREATED, {...});
-  // }
+  private emitUserCreated(createdUser: IUser) {
+    // await sendToRabbitMQ(USER_EVENTS.USER_CREATED, {...});
+    console.log(USER_EVENTS.USER_CREATED, {
+      userId: createdUser.id,
+      username: createdUser.username,
+      email: createdUser.email,
+      emailConfirmationCode: createdUser.emailConfirmation.code,
+    });
+  }
 }
