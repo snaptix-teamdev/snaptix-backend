@@ -1,1 +1,2 @@
-export * from './register-user.request-dto';
+export * from './register/index';
+export * from './registration-confirmation/index';

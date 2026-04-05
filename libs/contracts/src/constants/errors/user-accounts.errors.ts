@@ -1,4 +1,9 @@
-import { IDomainError, IUser } from '@snaptix/common';
+import {
+  IDomainError,
+  IUser,
+  IUserEmailConfirmation,
+  IUserRecoveryPassword,
+} from '@snaptix/common';
 
 export const USER_ACCOUNTS_ERRORS = {
   USER_EMAIL_ALREADY_EXISTS: {
@@ -13,4 +18,25 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 409,
     field: 'username',
   },
-} satisfies Record<string, IDomainError<IUser>>;
+  EMAIL_CONFIRMATION_CODE_NOT_FOUND: {
+    code: 'EMAIL_CONFIRMATION_CODE_NOT_FOUND',
+    message: 'Email confirmation code not found',
+    httpCode: 404,
+    field: 'code',
+  },
+  EMAIL_CONFIRMATION_CODE_EXPIRED: {
+    code: 'EMAIL_CONFIRMATION_CODE_EXPIRED',
+    message: 'Email confirmation code expired',
+    httpCode: 409,
+    field: 'code',
+  },
+  EMAIL_ALREADY_CONFIRMED: {
+    code: 'EMAIL_ALREADY_CONFIRMED',
+    message: 'Email with current confirmation code already confirmed',
+    httpCode: 409,
+    field: 'code',
+  },
+} satisfies Record<
+  string,
+  IDomainError<IUser | IUserEmailConfirmation | IUserRecoveryPassword>
+>;
