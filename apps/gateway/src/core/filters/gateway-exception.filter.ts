@@ -42,16 +42,13 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
       const zodError = exception.getZodError() as ZodError;
       const errors = zodError.issues.map((error) => {
         return {
-          field: error.path[0],
           code: error.code,
+          field: error.path[0],
           message: error.message,
         };
       });
 
       response.status(exception.getStatus()).json({
-        statusCode: exception.getStatus(),
-        error: COMMON_ERRORS.VALIDATION_ERROR.code,
-        message: COMMON_ERRORS.VALIDATION_ERROR.code,
         errors,
       });
       return;
@@ -68,7 +65,7 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
 
       response.status(exception.getStatus()).json({
         statusCode: exception.getStatus(),
-        error: HttpStatus[exception.getStatus()],
+        code: HttpStatus[exception.getStatus()],
         message: exception.message,
       });
       return;
@@ -77,26 +74,14 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
     if (isDomainException(exception)) {
       this.logger.error({ type: 'DomainException', exception });
 
-      if (exception.httpCode === HttpStatus.CONFLICT) {
-        response.status(exception.httpCode).json({
-          statusCode: COMMON_ERRORS.CONFLICT_ERROR.httpCode,
-          error: COMMON_ERRORS.CONFLICT_ERROR.code,
-          message: COMMON_ERRORS.CONFLICT_ERROR.message,
-          errors: [
-            {
-              field: exception.field,
-              code: exception.code,
-              message: exception.message,
-            },
-          ],
-        });
-        return;
-      }
-
       response.status(exception.httpCode).json({
-        statusCode: exception.httpCode,
-        error: exception.code,
-        message: exception.message,
+        errors: [
+          {
+            code: exception.code,
+            field: exception.field,
+            message: exception.message,
+          },
+        ],
       });
       return;
     }
@@ -104,9 +89,13 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
     this.logger.error(exception);
     const internalException = COMMON_ERRORS.INTERNAL_ERROR;
     response.status(internalException.httpCode).json({
-      statusCode: internalException.httpCode,
-      error: internalException.code,
-      message: internalException.message,
+      errors: [
+        {
+          code: internalException.code,
+          field: internalException.field,
+          message: internalException.message,
+        },
+      ],
     });
   }
 }

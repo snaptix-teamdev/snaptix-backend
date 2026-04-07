@@ -45,7 +45,7 @@ model User {
 
 model UserEmailConfirmation {
   id         String   @id @default(uuid(7)) @db.Uuid
-  code       String   @unique @default(uuid(4)) @map("code") @db.Uuid
+  code       String   @unique @default(uuid(7)) @map("code") @db.Uuid
   isVerified Boolean  @default(false) @map("is_verified") @db.Boolean
   expiresAt  DateTime @map("expires_at") @db.Timestamptz()
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
@@ -58,7 +58,7 @@ model UserEmailConfirmation {
 
 model UserRecoveryPassword {
   id        String   @id @default(uuid(7)) @db.Uuid
-  code      String   @unique @default(uuid(4)) @map("code") @db.Uuid
+  code      String   @unique @default(uuid(7)) @map("code") @db.Uuid
   expiresAt DateTime @map("expires_at") @db.Timestamptz()
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()

@@ -4,10 +4,14 @@ import { PassRecoveryInputDto } from './input-dto/pass-recovery.input-dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   RegisterUserRequestDto,
+  RegisterUserResponseDto,
+  RegistrationConfirmationRequestDto,
+  RegistrationConfirmationResponseDto,
   USER_ACCOUNTS_PATTERNS,
 } from '@snaptix/contracts';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/commands/register-user.usecase';
+import { ConfirmRegistrationCommand } from '../application/commands/confirm-registration.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +25,20 @@ export class AuthController {
   }
 
   @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.REGISTER_USER)
-  register(@Payload() payload: RegisterUserRequestDto) {
-    return this.commandBus.execute(new RegisterUserCommand(payload));
+  async register(
+    @Payload() payload: RegisterUserRequestDto,
+  ): Promise<RegisterUserResponseDto> {
+    await this.commandBus.execute(new RegisterUserCommand(payload));
+
+    return {};
+  }
+
+  @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.REGISTRATION_CONFIRMATION)
+  async registrationConfirmation(
+    @Payload() payload: RegistrationConfirmationRequestDto,
+  ): Promise<RegistrationConfirmationResponseDto> {
+    await this.commandBus.execute(new ConfirmRegistrationCommand(payload));
+
+    return {};
   }
 }

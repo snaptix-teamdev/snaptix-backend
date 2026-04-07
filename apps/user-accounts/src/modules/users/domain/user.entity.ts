@@ -16,14 +16,19 @@ export class UserEntity implements IUser {
 
   private constructor() {}
 
-  static create(dto: CreateUserDto): UserEntity {
+  static create(
+    dto: CreateUserDto,
+    emailConfirmationCodeLifetimeInMinutes: number,
+  ): UserEntity {
     const entity = new UserEntity();
 
     entity.email = dto.email;
     entity.username = dto.username;
     entity.passwordHash = dto.passwordHash;
     entity.deletedAt = null;
-    entity.emailConfirmation = UserEmailConfirmationEntity.create();
+    entity.emailConfirmation = UserEmailConfirmationEntity.create(
+      emailConfirmationCodeLifetimeInMinutes,
+    );
     entity.recoveryPassword = null;
 
     return entity;
@@ -43,5 +48,17 @@ export class UserEntity implements IUser {
     });
 
     return entity;
+  }
+
+  isEmailConfirmationCodeExpired(): boolean {
+    return this.emailConfirmation.isEmailConfirmationCodeExpired();
+  }
+
+  isEmailConfirmationCodeVerified(): boolean {
+    return this.emailConfirmation.isEmailConfirmationCodeVerified();
+  }
+
+  confirmEmail(code: string): void {
+    this.emailConfirmation.confirmEmail(code);
   }
 }

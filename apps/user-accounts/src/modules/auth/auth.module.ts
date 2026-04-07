@@ -3,10 +3,17 @@ import { AuthController } from './api/auth.controller';
 import { CryptoService } from './application/crypto.service';
 import { RegisterUserUseCase } from './application/commands/register-user.usecase';
 import { UsersModule } from '../users/users.module';
+import { ConfirmRegistrationUseCase } from './application/commands/confirm-registration.usecase';
+import { AuthConfig } from './auth.config';
 
 @Module({
   imports: [UsersModule],
   controllers: [AuthController],
-  providers: [CryptoService, RegisterUserUseCase],
+  providers: [
+    CryptoService,
+    RegisterUserUseCase,
+    ConfirmRegistrationUseCase,
+    AuthConfig,
+  ],
 })
 export class AuthModule {}
