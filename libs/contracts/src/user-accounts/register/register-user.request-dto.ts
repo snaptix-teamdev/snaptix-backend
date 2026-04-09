@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 
-export const RequestSchema = z.object({
+export const registerUserSchema = z.object({
   username: z
     .string()
     .trim()
@@ -21,4 +21,4 @@ export const RequestSchema = z.object({
     ),
 });
 
-export class RegisterUserRequestDto extends createZodDto(RequestSchema) {}
+export class RegisterUserRequestDto extends createZodDto(registerUserSchema) {}

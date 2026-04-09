@@ -1,6 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { RecaptchaGuard } from '../guards/recaptcha.guard';
-import { PassRecoveryInputDto } from './input-dto/pass-recovery.input-dto';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
   RegisterUserRequestDto,
@@ -17,12 +15,10 @@ import { ConfirmRegistrationCommand } from '../application/commands/confirm-regi
 export class AuthController {
   constructor(private commandBus: CommandBus) {}
 
-  //TODO: Перенести RecaptchaGuard и его логику вместе с env в gateway
-  @Post('password-recovery')
-  @UseGuards(RecaptchaGuard)
-  passwordRecovery(@Body() body: PassRecoveryInputDto): string {
-    return 'email sent to your email ' + body.email;
-  }
+  // @Post('password-recovery')
+  // passwordRecovery(@Body() body: PassRecoveryInputDto): string {
+  //   return 'email sent to your email ' + body.email;
+  // }
 
   @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.REGISTER_USER)
   async register(

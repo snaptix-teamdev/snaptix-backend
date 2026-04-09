@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
@@ -64,4 +65,10 @@ export class AuthController {
 
     return firstValueFrom(result);
   }
+
+  /**
+   * Получение информации о текущем юзере
+   */
+  @Get('me')
+  getMe() {}
 }
