@@ -56,6 +56,15 @@
         "tsConfigPath": "apps/gateway/tsconfig.app.json"
       }
     },
+    "notifications": {
+      "type": "application",
+      "root": "apps/notifications",
+      "entryFile": "main",
+      "sourceRoot": "apps/notifications/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notifications/tsconfig.app.json"
+      }
+    },
     "user-accounts": {
       "type": "application",
       "root": "apps/user-accounts",

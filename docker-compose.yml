@@ -20,6 +20,21 @@ services:
       timeout: 5s
       retries: 30
 
+  snaptix-rabbitmq:
+    image: rabbitmq:4-management
+    container_name: snaptix-rabbitmq
+    hostname: snaptix-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+
 volumes:
   snaptix-user-accounts-db:
 networks:
