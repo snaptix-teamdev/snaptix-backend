@@ -1,7 +1,7 @@
-export class UserContextDTO {
+export class UserContextDto {
   userId: string;
 }
 
-export class UserOptionalContextDTO {
+export class UserOptionalContextDto {
   userId: string | null;
 }

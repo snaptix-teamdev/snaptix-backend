@@ -4,7 +4,7 @@ export const GATEWAY_ERRORS = {
   RECAPTCHA_INVALID: {
     code: 'RECAPTCHA_INVALID',
     message: 'Incorrect recaptcha',
-    httpCode: 400,
+    httpCode: 401,
     field: 'recaptchaToken',
   },
 } satisfies Record<

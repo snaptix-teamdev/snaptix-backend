@@ -26,7 +26,7 @@ export class RecaptchaGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
-    const token = (request.body as PasswordForgotRequestDto).recaptchaToken;
+    const token = (request.body as PasswordForgotRequestDto)?.recaptchaToken;
 
     if (!token) {
       throw new DomainException(GATEWAY_ERRORS.RECAPTCHA_INVALID);

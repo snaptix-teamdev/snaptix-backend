@@ -36,6 +36,12 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 409,
     field: 'code',
   },
+  USER_NOT_FOUND: {
+    code: 'USER_NOT_FOUND',
+    message: 'User not found',
+    httpCode: 404,
+    field: 'id',
+  },
 } satisfies Record<
   string,
   IDomainError<IUser | IUserEmailConfirmation | IUserRecoveryPassword>

@@ -33,6 +33,12 @@ export default tseslint.config(
     },
   },
   {
+    files: ['libs/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-namespace': 'off',
+    },
+  },
+  {
     ignores: ['node_modules/'],
   },
 );

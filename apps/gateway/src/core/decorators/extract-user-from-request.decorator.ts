@@ -1,15 +1,15 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import {
-  UserContextDTO,
-  UserOptionalContextDTO,
+  UserContextDto,
+  UserOptionalContextDto,
 } from '../dto/user-context.dto';
 
 interface RequestWithUser extends Request {
-  user?: UserContextDTO;
+  user?: UserContextDto;
 }
 
 export const ExtractUserFromRequest = createParamDecorator(
-  (data: unknown, context: ExecutionContext): UserContextDTO => {
+  (data: unknown, context: ExecutionContext): UserContextDto => {
     const request: RequestWithUser = context.switchToHttp().getRequest();
 
     if (!request.user) {
@@ -21,7 +21,7 @@ export const ExtractUserFromRequest = createParamDecorator(
 );
 
 export const ExtractUserOptionalFromRequest = createParamDecorator(
-  (data: unknown, context: ExecutionContext): UserOptionalContextDTO => {
+  (data: unknown, context: ExecutionContext): UserOptionalContextDto => {
     const request: RequestWithUser = context.switchToHttp().getRequest();
 
     return request.user ?? { userId: null };
