@@ -6,6 +6,12 @@
     "deleteOutDir": true,
     "webpack": true,
     "tsConfigPath": "apps/gateway/tsconfig.app.json",
+    "assets": [
+      {
+        "include": "**/*.hbs",
+        "watchAssets": true
+      }
+    ],
     "plugins": [
       {
         "name": "@nestjs/swagger",
