@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { CoreConfig } from './core.config';
+import { CoreConfig } from './config/core.config';
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { USER_ACCOUNTS_EXCHANGE } from '@snaptix/contracts';
 
