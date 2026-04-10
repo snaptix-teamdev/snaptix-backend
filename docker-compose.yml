@@ -34,6 +34,19 @@ services:
       timeout: 10s
       retries: 30
 
+  snaptix-maildev:
+    image: maildev/maildev:2.2.1
+    container_name: snaptix-maildev
+    hostname: snaptix-maildev
+    restart: unless-stopped
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:1080/ > /dev/null 2>&1" ]
+      interval: 2s
+      timeout: 5s
+      retries: 30
 
 volumes:
   snaptix-user-accounts-db:

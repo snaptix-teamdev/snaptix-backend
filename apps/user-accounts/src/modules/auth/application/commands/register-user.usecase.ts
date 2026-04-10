@@ -2,10 +2,15 @@ import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DomainException, IUser } from '@snaptix/common';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { UserEntity } from '../../../users/domain/user.entity';
-import { USER_ACCOUNTS_ERRORS } from '@snaptix/contracts';
+import {
+  USER_ACCOUNTS_ERRORS,
+  USER_ACCOUNTS_EXCHANGE,
+  UserRegisteredEvent,
+} from '@snaptix/contracts';
 import { CryptoService } from '../crypto.service';
 import { AuthConfig } from '../../auth.config';
 import { USER_EVENTS } from '@snaptix/contracts/constants/events';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 
 class RegisterUserCommandRequest {
   email: string;
@@ -28,6 +33,7 @@ export class RegisterUserUseCase implements ICommandHandler<
     private usersRepository: UsersRepository,
     private cryptoService: CryptoService,
     private authConfig: AuthConfig,
+    private amqpConnection: AmqpConnection,
   ) {}
 
   async execute({ dto }: RegisterUserCommand): Promise<void> {
@@ -49,7 +55,7 @@ export class RegisterUserUseCase implements ICommandHandler<
 
     const savedUserWithId = await this.usersRepository.create(user);
 
-    this.emitUserCreated(savedUserWithId);
+    await this.emitUserCreated(savedUserWithId);
   }
 
   private async checkExistsEmailOrUsername(payload: {
@@ -72,13 +78,18 @@ export class RegisterUserUseCase implements ICommandHandler<
     }
   }
 
-  private emitUserCreated(createdUser: IUser) {
-    // await sendToRabbitMQ(USER_EVENTS.USER_CREATED, {...});
-    console.log(USER_EVENTS.USER_CREATED, {
+  private async emitUserCreated(createdUser: IUser): Promise<void> {
+    const payload: UserRegisteredEvent = {
       userId: createdUser.id,
       username: createdUser.username,
       email: createdUser.email,
       emailConfirmationCode: createdUser.emailConfirmation.code,
-    });
+    };
+
+    await this.amqpConnection.publish(
+      USER_ACCOUNTS_EXCHANGE,
+      USER_EVENTS.USER_REGISTERED,
+      payload,
+    );
   }
 }

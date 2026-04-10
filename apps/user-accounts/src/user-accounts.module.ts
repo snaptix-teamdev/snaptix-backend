@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { configModule } from './core/config/config-module';
-import { CoreModule } from './core/config/core-config.module';
+import { CoreModule } from './core/core.module';
 import { UsersModule } from './modules/users/users.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { InfrastructureModule } from './infrastructure/infrastructure.module';
