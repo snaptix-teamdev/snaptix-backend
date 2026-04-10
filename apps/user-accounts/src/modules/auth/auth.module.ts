@@ -6,6 +6,7 @@ import { UsersModule } from '../users/users.module';
 import { ConfirmRegistrationUseCase } from './application/commands/confirm-registration.usecase';
 import { AuthConfig } from './auth.config';
 import { GetMeQueryHandler } from './application/queries/get-me.usecase';
+import { ForgotPasswordUseCase } from './application/commands/forgot-password.usecase';
 
 @Module({
   imports: [UsersModule],
@@ -16,6 +17,7 @@ import { GetMeQueryHandler } from './application/queries/get-me.usecase';
     ConfirmRegistrationUseCase,
     AuthConfig,
     GetMeQueryHandler,
+    ForgotPasswordUseCase,
   ],
 })
 export class AuthModule {}

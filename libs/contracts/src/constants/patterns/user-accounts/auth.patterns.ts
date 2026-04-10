@@ -2,4 +2,5 @@ export const AUTH_PATTERNS = {
   REGISTER_USER: 'auth.register-user',
   REGISTRATION_CONFIRMATION: 'auth.registration-confirmation',
   GET_ME: 'auth.get-me',
+  FORGOT_PASSWORD: 'auth.forgot-password',
 } as const;

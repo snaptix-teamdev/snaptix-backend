@@ -61,7 +61,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.18",
     "@nestjs/schedule": "^6.1.1",
-    "@nestjs/swagger": "^11.2.7",
+    "@nestjs/swagger": "^11.2.6",
     "@node-rs/argon2": "^2.0.2",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",

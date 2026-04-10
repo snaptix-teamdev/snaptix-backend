@@ -42,6 +42,7 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
       const zodError = exception.getZodError() as ZodError;
       const errors = zodError.issues.map((error) => {
         return {
+          status: HttpStatus.BAD_REQUEST,
           code: error.code,
           field: error.path[0],
           message: error.message,
@@ -64,9 +65,14 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
       });
 
       response.status(exception.getStatus()).json({
-        statusCode: exception.getStatus(),
-        code: HttpStatus[exception.getStatus()],
-        message: exception.message,
+        errors: [
+          {
+            status: exception.getStatus(),
+            code: HttpStatus[exception.getStatus()],
+            field: null,
+            message: exception.message,
+          },
+        ],
       });
       return;
     }
@@ -77,6 +83,7 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
       response.status(exception.httpCode).json({
         errors: [
           {
+            status: exception.httpCode,
             code: exception.code,
             field: exception.field,
             message: exception.message,
@@ -91,6 +98,7 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
     response.status(internalException.httpCode).json({
       errors: [
         {
+          status: internalException.httpCode,
           code: internalException.code,
           field: internalException.field,
           message: internalException.message,

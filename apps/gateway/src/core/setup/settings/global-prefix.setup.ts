@@ -1,5 +1,5 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 export function globalPrefixSetup(app: NestExpressApplication) {
-  app.setGlobalPrefix('app');
+  app.setGlobalPrefix('api');
 }

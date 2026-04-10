@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
+  ForgotPasswordRequestDto,
+  ForgotPasswordResponseDto,
   GetMePayload,
   GetMeResponseDto,
   MICROSERVICE_NAME,
@@ -28,8 +30,11 @@ import { AccessTokenAuthGuard } from '../../core/guards/bearer/access-token.guar
 import { ExtractUserFromRequest } from '../../core/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '../../core/dto/user-context.dto';
 import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.swagger';
+import { ForgotPasswordPayload } from '@snaptix/contracts/user-accounts/password-forgot/forgot-password.payload';
+import { ApiForbiddenCustomResponse } from '../../core/swagger/forbidden.swagger';
+import { RecaptchaGuard } from '../../core/guards/recaptcha/recaptcha.guard';
 
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(
     @Inject(MICROSERVICE_NAME.USER_ACCOUNTS) private userAccounts: ClientProxy,
@@ -91,5 +96,25 @@ export class AuthController {
     );
 
     return firstValueFrom(result);
+  }
+
+  /**
+   * Запросить код сброса пароля на почту
+   */
+  @Post('password/forgot')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(RecaptchaGuard)
+  @ApiForbiddenCustomResponse()
+  @ApiBadRequestCustomResponse()
+  @ApiTooManyRequestsCustomResponse()
+  async forgotPassword(@Body() body: ForgotPasswordRequestDto): Promise<void> {
+    const result = this.userAccounts.send<
+      ForgotPasswordResponseDto,
+      ForgotPasswordPayload
+    >(USER_ACCOUNTS_PATTERNS.AUTH.FORGOT_PASSWORD, {
+      email: body.email,
+    });
+
+    await firstValueFrom(result);
   }
 }

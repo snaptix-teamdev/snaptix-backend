@@ -61,9 +61,14 @@ export class UsersRepository {
         emailConfirmation: {
           update: emailConfirmation,
         },
-        recoveryPassword: {
-          update: recoveryPassword ?? undefined,
-        },
+        recoveryPassword: recoveryPassword
+          ? {
+              upsert: {
+                create: recoveryPassword,
+                update: recoveryPassword,
+              },
+            }
+          : undefined,
       },
     });
   }
