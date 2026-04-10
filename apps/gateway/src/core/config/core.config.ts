@@ -62,6 +62,11 @@ export class CoreConfig {
   })
   isSwaggerEnabled: boolean;
 
+  @IsNotEmpty({
+    message: 'Set Env variable ACCESS_TOKEN_SECRET, dangerous for security!',
+  })
+  accessTokenSecret: string;
+
   constructor(private configService: ConfigService<any, true>) {
     this.port = parseInt(this.configService.get<string>('PORT'));
 
@@ -84,6 +89,8 @@ export class CoreConfig {
     this.isSwaggerEnabled = configValidationUtility.convertToBoolean(
       this.configService.get('IS_SWAGGER_ENABLED'),
     ) as boolean;
+
+    this.accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
 
     configValidationUtility.validateConfig(this);
   }

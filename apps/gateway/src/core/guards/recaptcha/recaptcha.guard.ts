@@ -1,14 +1,14 @@
 import {
-  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,
   Logger,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { PassRecoveryInputDto } from '../api/input-dto/pass-recovery.input-dto';
 import axios, { AxiosResponse } from 'axios';
-import { CoreConfig } from '../../../core/config/core.config';
+import { CoreConfig } from '../../config/core.config';
+import { GATEWAY_ERRORS, PasswordForgotRequestDto } from '@snaptix/contracts';
+import { DomainException } from '@snaptix/common';
 
 type RecaptchaResponse = {
   success: boolean;
@@ -26,11 +26,10 @@ export class RecaptchaGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
-    const token = (request.body as PassRecoveryInputDto).recaptchaToken;
+    const token = (request.body as PasswordForgotRequestDto)?.recaptchaToken;
 
-    //TODO custom errors
     if (!token) {
-      throw new BadRequestException('No recaptcha token');
+      throw new DomainException(GATEWAY_ERRORS.RECAPTCHA_INVALID);
     }
 
     const response = await axios.request<any, AxiosResponse<RecaptchaResponse>>(
@@ -49,7 +48,7 @@ export class RecaptchaGuard implements CanActivate {
     this.logger.debug(data);
 
     if (!data.success) {
-      throw new BadRequestException('Recaptcha failed');
+      throw new DomainException(GATEWAY_ERRORS.RECAPTCHA_INVALID);
     }
 
     return data.success;
