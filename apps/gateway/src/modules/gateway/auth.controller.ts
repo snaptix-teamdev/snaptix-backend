@@ -32,6 +32,7 @@ import { UserContextDto } from '../../core/dto/user-context.dto';
 import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.swagger';
 import { ForgotPasswordPayload } from '@snaptix/contracts/user-accounts/password-forgot/forgot-password.payload';
 import { ApiForbiddenCustomResponse } from '../../core/swagger/forbidden.swagger';
+import { RecaptchaGuard } from '../../core/guards/recaptcha/recaptcha.guard';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -102,7 +103,7 @@ export class AuthController {
    */
   @Post('password/forgot')
   @HttpCode(HttpStatus.NO_CONTENT)
-  // @UseGuards(RecaptchaGuard)
+  @UseGuards(RecaptchaGuard)
   @ApiForbiddenCustomResponse()
   @ApiBadRequestCustomResponse()
   @ApiTooManyRequestsCustomResponse()
