@@ -29,7 +29,7 @@ import { ExtractUserFromRequest } from '../../core/decorators/extract-user-from-
 import { UserContextDto } from '../../core/dto/user-context.dto';
 import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.swagger';
 
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(
     @Inject(MICROSERVICE_NAME.USER_ACCOUNTS) private userAccounts: ClientProxy,

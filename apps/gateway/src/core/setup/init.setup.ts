@@ -8,6 +8,7 @@ import { ipAddressSetup } from './settings/ip-address.setup';
 import { swaggerSetup } from './settings/swagger.setup';
 import { shutdownHooksSetup } from './settings/shutdown-hooks.setup';
 import { globalPrefixSetup } from './settings/global-prefix.setup';
+import { versioningSetup } from './settings/versioning.setup';
 
 export function initSetup(app: NestExpressApplication): void {
   const coreConfig = app.get(CoreConfig);
@@ -18,6 +19,7 @@ export function initSetup(app: NestExpressApplication): void {
   ipAddressSetup(app);
   shutdownHooksSetup(app);
   globalPrefixSetup(app);
+  versioningSetup(app);
   corsSetup(app, coreConfig);
   swaggerSetup(app, coreConfig);
 }
