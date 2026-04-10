@@ -1,39 +1,35 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ERRORS } from '@snaptix/contracts';
 import { HttpStatus } from '@nestjs/common';
 
-class ConflictErrorMessageType {
+class UnauthorizedErrorMessageType {
   @ApiProperty({
     description: 'The HTTP status code of the response',
-    example: HttpStatus.CONFLICT,
+    example: HttpStatus.UNAUTHORIZED,
   })
   status: HttpStatus;
 
   @ApiProperty({
     description: 'The error code expressed as a string value',
-    example: ERRORS.EMAIL_ALREADY_CONFIRMED.code,
-    enum: Object.values(ERRORS)
-      .filter((error) => error.httpCode === 409)
-      .map((error) => error.code),
+    example: 'UNAUTHORIZED',
   })
   code: string;
 
   @ApiProperty({
     description: 'The name of the field where the error occurred',
-    example: ERRORS.EMAIL_ALREADY_CONFIRMED.field,
+    example: null,
   })
   field: string;
 
   @ApiProperty({
     description: 'Brief description of the problem',
-    example: ERRORS.EMAIL_ALREADY_CONFIRMED.message,
+    example: 'Unauthorized',
   })
   message: string;
 }
 
-export class ConflictErrorsResponseDto {
+export class UnauthorizedErrorsResponseDto {
   /**
    * List of validation errors
    */
-  errors: ConflictErrorMessageType[];
+  errors: UnauthorizedErrorMessageType[];
 }

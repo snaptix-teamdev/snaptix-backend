@@ -1,14 +1,14 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   Logger,
 } from '@nestjs/common';
 import { Request } from 'express';
 import axios, { AxiosResponse } from 'axios';
 import { CoreConfig } from '../../config/core.config';
-import { GATEWAY_ERRORS, PasswordForgotRequestDto } from '@snaptix/contracts';
-import { DomainException } from '@snaptix/common';
+import { ForgotPasswordRequestDto } from '@snaptix/contracts';
 
 type RecaptchaResponse = {
   success: boolean;
@@ -26,10 +26,11 @@ export class RecaptchaGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
-    const token = (request.body as PasswordForgotRequestDto)?.recaptchaToken;
+    const token = (request.body as ForgotPasswordRequestDto)?.recaptchaToken;
 
     if (!token) {
-      throw new DomainException(GATEWAY_ERRORS.RECAPTCHA_INVALID);
+      // throw new DomainException(GATEWAY_ERRORS.RECAPTCHA_INVALID);
+      throw new ForbiddenException();
     }
 
     const response = await axios.request<any, AxiosResponse<RecaptchaResponse>>(
@@ -48,7 +49,8 @@ export class RecaptchaGuard implements CanActivate {
     this.logger.debug(data);
 
     if (!data.success) {
-      throw new DomainException(GATEWAY_ERRORS.RECAPTCHA_INVALID);
+      // throw new DomainException(GATEWAY_ERRORS.RECAPTCHA_INVALID);
+      throw new ForbiddenException();
     }
 
     return data.success;

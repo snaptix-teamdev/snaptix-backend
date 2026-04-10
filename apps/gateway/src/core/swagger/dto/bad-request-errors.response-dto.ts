@@ -1,7 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ZodIssueCode } from 'zod/v4';
+import { HttpStatus } from '@nestjs/common';
 
 class BadRequestErrorMessageType {
+  @ApiProperty({
+    description: 'The HTTP status code of the response',
+    example: HttpStatus.BAD_REQUEST,
+  })
+  status: HttpStatus;
+
   @ApiProperty({
     description: 'The error code expressed as a string value',
     example: ZodIssueCode.invalid_format,
