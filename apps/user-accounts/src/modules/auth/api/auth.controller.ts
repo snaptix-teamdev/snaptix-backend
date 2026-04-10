@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
+  ForgotPasswordResponseDto,
   GetMePayload,
   GetMeResponseDto,
   RegisterUserRequestDto,
@@ -13,6 +14,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/commands/register-user.usecase';
 import { ConfirmRegistrationCommand } from '../application/commands/confirm-registration.usecase';
 import { GetMeQuery } from '../application/queries/get-me.usecase';
+import { ForgotPasswordPayload } from '@snaptix/contracts/user-accounts/password-forgot/forgot-password.payload';
+import { ForgotPasswordCommand } from '../application/commands/forgot-password.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -47,5 +50,14 @@ export class AuthController {
   @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.GET_ME)
   async getMe(@Payload() payload: GetMePayload): Promise<GetMeResponseDto> {
     return this.queryBus.execute(new GetMeQuery(payload));
+  }
+
+  @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.FORGOT_PASSWORD)
+  async forgotPassword(
+    @Payload() payload: ForgotPasswordPayload,
+  ): Promise<ForgotPasswordResponseDto> {
+    await this.commandBus.execute(new ForgotPasswordCommand(payload));
+
+    return {};
   }
 }

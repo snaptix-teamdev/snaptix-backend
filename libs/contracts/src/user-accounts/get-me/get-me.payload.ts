@@ -1,5 +1,8 @@
-import { IUser } from '@snaptix/common';
+import { z } from 'zod';
+import { createZodDto } from 'nestjs-zod';
 
-export class GetMePayload implements Pick<IUser, 'id'> {
-  id: string;
-}
+const getMePayloadSchema = z.object({
+  id: z.string().trim().uuid(),
+});
+
+export class GetMePayload extends createZodDto(getMePayloadSchema) {}

@@ -61,4 +61,17 @@ export class UserEntity implements IUser {
   confirmEmail(code: string): void {
     this.emailConfirmation.confirmEmail(code);
   }
+
+  createPasswordRecoveryCode(passwordResetCodeTtlHours: number): string {
+    if (this.recoveryPassword) {
+      this.recoveryPassword.generateRecoveryCode(passwordResetCodeTtlHours);
+    } else {
+      this.recoveryPassword = UserRecoveryPasswordEntity.create({
+        userId: this.id,
+        passwordResetCodeTtlHours,
+      });
+    }
+
+    return this.recoveryPassword.code;
+  }
 }

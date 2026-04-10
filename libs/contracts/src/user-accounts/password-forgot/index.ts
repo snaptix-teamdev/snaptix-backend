@@ -1,2 +1,2 @@
-export * from './password-forgot.request-dto';
-export * from './password-forgot.response-dto';
+export * from './forgot-password.request-dto';
+export * from './forgot-password.response-dto';
