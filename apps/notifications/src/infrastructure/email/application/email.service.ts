@@ -18,6 +18,7 @@ interface SendEmailPayload {
 enum TemplateName {
   ConfirmEmailRegistration = 'confirm-email-registration',
   ResetPassword = 'reset-password',
+  PasswordChanged = 'password-changed',
 }
 
 @Injectable()
@@ -44,6 +45,21 @@ export class EmailService {
         username: payload.username,
         passwordResetCode: payload.passwordResetCode,
         passwordResetCodeTtlHours: payload.passwordResetCodeTtlHours,
+      },
+    });
+  }
+
+  async passwordChanged(payload: {
+    email: string;
+    username: string;
+  }): Promise<void> {
+    await this.sendEmail({
+      email: payload.email,
+      subject: 'Пароль успешно изменён',
+      templateName: TemplateName.PasswordChanged,
+      context: {
+        appBaseUrl: this.emailConfig.appBaseUrl,
+        username: payload.username,
       },
     });
   }
