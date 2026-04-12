@@ -17,6 +17,7 @@ export class SessionEntity implements ISession {
     const entity = new SessionEntity();
 
     entity.userId = dto.userId;
+    entity.deviceId = dto.deviceId;
     entity.deviceName = dto.deviceName;
     entity.ip = dto.ip;
     entity.issuedAt = dto.issuedAt;

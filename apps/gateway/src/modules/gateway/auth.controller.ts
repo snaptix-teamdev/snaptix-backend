@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
@@ -36,6 +37,12 @@ import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.s
 import { ForgotPasswordPayload } from '@snaptix/contracts/user-accounts/password-forgot/forgot-password.payload';
 import { ApiForbiddenCustomResponse } from '../../core/swagger/forbidden.swagger';
 import { RecaptchaGuard } from '../../core/guards/recaptcha/recaptcha.guard';
+import { LoginRequestDto } from '@snaptix/contracts/user-accounts/login/login.request-dto';
+import { LoginResponseDto } from '@snaptix/contracts/user-accounts/login/login.response-dto';
+import { ExtractClientDetails } from '../../core/decorators/extract-client-details.decorator';
+import { ClientDetailsRequestDto } from '@snaptix/contracts/user-accounts/login/client-details.request-dto';
+import { Response } from 'express';
+import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -142,5 +149,35 @@ export class AuthController {
     });
 
     return firstValueFrom(result);
+  }
+
+  /**
+   * Вход в систему
+   */
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Body() body: LoginRequestDto,
+    @ExtractClientDetails() clientDetails: ClientDetailsRequestDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginResponseDto> {
+    const result = this.userAccounts.send<AccessAndRefreshTokensDto>(
+      USER_ACCOUNTS_PATTERNS.AUTH.LOGIN,
+      {
+        email: body.email,
+        password: body.password,
+        ip: clientDetails.ip,
+        deviceName: clientDetails.deviceName,
+      },
+    );
+
+    const tokens = await firstValueFrom(result);
+
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken: tokens.accessToken };
   }
 }

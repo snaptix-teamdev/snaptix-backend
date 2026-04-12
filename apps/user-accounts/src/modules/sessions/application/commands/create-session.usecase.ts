@@ -4,6 +4,7 @@ import { SessionsRepository } from '../../infrastructure/sessions.repository';
 
 class CreateSessionCommandRequest {
   userId: string;
+  deviceId: string;
   deviceName: string;
   ip: string;
   issuedAt: Date;
@@ -26,6 +27,7 @@ export class CreateSessionUseCase implements ICommandHandler<
   async execute({ dto }: CreateSessionCommand): Promise<void> {
     const session: SessionEntity = SessionEntity.create({
       userId: dto.userId,
+      deviceId: dto.deviceId,
       deviceName: dto.deviceName,
       ip: dto.ip,
       issuedAt: dto.issuedAt,

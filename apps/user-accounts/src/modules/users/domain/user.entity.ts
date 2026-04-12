@@ -54,7 +54,7 @@ export class UserEntity implements IUser {
     return this.emailConfirmation.isEmailConfirmationCodeExpired();
   }
 
-  isEmailConfirmationCodeVerified(): boolean {
+  isEmailVerified(): boolean {
     return this.emailConfirmation.isEmailConfirmationCodeVerified();
   }
 
