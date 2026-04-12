@@ -17,6 +17,7 @@ interface SendEmailPayload {
 // names of template files in the "templates" folder
 enum TemplateName {
   ConfirmEmailRegistration = 'confirm-email-registration',
+  ResetPassword = 'reset-password',
 }
 
 @Injectable()
@@ -28,6 +29,25 @@ export class EmailService {
     private emailConfig: EmailConfig,
   ) {}
 
+  async resetPasswordRequested(payload: {
+    email: string;
+    username: string;
+    passwordResetCode: string;
+    passwordResetCodeTtlHours: number;
+  }): Promise<void> {
+    await this.sendEmail({
+      email: payload.email,
+      subject: 'Сброс пароля',
+      templateName: TemplateName.ResetPassword,
+      context: {
+        appBaseUrl: this.emailConfig.appBaseUrl,
+        username: payload.username,
+        passwordResetCode: payload.passwordResetCode,
+        passwordResetCodeTtlHours: payload.passwordResetCodeTtlHours,
+      },
+    });
+  }
+
   async confirmEmailRegistration(payload: {
     email: string;
     emailConfirmationCode: string;
@@ -36,7 +56,10 @@ export class EmailService {
       email: payload.email,
       subject: 'Подтверждение почты',
       templateName: TemplateName.ConfirmEmailRegistration,
-      context: { confirmationCode: payload.emailConfirmationCode },
+      context: {
+        appBaseUrl: this.emailConfig.appBaseUrl,
+        confirmationCode: payload.emailConfirmationCode,
+      },
     });
   }
 

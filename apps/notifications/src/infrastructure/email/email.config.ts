@@ -43,6 +43,11 @@ export class EmailConfig {
   })
   mailIgnoreTLS: boolean;
 
+  @IsNotEmpty({
+    message: 'Set Env variable APP_BASE_URL, example: https://example.ru',
+  })
+  appBaseUrl: string;
+
   constructor(private configService: ConfigService<any, true>) {
     this.mailHost = this.configService.get<string>('MAIL_HOST');
 
@@ -61,6 +66,8 @@ export class EmailConfig {
     this.mailIgnoreTLS = configValidationUtility.convertToBoolean(
       this.configService.get('MAIL_IGNORE_TLS'),
     ) as boolean;
+
+    this.appBaseUrl = this.configService.get<string>('APP_BASE_URL');
 
     configValidationUtility.validateConfig(this);
   }
