@@ -19,7 +19,7 @@ export class UserRegisteredHandler {
     queue: 'notifications.user-accounts.queue',
   })
   async handle(event: UserRegisteredEvent): Promise<void> {
-    this.logger.log(`User registered: ${event.email} (id: ${event.userId})`);
+    this.logger.debug(`User registered: ${event.email} (id: ${event.userId})`);
 
     await this.emailService.confirmEmailRegistration({
       email: event.email,
