@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 export class UserRecoveryPasswordEntity implements IUserRecoveryPassword {
   id: string;
   code: string;
+  isCodeAlreadyUsed: boolean;
   userId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +21,7 @@ export class UserRecoveryPasswordEntity implements IUserRecoveryPassword {
 
     entity.userId = payload.userId;
     entity.code = randomUUID();
+    entity.isCodeAlreadyUsed = false;
     entity.expiresAt = add(new Date(), {
       hours: payload.passwordResetCodeTtlHours,
     });
@@ -35,8 +37,32 @@ export class UserRecoveryPasswordEntity implements IUserRecoveryPassword {
 
   generateRecoveryCode(passwordResetCodeTtlHours: number): void {
     this.code = randomUUID();
+    this.isCodeAlreadyUsed = false;
     this.expiresAt = add(new Date(), {
       hours: passwordResetCodeTtlHours,
     });
+  }
+
+  isPasswordRecoveryCodeExpired(): boolean {
+    return this.expiresAt < new Date();
+  }
+
+  isPasswordRecoveryCodeAlreadyUsed(): boolean {
+    return this.isCodeAlreadyUsed;
+  }
+
+  isPasswordCanBeResetByCode(): boolean {
+    return (
+      !this.isPasswordRecoveryCodeExpired() &&
+      !this.isPasswordRecoveryCodeAlreadyUsed()
+    );
+  }
+
+  markRecoveryPasswordCodeAsUsed(code: string): void {
+    if (!this.isPasswordCanBeResetByCode())
+      throw new Error(`recovery code already used or expired`);
+    if (this.code !== code) throw new Error(`invalid reset password code`);
+
+    this.isCodeAlreadyUsed = true;
   }
 }

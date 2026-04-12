@@ -91,6 +91,7 @@
     "@nestjs/testing": "^11.1.18",
     "@swc/cli": "^0.8.1",
     "@swc/core": "^1.15.24",
+    "@types/amqplib": "^0.10.8",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",

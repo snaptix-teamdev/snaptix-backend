@@ -164,4 +164,32 @@ export class UsersRepository {
       recoveryPassword: result.recoveryPassword,
     });
   }
+
+  async findByRecoveryPasswordCode(code: string): Promise<UserEntity | null> {
+    const result = await this.prisma.user.findFirst({
+      where: {
+        recoveryPassword: {
+          code,
+        },
+      },
+      include: {
+        emailConfirmation: true,
+        recoveryPassword: true,
+      },
+    });
+
+    if (!result) {
+      return null;
+    }
+
+    if (!result.emailConfirmation) {
+      throw new Error('user email confirmation is missing');
+    }
+
+    return this.userConverter.fromPrismaModelToEntity({
+      ...result,
+      emailConfirmation: result.emailConfirmation,
+      recoveryPassword: result.recoveryPassword,
+    });
+  }
 }
