@@ -42,6 +42,24 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 404,
     field: 'id',
   },
+  USER_PASSWORD_RECOVERY_CODE_NOT_FOUND: {
+    code: 'USER_PASSWORD_RECOVERY_CODE_NOT_FOUND',
+    message: 'User password recovery code not found',
+    httpCode: 404,
+    field: 'code',
+  },
+  USER_PASSWORD_RECOVERY_CODE_EXPIRED: {
+    code: 'USER_PASSWORD_RECOVERY_CODE_EXPIRED',
+    message: 'User password recovery code expired',
+    httpCode: 409,
+    field: 'code',
+  },
+  USER_PASSWORD_RECOVERY_CODE_ALREADY_USED: {
+    code: 'USER_PASSWORD_RECOVERY_CODE_ALREADY_USED',
+    message: 'User password recovery code already used',
+    httpCode: 409,
+    field: 'code',
+  },
 } satisfies Record<
   string,
   IDomainError<IUser | IUserEmailConfirmation | IUserRecoveryPassword>

@@ -57,13 +57,14 @@ model UserEmailConfirmation {
 }
 
 model UserRecoveryPassword {
-  id        String   @id @default(uuid(7)) @db.Uuid
-  code      String   @unique @default(uuid(7)) @map("code") @db.Uuid
-  expiresAt DateTime @map("expires_at") @db.Timestamptz()
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
-  userId    String   @unique @map("user_id") @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], name: "UserRecoveryPassword")
+  id                String   @id @default(uuid(7)) @db.Uuid
+  code              String   @unique @default(uuid(7)) @map("code") @db.Uuid
+  isCodeAlreadyUsed Boolean  @default(false) @map("is_code_already_used") @db.Boolean
+  expiresAt         DateTime @map("expires_at") @db.Timestamptz()
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  userId            String   @unique @map("user_id") @db.Uuid
+  user              User     @relation(fields: [userId], references: [id], name: "UserRecoveryPassword")
 
   @@map("user_recovery_password")
 }

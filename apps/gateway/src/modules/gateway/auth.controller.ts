@@ -19,6 +19,9 @@ import {
   RegisterUserResponseDto,
   RegistrationConfirmationRequestDto,
   RegistrationConfirmationResponseDto,
+  ResetPasswordPayload,
+  ResetPasswordRequestDto,
+  ResetPasswordResponseDto,
   USER_ACCOUNTS_PATTERNS,
 } from '@snaptix/contracts';
 import { firstValueFrom } from 'rxjs';
@@ -116,5 +119,28 @@ export class AuthController {
     });
 
     await firstValueFrom(result);
+  }
+
+  /**
+   * Сбросить пароль по коду
+   */
+  @Post('password/reset')
+  @HttpCode(HttpStatus.OK)
+  @ApiBadRequestCustomResponse()
+  @ApiNotFoundCustomResponse()
+  @ApiConflictCustomResponse()
+  @ApiTooManyRequestsCustomResponse()
+  async resetPassword(
+    @Body() body: ResetPasswordRequestDto,
+  ): Promise<ResetPasswordResponseDto> {
+    const result = this.userAccounts.send<
+      ResetPasswordResponseDto,
+      ResetPasswordPayload
+    >(USER_ACCOUNTS_PATTERNS.AUTH.RESET_PASSWORD, {
+      code: body.code,
+      password: body.password,
+    });
+
+    return firstValueFrom(result);
   }
 }

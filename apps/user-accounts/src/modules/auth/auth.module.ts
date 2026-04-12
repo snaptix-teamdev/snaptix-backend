@@ -7,6 +7,7 @@ import { ConfirmRegistrationUseCase } from './application/commands/confirm-regis
 import { AuthConfig } from './auth.config';
 import { GetMeQueryHandler } from './application/queries/get-me.usecase';
 import { ForgotPasswordUseCase } from './application/commands/forgot-password.usecase';
+import { ResetPasswordUsecase } from './application/commands/reset-password.usecase';
 
 @Module({
   imports: [UsersModule],
@@ -18,6 +19,7 @@ import { ForgotPasswordUseCase } from './application/commands/forgot-password.us
     AuthConfig,
     GetMeQueryHandler,
     ForgotPasswordUseCase,
+    ResetPasswordUsecase,
   ],
 })
 export class AuthModule {}

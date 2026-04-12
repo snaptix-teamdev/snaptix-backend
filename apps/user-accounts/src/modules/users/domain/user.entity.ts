@@ -74,4 +74,32 @@ export class UserEntity implements IUser {
 
     return this.recoveryPassword.code;
   }
+
+  isPasswordRecoveryCodeExpired(): boolean {
+    if (!this.recoveryPassword) {
+      throw new Error('user does not have recovery password');
+    }
+
+    return this.recoveryPassword.isPasswordRecoveryCodeExpired();
+  }
+
+  isPasswordRecoveryCodeAlreadyUsed(): boolean {
+    if (!this.recoveryPassword) {
+      throw new Error('user does not have recovery password');
+    }
+
+    return this.recoveryPassword.isPasswordRecoveryCodeAlreadyUsed();
+  }
+
+  resetPasswordByRecoveryCode(payload: {
+    code: string;
+    newPasswordHash: string;
+  }): void {
+    if (!this.recoveryPassword) {
+      throw new Error('user does not have recovery password');
+    }
+
+    this.recoveryPassword.markRecoveryPasswordCodeAsUsed(payload.code);
+    this.passwordHash = payload.newPasswordHash;
+  }
 }
