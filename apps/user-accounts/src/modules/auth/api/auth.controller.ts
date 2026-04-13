@@ -18,6 +18,9 @@ import { ConfirmRegistrationCommand } from '../application/commands/confirm-regi
 import { GetMeQuery } from '../application/queries/get-me.usecase';
 import { ForgotPasswordPayload } from '@snaptix/contracts/user-accounts/password-forgot/forgot-password.payload';
 import { ForgotPasswordCommand } from '../application/commands/forgot-password.usecase';
+import { LoginPayload } from '@snaptix/contracts/user-accounts/login/login.payload';
+import { LoginUserCommand } from '../application/commands/login-user.usecase';
+import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 import { ResetPasswordCommand } from '../application/commands/reset-password.usecase';
 
 @Controller('auth')
@@ -71,5 +74,19 @@ export class AuthController {
     await this.commandBus.execute(new ResetPasswordCommand(payload));
 
     return {};
+  }
+
+  @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.LOGIN)
+  async login(
+    @Payload() payload: LoginPayload,
+  ): Promise<AccessAndRefreshTokensDto> {
+    return this.commandBus.execute(
+      new LoginUserCommand({
+        email: payload.email,
+        password: payload.password,
+        ip: payload.ip,
+        deviceName: payload.deviceName,
+      }),
+    );
   }
 }

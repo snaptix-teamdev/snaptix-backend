@@ -36,6 +36,12 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 409,
     field: 'code',
   },
+  USER_EMAIL_NOT_CONFIRMED: {
+    code: 'USER_EMAIL_NOT_CONFIRMED',
+    message: 'User email not confirmed',
+    httpCode: 403,
+    field: 'email',
+  },
   USER_NOT_FOUND: {
     code: 'USER_NOT_FOUND',
     message: 'User not found',

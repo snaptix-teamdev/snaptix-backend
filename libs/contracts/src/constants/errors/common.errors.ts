@@ -19,4 +19,10 @@ export const COMMON_ERRORS = {
     httpCode: 409,
     field: null,
   },
+  UNAUTHORIZED_ERROR: {
+    code: 'UNAUTHORIZED_ERROR',
+    message: 'Unauthorized',
+    httpCode: 401,
+    field: null,
+  },
 } satisfies Record<string, IDomainError>;

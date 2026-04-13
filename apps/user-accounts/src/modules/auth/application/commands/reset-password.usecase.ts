@@ -1,6 +1,6 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { CryptoService } from '../crypto.service';
+
 import { UserEntity } from '../../../users/domain/user.entity';
 import { DomainException, IUser } from '@snaptix/common';
 import {
@@ -10,6 +10,7 @@ import {
   USER_EVENTS,
 } from '@snaptix/contracts';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { CryptoService } from '../services/crypto.service';
 
 class ResetPasswordCommandRequest {
   password: string;
@@ -23,7 +24,7 @@ export class ResetPasswordCommand extends Command<void> {
 }
 
 @CommandHandler(ResetPasswordCommand)
-export class ResetPasswordUsecase implements ICommandHandler<
+export class ResetPasswordUseCase implements ICommandHandler<
   ResetPasswordCommand,
   void
 > {

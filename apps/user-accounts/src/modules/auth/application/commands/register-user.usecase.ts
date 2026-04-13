@@ -7,7 +7,7 @@ import {
   USER_ACCOUNTS_EXCHANGE,
   UserRegisteredEvent,
 } from '@snaptix/contracts';
-import { CryptoService } from '../crypto.service';
+import { CryptoService } from '../services/crypto.service';
 import { AuthConfig } from '../../auth.config';
 import { USER_EVENTS } from '@snaptix/contracts/constants/events';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';

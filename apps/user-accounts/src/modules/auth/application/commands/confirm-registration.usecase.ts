@@ -29,7 +29,7 @@ export class ConfirmRegistrationUseCase implements ICommandHandler<ConfirmRegist
         USER_ACCOUNTS_ERRORS.EMAIL_CONFIRMATION_CODE_EXPIRED,
       );
 
-    if (user.isEmailConfirmationCodeVerified())
+    if (user.isEmailVerified())
       throw new DomainException(USER_ACCOUNTS_ERRORS.EMAIL_ALREADY_CONFIRMED);
 
     user.confirmEmail(dto.code);
