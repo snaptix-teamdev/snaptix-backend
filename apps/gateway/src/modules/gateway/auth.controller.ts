@@ -43,6 +43,7 @@ import { ExtractClientDetails } from '../../core/decorators/extract-client-detai
 import { ClientDetailsRequestDto } from '@snaptix/contracts/user-accounts/login/client-details.request-dto';
 import { Response } from 'express';
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -72,7 +73,7 @@ export class AuthController {
    * Подтверждение почты юзера
    */
   @Post('registration-confirmation')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   @ApiBadRequestCustomResponse()
   @ApiNotFoundCustomResponse()
   @ApiConflictCustomResponse()
@@ -93,6 +94,7 @@ export class AuthController {
    */
   @Get('me')
   @UseGuards(AccessTokenAuthGuard)
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiUnauthorizedCustomResponse()
   @ApiNotFoundCustomResponse()
@@ -112,8 +114,13 @@ export class AuthController {
    * Запросить код сброса пароля на почту
    */
   @Post('password/forgot')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   @UseGuards(RecaptchaGuard)
+  @ApiOperation({
+    summary: 'Запросить код сброса пароля на почту',
+    description:
+      'Требует reCAPTCHA v3: передайте токен в поле `recaptchaToken` тела запроса.',
+  })
   @ApiForbiddenCustomResponse()
   @ApiBadRequestCustomResponse()
   @ApiTooManyRequestsCustomResponse()
