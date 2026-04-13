@@ -13,13 +13,13 @@ export class UserEmailConfirmationEntity implements IUserEmailConfirmation {
   private constructor() {}
 
   static create(
-    emailConfirmationCodeLifetimeInMinutes: number,
+    emailConfirmationCodeLifetimeInHours: number,
   ): UserEmailConfirmationEntity {
     const entity = new UserEmailConfirmationEntity();
 
     entity.isVerified = false;
     entity.expiresAt = add(new Date(), {
-      minutes: emailConfirmationCodeLifetimeInMinutes,
+      hours: emailConfirmationCodeLifetimeInHours,
     });
 
     return entity;

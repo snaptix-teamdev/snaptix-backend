@@ -50,12 +50,15 @@ export class RegisterUserUseCase implements ICommandHandler<
         email: dto.email,
         passwordHash,
       },
-      this.authConfig.EMAIL_CONFIRMATION_CODE_TTL_MINUTES,
+      this.authConfig.EMAIL_CONFIRMATION_CODE_TTL_HOURS,
     );
 
     const savedUserWithId = await this.usersRepository.create(user);
 
-    await this.emitUserCreated(savedUserWithId);
+    await this.emitUserCreated(
+      savedUserWithId,
+      this.authConfig.EMAIL_CONFIRMATION_CODE_TTL_HOURS,
+    );
   }
 
   private async checkExistsEmailOrUsername(payload: {
@@ -78,12 +81,16 @@ export class RegisterUserUseCase implements ICommandHandler<
     }
   }
 
-  private async emitUserCreated(createdUser: IUser): Promise<void> {
+  private async emitUserCreated(
+    createdUser: IUser,
+    emailConfirmationCodeTtlHours: number,
+  ): Promise<void> {
     const payload: UserRegisteredEvent = {
       userId: createdUser.id,
       username: createdUser.username,
       email: createdUser.email,
       emailConfirmationCode: createdUser.emailConfirmation.code,
+      emailConfirmationCodeTtlHours,
     };
 
     await this.amqpConnection.publish(
