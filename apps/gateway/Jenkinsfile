@@ -3,7 +3,7 @@ pipeline {
     agent any
     environment {
         ENV_TYPE = "production"
-        PORT = 4247
+        PORT = 4248
         NAMESPACE = "snaptix-ru"
         REGISTRY_HOSTNAME = "snaptixteam"
         PROJECT = "main-gateway"
