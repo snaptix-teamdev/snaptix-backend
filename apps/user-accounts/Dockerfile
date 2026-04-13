@@ -35,4 +35,4 @@ RUN pnpm run ${SERVICE}:build
 
 EXPOSE ${PORT}
 
-CMD pnpm run 'user-accounts:start'
+CMD pnpm run 'user-accounts:prisma:deploy:prod' && pnpm run 'user-accounts:start'

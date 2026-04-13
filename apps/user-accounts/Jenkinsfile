@@ -84,19 +84,6 @@ pipeline {
                      sh "cat ./apps/${env.SERVICE}/deployment.yaml"
              }
         }
-        stage('Apply migrations') {
-            steps {
-                script {
-                    sh '''
-                       export NVM_DIR="$HOME/.nvm"
-                       [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                       nvm use --lts
-                       npm install -g pnpm
-                       pnpm user-accounts:prisma:deploy:prod
-                    '''
-                }
-            }
-        }
         stage('Deploy to Kubernetes') {
              steps {
                  withKubeConfig([credentialsId: 'prod-kubernetes']) {
