@@ -24,6 +24,8 @@
     "preuser-accounts:start:dev": "pnpm docker:up && pnpm user-accounts:prisma:generate && pnpm user-accounts:prisma:deploy:dev",
     "user-accounts:build": "nest build user-accounts",
     "user-accounts:start": "node dist/apps/user-accounts/main",
+    "user-accounts:test": "jest --testPathPattern=apps/user-accounts --passWithNoTests",
+    "user-accounts:test:e2e": "jest --config ./apps/user-accounts/test/jest-e2e.json",
     "----------------------": "",
     "notifications:start:dev": "cross-env NODE_ENV=development nest start notifications --watch",
     "notifications:start:debug": "cross-env NODE_ENV=development nest start notifications --debug --watch",
