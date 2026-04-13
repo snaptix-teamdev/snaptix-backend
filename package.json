@@ -30,6 +30,8 @@
     "prenotifications:start:dev": "pnpm docker:up",
     "notifications:build": "nest build notifications",
     "notifications:start": "node dist/apps/notifications/main",
+    "notifications:test": "jest --testPathPattern=apps/notifications --passWithNoTests",
+    "notifications:test:e2e": "jest --config ./apps/notifications/test/jest-e2e.json",
     "-----------------------": "",
     "docker:up": "docker compose -f docker-compose.yml up -d --wait",
     "docker:stop": "docker compose -f docker-compose.yml stop",
