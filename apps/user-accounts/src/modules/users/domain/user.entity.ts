@@ -18,7 +18,7 @@ export class UserEntity implements IUser {
 
   static create(
     dto: CreateUserDto,
-    emailConfirmationCodeLifetimeInMinutes: number,
+    emailConfirmationCodeLifetimeInHours: number,
   ): UserEntity {
     const entity = new UserEntity();
 
@@ -27,7 +27,7 @@ export class UserEntity implements IUser {
     entity.passwordHash = dto.passwordHash;
     entity.deletedAt = null;
     entity.emailConfirmation = UserEmailConfirmationEntity.create(
-      emailConfirmationCodeLifetimeInMinutes,
+      emailConfirmationCodeLifetimeInHours,
     );
     entity.recoveryPassword = null;
 

@@ -67,6 +67,7 @@ export class EmailService {
   async confirmEmailRegistration(payload: {
     email: string;
     emailConfirmationCode: string;
+    emailConfirmationCodeTtlHours: number;
   }): Promise<void> {
     await this.sendEmail({
       email: payload.email,
@@ -75,6 +76,7 @@ export class EmailService {
       context: {
         appBaseUrl: this.emailConfig.appBaseUrl,
         confirmationCode: payload.emailConfirmationCode,
+        emailConfirmationCodeTtlHours: payload.emailConfirmationCodeTtlHours,
       },
     });
   }

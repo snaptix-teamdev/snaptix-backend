@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: DEPLOYMENT_NAME
+  namespace: NAMESPACE
+  labels:
+    app: PROJECT
+spec:
+  selector:
+    matchLabels:
+      project: PROJECT
+  template:
+    metadata:
+      namespace: NAMESPACE
+      labels:
+        project: PROJECT
+    spec:
+      containers:
+         - name: PROJECT
+           image: REGISTRY_HOSTNAME/PROJECT:TAG_VERSION
+           securityContext:
+             allowPrivilegeEscalation: false
+             runAsNonRoot: true      # опционально, но хорошая практика
+             runAsUser: 1000         # опционально
+           ports:
+             - containerPort: PORT_CONTAINER
+           env:
+             - name: RABBITMQ_URI
+               valueFrom:
+                 secretKeyRef:
+                   name: notifications-microservice-production-config-secret
+                   key: RABBITMQ_URI
+             - name: MAIL_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: notifications-microservice-production-config-secret
+                   key: MAIL_HOST
+             - name: MAIL_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: notifications-microservice-production-config-secret
+                   key: MAIL_PORT
+             - name: MAIL_USER
+               valueFrom:
+                 secretKeyRef:
+                   name: notifications-microservice-production-config-secret
+                   key: MAIL_USER
+             - name: MAIL_PASS
+               valueFrom:
+                 secretKeyRef:
+                   name: notifications-microservice-production-config-secret
+                   key: MAIL_PASS
+             - name: MAIL_USE_SECURE
+               valueFrom:
+                 secretKeyRef:
+                   name: notifications-microservice-production-config-secret
+                   key: MAIL_USE_SECURE
+             - name: MAIL_IGNORE_TLS
+               valueFrom:
+                 secretKeyRef:
+                   name: notifications-microservice-production-config-secret
+                   key: MAIL_IGNORE_TLS
+             - name: APP_BASE_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: notifications-microservice-production-config-secret
+                   key: APP_BASE_URL
+             - name: NODE_ENV
+               valueFrom:
+                 secretKeyRef:
+                   name: notifications-microservice-production-config-secret
+                   key: NODE_ENV

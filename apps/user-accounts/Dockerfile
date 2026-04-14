@@ -28,10 +28,11 @@ RUN pnpm install
 # Bundle app source code
 COPY --chown=node . .
 
+RUN pnpm run ${SERVICE}:prisma:generate
 RUN pnpm run ${SERVICE}:build
 
 # Bind to all network interfaces so that it can be mapped to the host OS
 
 EXPOSE ${PORT}
 
-CMD pnpm run 'gateway:start'
+CMD pnpm run 'user-accounts:prisma:deploy:prod' && pnpm run 'user-accounts:start'

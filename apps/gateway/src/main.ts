@@ -16,7 +16,7 @@ async function bootstrap() {
 
   await app.listen(coreConfig.port, () => {
     logger.log(`✅  Server running on port ${coreConfig.port}`);
-    logger.log(`http://localhost:${coreConfig.port}/swagger`);
+    logger.log(`http://localhost:${coreConfig.port}/api/v1/swagger`);
   });
 }
 void bootstrap();
