@@ -2,7 +2,7 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import {
   UserContextDto,
   UserOptionalContextDto,
-} from '../dto/user-context.dto';
+} from '@snaptix/common/dto/user-context.dto';
 
 interface RequestWithUser extends Request {
   user?: UserContextDto;

@@ -85,7 +85,7 @@ export class AuthController {
         email: payload.email,
         password: payload.password,
         ip: payload.ip,
-        deviceName: payload.deviceName,
+        userAgent: payload.userAgent,
       }),
     );
   }
