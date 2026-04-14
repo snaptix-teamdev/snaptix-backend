@@ -32,7 +32,7 @@ import { ApiNotFoundCustomResponse } from '../../core/swagger/not-found.swagger'
 import { ApiTooManyRequestsCustomResponse } from '../../core/swagger/too-many-requests.swagger';
 import { AccessTokenAuthGuard } from '../../core/guards/bearer/access-token.guard';
 import { ExtractUserFromRequest } from '../../core/decorators/extract-user-from-request.decorator';
-import { UserContextDto } from '../../core/dto/user-context.dto';
+import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
 import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.swagger';
 import { ForgotPasswordPayload } from '@snaptix/contracts/user-accounts/password-forgot/forgot-password.payload';
 import { ApiForbiddenCustomResponse } from '../../core/swagger/forbidden.swagger';
@@ -43,6 +43,7 @@ import { ExtractClientDetails } from '../../core/decorators/extract-client-detai
 import { ClientDetailsRequestDto } from '@snaptix/contracts/user-accounts/login/client-details.request-dto';
 import { Response } from 'express';
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
+import { LoginPayload } from '@snaptix/contracts/user-accounts/login/login.payload';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller({ path: 'auth', version: '1' })
@@ -163,20 +164,23 @@ export class AuthController {
    */
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiBadRequestCustomResponse()
+  @ApiUnauthorizedCustomResponse()
+  @ApiForbiddenCustomResponse()
   async login(
     @Body() body: LoginRequestDto,
     @ExtractClientDetails() clientDetails: ClientDetailsRequestDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResponseDto> {
-    const result = this.userAccounts.send<AccessAndRefreshTokensDto>(
-      USER_ACCOUNTS_PATTERNS.AUTH.LOGIN,
-      {
-        email: body.email,
-        password: body.password,
-        ip: clientDetails.ip,
-        deviceName: clientDetails.deviceName,
-      },
-    );
+    const result = this.userAccounts.send<
+      AccessAndRefreshTokensDto,
+      LoginPayload
+    >(USER_ACCOUNTS_PATTERNS.AUTH.LOGIN, {
+      email: body.email,
+      password: body.password,
+      ip: clientDetails.ip,
+      userAgent: clientDetails.userAgent,
+    });
 
     const tokens = await firstValueFrom(result);
 
