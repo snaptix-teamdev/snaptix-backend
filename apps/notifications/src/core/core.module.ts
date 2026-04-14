@@ -17,6 +17,7 @@ import { USER_ACCOUNTS_EXCHANGE } from '@snaptix/contracts';
             type: 'topic',
           },
         ],
+        connectionInitOptions: { wait: false },
       }),
     }),
   ],

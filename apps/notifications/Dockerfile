@@ -34,4 +34,4 @@ RUN pnpm run ${SERVICE}:build
 
 EXPOSE ${PORT}
 
-CMD pnpm run 'gateway:start'
+CMD pnpm run 'notifications:start'

@@ -3,4 +3,5 @@ export interface UserRegisteredEvent {
   username: string;
   email: string;
   emailConfirmationCode: string;
+  emailConfirmationCodeTtlHours: number;
 }

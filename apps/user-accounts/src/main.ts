@@ -31,8 +31,9 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
 
-  await app.listen(coreConfig.port, () => {
-    logger.log(`✅  Server running on port: ${coreConfig.port}`);
-  });
+  await app.init();
+  logger.log(
+    `✅  Microservice running on port: ${coreConfig.microserviceUserAccountsPort}`,
+  );
 }
 void bootstrap();

@@ -24,6 +24,7 @@ export class UserRegisteredHandler {
     await this.emailService.confirmEmailRegistration({
       email: event.email,
       emailConfirmationCode: event.emailConfirmationCode,
+      emailConfirmationCodeTtlHours: event.emailConfirmationCodeTtlHours,
     });
   }
 }

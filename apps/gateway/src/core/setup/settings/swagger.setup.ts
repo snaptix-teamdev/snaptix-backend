@@ -12,7 +12,7 @@ export function swaggerSetup(
   }
 
   const projectName = 'Snaptix-backend';
-  const swaggerPath = `/swagger`;
+  const swaggerPath = `/api/v1/swagger`;
 
   const description = `
   **Environment**: ${coreConfig.env}
