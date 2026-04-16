@@ -67,6 +67,11 @@ export class CoreConfig {
   })
   accessTokenSecret: string;
 
+  @IsNotEmpty({
+    message: 'Set Env variable REFRESH_TOKEN_SECRET, dangerous for security!',
+  })
+  refreshTokenSecret: string;
+
   constructor(private configService: ConfigService<any, true>) {
     this.port = parseInt(this.configService.get<string>('PORT'));
 
@@ -91,6 +96,7 @@ export class CoreConfig {
     ) as boolean;
 
     this.accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
+    this.refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
 
     configValidationUtility.validateConfig(this);
   }
