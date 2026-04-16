@@ -15,6 +15,8 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { JwtAdapter } from './infrastructure/jwt.adapter';
 import { ResetPasswordUseCase } from './application/commands/reset-password.usecase';
+import { RefreshTokensUseCase } from './application/commands/refresh-tokens.usecase';
+import { GenerateTokensUseCase } from './application/commands/generate-tokens.usecase';
 import { SessionsModule } from '../sessions/sessions.module';
 
 @Module({
@@ -55,6 +57,8 @@ import { SessionsModule } from '../sessions/sessions.module';
     LoginUserUseCase,
     JwtAdapter,
     ResetPasswordUseCase,
+    RefreshTokensUseCase,
+    GenerateTokensUseCase,
   ],
 })
 export class AuthModule {}

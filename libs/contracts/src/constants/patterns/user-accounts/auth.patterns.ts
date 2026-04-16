@@ -5,4 +5,5 @@ export const AUTH_PATTERNS = {
   FORGOT_PASSWORD: 'auth.forgot-password',
   LOGIN: 'auth.login',
   RESET_PASSWORD: 'auth.reset-password',
+  REFRESH_TOKENS: 'auth.refresh-tokens',
 } as const;

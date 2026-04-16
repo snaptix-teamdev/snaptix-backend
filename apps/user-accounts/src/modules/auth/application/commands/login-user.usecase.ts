@@ -10,8 +10,11 @@ import { CryptoService } from '../services/crypto.service';
 import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS, USER_ACCOUNTS_ERRORS } from '@snaptix/contracts';
-import { JwtAdapter } from '../../infrastructure/jwt.adapter';
 import { CreateSessionCommand } from '../../../sessions/application/commands/create-session.usecase';
+import {
+  GenerateTokensCommand,
+  GenerateTokensResult,
+} from './generate-tokens.usecase';
 import { UAParser } from 'ua-parser-js';
 
 class LoginUserCommandRequest {
@@ -35,18 +38,17 @@ export class LoginUserUseCase implements ICommandHandler<
   constructor(
     private usersRepository: UsersRepository,
     private cryptoService: CryptoService,
-    private jwtAdapter: JwtAdapter,
     private commandBus: CommandBus,
   ) {}
 
   async execute({ dto }: LoginUserCommand): Promise<AccessAndRefreshTokensDto> {
-    const result = await this.validateUserOrThrow(dto.email, dto.password);
-    const { userId } = result;
+    const { userId } = await this.validateUserOrThrow(dto.email, dto.password);
 
-    const accessToken = this.jwtAdapter.createAccessToken(userId);
     const deviceId: string = crypto.randomUUID();
-    const refreshToken = this.jwtAdapter.createRefreshToken(userId, deviceId);
-    const payload = this.jwtAdapter.decodeRefreshToken(refreshToken);
+
+    const tokens: GenerateTokensResult = await this.commandBus.execute(
+      new GenerateTokensCommand({ userId, deviceId }),
+    );
 
     const deviceName = this.buildDeviceInfo(dto.userAgent);
 
@@ -56,12 +58,15 @@ export class LoginUserUseCase implements ICommandHandler<
         deviceId,
         deviceName,
         ip: dto.ip,
-        issuedAt: new Date(payload.iat * 1000),
-        expiresAt: new Date(payload.exp * 1000),
+        issuedAt: tokens.refreshTokenIssuedAt,
+        expiresAt: tokens.refreshTokenExpiresAt,
       }),
     );
 
-    return { accessToken, refreshToken };
+    return {
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    };
   }
 
   private async validateUserOrThrow(
