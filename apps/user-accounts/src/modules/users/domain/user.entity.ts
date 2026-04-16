@@ -102,4 +102,12 @@ export class UserEntity implements IUser {
     this.recoveryPassword.markRecoveryPasswordCodeAsUsed(payload.code);
     this.passwordHash = payload.newPasswordHash;
   }
+
+  generateEmailConfirmationCode(
+    emailConfirmationCodeLifetimeInHours: number,
+  ): string {
+    return this.emailConfirmation.generateCode(
+      emailConfirmationCodeLifetimeInHours,
+    );
+  }
 }

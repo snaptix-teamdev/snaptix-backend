@@ -16,6 +16,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtAdapter } from './infrastructure/jwt.adapter';
 import { ResetPasswordUseCase } from './application/commands/reset-password.usecase';
 import { SessionsModule } from '../sessions/sessions.module';
+import { ResendEmailConfirmationCodeUseCase } from './application/commands/resend-email-confirmation-code.usecase';
 
 @Module({
   imports: [UsersModule, SessionsModule],
@@ -55,6 +56,7 @@ import { SessionsModule } from '../sessions/sessions.module';
     LoginUserUseCase,
     JwtAdapter,
     ResetPasswordUseCase,
+    ResendEmailConfirmationCodeUseCase,
   ],
 })
 export class AuthModule {}

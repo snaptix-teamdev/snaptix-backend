@@ -1,5 +1,6 @@
 import { IUserEmailConfirmation } from '@snaptix/common';
 import { add } from 'date-fns';
+import { randomUUID } from 'crypto';
 
 export class UserEmailConfirmationEntity implements IUserEmailConfirmation {
   id: string;
@@ -18,9 +19,7 @@ export class UserEmailConfirmationEntity implements IUserEmailConfirmation {
     const entity = new UserEmailConfirmationEntity();
 
     entity.isVerified = false;
-    entity.expiresAt = add(new Date(), {
-      hours: emailConfirmationCodeLifetimeInHours,
-    });
+    entity.generateCode(emailConfirmationCodeLifetimeInHours);
 
     return entity;
   }
@@ -52,5 +51,14 @@ export class UserEmailConfirmationEntity implements IUserEmailConfirmation {
     if (this.code !== code) throw new Error(`invalid email confirmation code`);
 
     this.isVerified = true;
+  }
+
+  generateCode(emailConfirmationCodeLifetimeInHours: number): string {
+    this.code = randomUUID();
+    this.expiresAt = add(new Date(), {
+      hours: emailConfirmationCodeLifetimeInHours,
+    });
+
+    return this.code;
   }
 }
