@@ -20,6 +20,8 @@ import {
   RegisterUserResponseDto,
   RegistrationConfirmationRequestDto,
   RegistrationConfirmationResponseDto,
+  ResendEmailConfirmationCodePayload,
+  ResendEmailConfirmationCodeRequestDto,
   ResetPasswordPayload,
   ResetPasswordRequestDto,
   ResetPasswordResponseDto,
@@ -190,5 +192,25 @@ export class AuthController {
     });
 
     return { accessToken: tokens.accessToken };
+  }
+
+  /**
+   * Отправить код подтверждения email еще раз
+   */
+  @Post('resend-email-confirmation-code')
+  @ApiBadRequestCustomResponse()
+  @ApiTooManyRequestsCustomResponse()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async resendEmailConfirmationCode(
+    @Body() body: ResendEmailConfirmationCodeRequestDto,
+  ): Promise<void> {
+    const result = this.userAccounts.send<
+      void,
+      ResendEmailConfirmationCodePayload
+    >(USER_ACCOUNTS_PATTERNS.AUTH.RESEND_EMAIL_CONFIRMATION_CODE, {
+      email: body.email,
+    });
+
+    await firstValueFrom(result);
   }
 }
