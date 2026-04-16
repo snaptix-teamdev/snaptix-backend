@@ -19,7 +19,6 @@ import {
   RegisterUserRequestDto,
   RegisterUserResponseDto,
   RegistrationConfirmationRequestDto,
-  RegistrationConfirmationResponseDto,
   ResendEmailConfirmationCodePayload,
   ResendEmailConfirmationCodeRequestDto,
   ResetPasswordPayload,
@@ -46,7 +45,7 @@ import { ClientDetailsRequestDto } from '@snaptix/contracts/user-accounts/login/
 import { Response } from 'express';
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 import { LoginPayload } from '@snaptix/contracts/user-accounts/login/login.payload';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -76,51 +75,49 @@ export class AuthController {
    * Подтверждение почты юзера
    */
   @Post('registration-confirmation')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBadRequestCustomResponse()
   @ApiNotFoundCustomResponse()
   @ApiConflictCustomResponse()
   @ApiTooManyRequestsCustomResponse()
-  registrationConfirmation(
+  async registrationConfirmation(
     @Body() payload: RegistrationConfirmationRequestDto,
-  ): Promise<RegistrationConfirmationResponseDto> {
+  ): Promise<void> {
     const result = this.userAccounts.send(
       USER_ACCOUNTS_PATTERNS.AUTH.REGISTRATION_CONFIRMATION,
       payload,
     );
 
-    return firstValueFrom(result);
+    await firstValueFrom(result);
   }
 
   /**
-   * Получение информации о текущем юзере
+   * Отправить код подтверждения email еще раз
    */
-  @Get('me')
-  @UseGuards(AccessTokenAuthGuard)
-  @ApiBearerAuth()
-  @HttpCode(HttpStatus.OK)
-  @ApiUnauthorizedCustomResponse()
-  @ApiNotFoundCustomResponse()
+  @Post('resend-email-confirmation-code')
+  @ApiBadRequestCustomResponse()
   @ApiTooManyRequestsCustomResponse()
-  async getMe(
-    @ExtractUserFromRequest() user: UserContextDto,
-  ): Promise<GetMeResponseDto> {
-    const result = this.userAccounts.send<GetMeResponseDto, GetMePayload>(
-      USER_ACCOUNTS_PATTERNS.AUTH.GET_ME,
-      { id: user.userId },
-    );
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async resendEmailConfirmationCode(
+    @Body() body: ResendEmailConfirmationCodeRequestDto,
+  ): Promise<void> {
+    const result = this.userAccounts.send<
+      void,
+      ResendEmailConfirmationCodePayload
+    >(USER_ACCOUNTS_PATTERNS.AUTH.RESEND_EMAIL_CONFIRMATION_CODE, {
+      email: body.email,
+    });
 
-    return firstValueFrom(result);
+    await firstValueFrom(result);
   }
 
   /**
    * Запросить код сброса пароля на почту
    */
   @Post('password/forgot')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(RecaptchaGuard)
   @ApiOperation({
-    summary: 'Запросить код сброса пароля на почту',
     description:
       'Требует reCAPTCHA v3: передайте токен в поле `recaptchaToken` тела запроса.',
   })
@@ -142,14 +139,12 @@ export class AuthController {
    * Сбросить пароль по коду
    */
   @Post('password/reset')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBadRequestCustomResponse()
   @ApiNotFoundCustomResponse()
   @ApiConflictCustomResponse()
   @ApiTooManyRequestsCustomResponse()
-  async resetPassword(
-    @Body() body: ResetPasswordRequestDto,
-  ): Promise<ResetPasswordResponseDto> {
+  async resetPassword(@Body() body: ResetPasswordRequestDto): Promise<void> {
     const result = this.userAccounts.send<
       ResetPasswordResponseDto,
       ResetPasswordPayload
@@ -158,7 +153,7 @@ export class AuthController {
       password: body.password,
     });
 
-    return firstValueFrom(result);
+    await firstValueFrom(result);
   }
 
   /**
@@ -166,6 +161,10 @@ export class AuthController {
    */
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Успешный логин. `refreshToken` записывается в `cookie`',
+    type: LoginResponseDto,
+  })
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
   @ApiForbiddenCustomResponse()
@@ -195,22 +194,23 @@ export class AuthController {
   }
 
   /**
-   * Отправить код подтверждения email еще раз
+   * Получение информации о текущем юзере
    */
-  @Post('resend-email-confirmation-code')
-  @ApiBadRequestCustomResponse()
+  @Get('me')
+  @UseGuards(AccessTokenAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiUnauthorizedCustomResponse()
+  @ApiNotFoundCustomResponse()
   @ApiTooManyRequestsCustomResponse()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async resendEmailConfirmationCode(
-    @Body() body: ResendEmailConfirmationCodeRequestDto,
-  ): Promise<void> {
-    const result = this.userAccounts.send<
-      void,
-      ResendEmailConfirmationCodePayload
-    >(USER_ACCOUNTS_PATTERNS.AUTH.RESEND_EMAIL_CONFIRMATION_CODE, {
-      email: body.email,
-    });
+  async getMe(
+    @ExtractUserFromRequest() user: UserContextDto,
+  ): Promise<GetMeResponseDto> {
+    const result = this.userAccounts.send<GetMeResponseDto, GetMePayload>(
+      USER_ACCOUNTS_PATTERNS.AUTH.GET_ME,
+      { id: user.userId },
+    );
 
-    await firstValueFrom(result);
+    return firstValueFrom(result);
   }
 }
