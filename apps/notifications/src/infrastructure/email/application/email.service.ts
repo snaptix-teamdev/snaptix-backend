@@ -17,6 +17,7 @@ interface SendEmailPayload {
 // names of template files in the "templates" folder
 enum TemplateName {
   ConfirmEmailRegistration = 'confirm-email-registration',
+  ResendEmailConfirmation = 'resend-email-confirmation',
   ResetPassword = 'reset-password',
   PasswordChanged = 'password-changed',
 }
@@ -60,6 +61,25 @@ export class EmailService {
       context: {
         appBaseUrl: this.emailConfig.appBaseUrl,
         username: payload.username,
+      },
+    });
+  }
+
+  async resendEmailConfirmation(payload: {
+    email: string;
+    username: string;
+    emailConfirmationCode: string;
+    emailConfirmationCodeTtlHours: number;
+  }): Promise<void> {
+    await this.sendEmail({
+      email: payload.email,
+      subject: 'Подтверждение почты',
+      templateName: TemplateName.ResendEmailConfirmation,
+      context: {
+        appBaseUrl: this.emailConfig.appBaseUrl,
+        username: payload.username,
+        confirmationCode: payload.emailConfirmationCode,
+        emailConfirmationCodeTtlHours: payload.emailConfirmationCodeTtlHours,
       },
     });
   }
