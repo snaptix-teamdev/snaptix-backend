@@ -19,4 +19,28 @@ export class SessionsRepository {
       },
     });
   }
+
+  async findByUserIdAndDeviceId(
+    userId: string,
+    deviceId: string,
+  ): Promise<SessionEntity | null> {
+    const model = await this.prisma.session.findUnique({
+      where: { userId_deviceId: { userId, deviceId } },
+    });
+
+    if (!model) return null;
+
+    return this.sessionConverter.fromPrismaModelToEntity(model);
+  }
+
+  async update(entity: SessionEntity): Promise<void> {
+    const model = this.sessionConverter.fromEntityToPrismaModel(entity);
+
+    await this.prisma.session.update({
+      where: { id: model.id },
+      data: {
+        ...model,
+      },
+    });
+  }
 }

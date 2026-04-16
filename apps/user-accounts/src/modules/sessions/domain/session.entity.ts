@@ -35,4 +35,8 @@ export class SessionEntity implements ISession {
 
     return entity;
   }
+
+  isExpired(): boolean {
+    return this.expiresAt < new Date();
+  }
 }
