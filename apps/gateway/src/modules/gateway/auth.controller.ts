@@ -16,6 +16,8 @@ import {
   GetMePayload,
   GetMeResponseDto,
   MICROSERVICE_NAME,
+  RefreshTokensPayload,
+  RefreshTokensResponseDto,
   RegisterUserRequestDto,
   RegisterUserResponseDto,
   RegistrationConfirmationRequestDto,
@@ -32,6 +34,7 @@ import { ApiConflictCustomResponse } from '../../core/swagger/conflict.swagger';
 import { ApiNotFoundCustomResponse } from '../../core/swagger/not-found.swagger';
 import { ApiTooManyRequestsCustomResponse } from '../../core/swagger/too-many-requests.swagger';
 import { AccessTokenAuthGuard } from '../../core/guards/bearer/access-token.guard';
+import { RefreshTokenAuthGuard } from '../../core/guards/cookie/refresh-token.guard';
 import { ExtractUserFromRequest } from '../../core/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
 import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.swagger';
@@ -45,7 +48,13 @@ import { ClientDetailsRequestDto } from '@snaptix/contracts/user-accounts/login/
 import { Response } from 'express';
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 import { LoginPayload } from '@snaptix/contracts/user-accounts/login/login.payload';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
+import { ExtractRefreshTokenFromCookie } from '../../core/decorators/extract-refresh-token-from-cookie.decorator';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -179,6 +188,43 @@ export class AuthController {
     >(USER_ACCOUNTS_PATTERNS.AUTH.LOGIN, {
       email: body.email,
       password: body.password,
+      ip: clientDetails.ip,
+      userAgent: clientDetails.userAgent,
+    });
+
+    const tokens = await firstValueFrom(result);
+
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken: tokens.accessToken };
+  }
+
+  /**
+   * Обновление пары токенов
+   */
+  @Post('refresh-tokens')
+  @UseGuards(RefreshTokenAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description:
+      'Успешное обновление токенов. `refreshToken` записывается в `cookie`',
+    type: RefreshTokensResponseDto,
+  })
+  @ApiCookieAuth()
+  @ApiUnauthorizedCustomResponse()
+  async refreshTokens(
+    @ExtractRefreshTokenFromCookie() refreshToken: string,
+    @ExtractClientDetails() clientDetails: ClientDetailsRequestDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<RefreshTokensResponseDto> {
+    const result = this.userAccounts.send<
+      AccessAndRefreshTokensDto,
+      RefreshTokensPayload
+    >(USER_ACCOUNTS_PATTERNS.AUTH.REFRESH_TOKENS, {
+      refreshToken,
       ip: clientDetails.ip,
       userAgent: clientDetails.userAgent,
     });

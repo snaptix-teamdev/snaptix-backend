@@ -7,7 +7,7 @@ export class AccessTokenPayloadDto {
 export class RefreshTokenPayloadDto {
   userId: string;
   deviceId: string;
-  lastActiveDate: string;
+  iat: number;
   exp: number;
 }
 

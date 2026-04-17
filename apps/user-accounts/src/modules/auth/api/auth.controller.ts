@@ -4,6 +4,7 @@ import {
   ForgotPasswordResponseDto,
   GetMePayload,
   GetMeResponseDto,
+  RefreshTokensPayload,
   RegisterUserRequestDto,
   RegisterUserResponseDto,
   RegistrationConfirmationRequestDto,
@@ -23,6 +24,7 @@ import { LoginPayload } from '@snaptix/contracts/user-accounts/login/login.paylo
 import { LoginUserCommand } from '../application/commands/login-user.usecase';
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 import { ResetPasswordCommand } from '../application/commands/reset-password.usecase';
+import { RefreshTokensCommand } from '../application/commands/refresh-tokens.usecase';
 import { ResendEmailConfirmationCodeCommand } from '../application/commands/resend-email-confirmation-code.usecase';
 
 @Controller('auth')
@@ -31,11 +33,6 @@ export class AuthController {
     private commandBus: CommandBus,
     private queryBus: QueryBus,
   ) {}
-
-  // @Post('password-recovery')
-  // passwordRecovery(@Body() body: PassRecoveryInputDto): string {
-  //   return 'email sent to your email ' + body.email;
-  // }
 
   @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.REGISTER_USER)
   async register(
@@ -101,5 +98,18 @@ export class AuthController {
     );
 
     return {};
+  }
+
+  @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.REFRESH_TOKENS)
+  async refreshTokens(
+    @Payload() payload: RefreshTokensPayload,
+  ): Promise<AccessAndRefreshTokensDto> {
+    return this.commandBus.execute(
+      new RefreshTokensCommand({
+        refreshToken: payload.refreshToken,
+        ip: payload.ip,
+        userAgent: payload.userAgent,
+      }),
+    );
   }
 }

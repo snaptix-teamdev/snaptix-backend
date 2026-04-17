@@ -15,6 +15,8 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { JwtAdapter } from './infrastructure/jwt.adapter';
 import { ResetPasswordUseCase } from './application/commands/reset-password.usecase';
+import { RefreshTokensUseCase } from './application/commands/refresh-tokens.usecase';
+import { GenerateTokensUseCase } from './application/commands/generate-tokens.usecase';
 import { SessionsModule } from '../sessions/sessions.module';
 import { ResendEmailConfirmationCodeUseCase } from './application/commands/resend-email-confirmation-code.usecase';
 
@@ -56,6 +58,8 @@ import { ResendEmailConfirmationCodeUseCase } from './application/commands/resen
     LoginUserUseCase,
     JwtAdapter,
     ResetPasswordUseCase,
+    RefreshTokensUseCase,
+    GenerateTokensUseCase,
     ResendEmailConfirmationCodeUseCase,
   ],
 })
