@@ -21,6 +21,7 @@ export class MicroserviceExceptionFilter implements RpcExceptionFilter<RpcExcept
     if (exception instanceof ZodValidationException) {
       const zodError = exception.getZodError() as ZodError;
       this.logger.error(zodError.issues);
+      //TODO: добавить маппинг
       return throwError(() => COMMON_ERRORS.VALIDATION_ERROR);
     }
 
