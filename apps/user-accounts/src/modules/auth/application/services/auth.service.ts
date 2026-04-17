@@ -1,11 +1,6 @@
-import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { Injectable } from '@nestjs/common';
 import { JwtAdapter } from '../../infrastructure/jwt.adapter';
 import { RefreshTokenPayloadDto } from '@snaptix/contracts/tokens';
-
-class GenerateTokensCommandRequest {
-  userId: string;
-  deviceId: string;
-}
 
 export interface GenerateTokensResult {
   accessToken: string;
@@ -14,33 +9,28 @@ export interface GenerateTokensResult {
   refreshTokenExpiresAt: Date;
 }
 
-export class GenerateTokensCommand extends Command<GenerateTokensResult> {
-  constructor(public dto: GenerateTokensCommandRequest) {
-    super();
-  }
-}
-
-@CommandHandler(GenerateTokensCommand)
-export class GenerateTokensUseCase implements ICommandHandler<
-  GenerateTokensCommand,
-  GenerateTokensResult
-> {
+@Injectable()
+export class AuthService {
   constructor(private jwtAdapter: JwtAdapter) {}
 
-  async execute({ dto }: GenerateTokensCommand): Promise<GenerateTokensResult> {
-    const accessToken = this.jwtAdapter.createAccessToken(dto.userId);
+  generateTokens(payload: {
+    userId: string;
+    deviceId: string;
+  }): GenerateTokensResult {
+    const accessToken = this.jwtAdapter.createAccessToken(payload.userId);
     const refreshToken = this.jwtAdapter.createRefreshToken(
-      dto.userId,
-      dto.deviceId,
+      payload.userId,
+      payload.deviceId,
     );
+
     const refreshTokenPayload: RefreshTokenPayloadDto =
       this.jwtAdapter.decodeRefreshToken(refreshToken);
 
-    return Promise.resolve({
+    return {
       accessToken,
       refreshToken,
       refreshTokenIssuedAt: new Date(refreshTokenPayload.iat * 1000),
       refreshTokenExpiresAt: new Date(refreshTokenPayload.exp * 1000),
-    });
+    };
   }
 }
