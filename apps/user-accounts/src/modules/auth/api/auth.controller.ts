@@ -9,6 +9,7 @@ import {
   RegisterUserResponseDto,
   RegistrationConfirmationRequestDto,
   RegistrationConfirmationResponseDto,
+  ResendEmailConfirmationCodePayload,
   ResetPasswordPayload,
   ResetPasswordResponseDto,
   USER_ACCOUNTS_PATTERNS,
@@ -24,6 +25,7 @@ import { LoginUserCommand } from '../application/commands/login-user.usecase';
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 import { ResetPasswordCommand } from '../application/commands/reset-password.usecase';
 import { RefreshTokensCommand } from '../application/commands/refresh-tokens.usecase';
+import { ResendEmailConfirmationCodeCommand } from '../application/commands/resend-email-confirmation-code.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -85,6 +87,17 @@ export class AuthController {
         userAgent: payload.userAgent,
       }),
     );
+  }
+
+  @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.RESEND_EMAIL_CONFIRMATION_CODE)
+  async resendEmailConfirmationCode(
+    @Payload() payload: ResendEmailConfirmationCodePayload,
+  ): Promise<object> {
+    await this.commandBus.execute(
+      new ResendEmailConfirmationCodeCommand(payload),
+    );
+
+    return {};
   }
 
   @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.REFRESH_TOKENS)

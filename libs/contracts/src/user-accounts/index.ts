@@ -4,3 +4,4 @@ export * from './password-reset/index';
 export * from './refresh-tokens/index';
 export * from './register/index';
 export * from './registration-confirmation/index';
+export * from './resend-email-confirmation-code/index';
