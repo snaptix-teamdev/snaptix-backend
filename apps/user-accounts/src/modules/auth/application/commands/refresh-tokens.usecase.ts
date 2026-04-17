@@ -5,15 +5,13 @@ import {
   ICommandHandler,
 } from '@nestjs/cqrs';
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
-import { UAParser } from 'ua-parser-js';
-import {
-  GenerateTokensCommand,
-  GenerateTokensResult,
-} from './generate-tokens.usecase';
+
 import { UpdateSessionCommand } from '../../../sessions/application/commands/update-session.usecase';
 import { JwtAdapter } from '../../infrastructure/jwt.adapter';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS } from '@snaptix/contracts';
+import { AuthService, GenerateTokensResult } from '../services/auth.service';
+import { buildDeviceInfo } from '../helpers/build-device-info.helper';
 
 class RefreshTokensCommandRequest {
   refreshToken: string;
@@ -34,6 +32,7 @@ export class RefreshTokensUseCase implements ICommandHandler<
 > {
   constructor(
     private commandBus: CommandBus,
+    private authService: AuthService,
     private jwtAdapter: JwtAdapter,
   ) {}
 
@@ -48,14 +47,12 @@ export class RefreshTokensUseCase implements ICommandHandler<
       throw new DomainException(COMMON_ERRORS.UNAUTHORIZED_ERROR);
     }
 
-    const tokens: GenerateTokensResult = await this.commandBus.execute(
-      new GenerateTokensCommand({
-        userId: refreshTokenPayload.userId,
-        deviceId: refreshTokenPayload.deviceId,
-      }),
-    );
+    const tokens: GenerateTokensResult = this.authService.generateTokens({
+      userId: refreshTokenPayload.userId,
+      deviceId: refreshTokenPayload.deviceId,
+    });
 
-    const deviceName = this.buildDeviceInfo(payload.userAgent);
+    const deviceName = buildDeviceInfo(payload.userAgent);
 
     await this.commandBus.execute(
       new UpdateSessionCommand({
@@ -72,18 +69,5 @@ export class RefreshTokensUseCase implements ICommandHandler<
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
-  }
-
-  //TODO: вынести в утилиты
-  private buildDeviceInfo(userAgent: string): string {
-    const ua = UAParser(userAgent);
-
-    const deviceInfo = ua.device.type
-      ? `Device: ${ua.device.type} ${ua.device.vendor} ${ua.device.model};`
-      : '';
-    const osInfo = `OS: ${ua.os.name} ${ua.os.version};`;
-    const browserInfo = `Browser: ${ua.browser.name} ${ua.browser.version}`;
-
-    return `${deviceInfo} ${osInfo} ${browserInfo}`;
   }
 }

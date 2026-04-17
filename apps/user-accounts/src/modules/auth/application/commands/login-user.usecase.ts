@@ -11,11 +11,8 @@ import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS, USER_ACCOUNTS_ERRORS } from '@snaptix/contracts';
 import { CreateSessionCommand } from '../../../sessions/application/commands/create-session.usecase';
-import {
-  GenerateTokensCommand,
-  GenerateTokensResult,
-} from './generate-tokens.usecase';
-import { UAParser } from 'ua-parser-js';
+import { AuthService, GenerateTokensResult } from '../services/auth.service';
+import { buildDeviceInfo } from '../helpers/build-device-info.helper';
 
 class LoginUserCommandRequest {
   email: string;
@@ -38,6 +35,7 @@ export class LoginUserUseCase implements ICommandHandler<
   constructor(
     private usersRepository: UsersRepository,
     private cryptoService: CryptoService,
+    private authService: AuthService,
     private commandBus: CommandBus,
   ) {}
 
@@ -46,11 +44,12 @@ export class LoginUserUseCase implements ICommandHandler<
 
     const deviceId: string = crypto.randomUUID();
 
-    const tokens: GenerateTokensResult = await this.commandBus.execute(
-      new GenerateTokensCommand({ userId, deviceId }),
-    );
+    const tokens: GenerateTokensResult = this.authService.generateTokens({
+      userId,
+      deviceId,
+    });
 
-    const deviceName = this.buildDeviceInfo(dto.userAgent);
+    const deviceName = buildDeviceInfo(dto.userAgent);
 
     await this.commandBus.execute(
       new CreateSessionCommand({
@@ -93,17 +92,5 @@ export class LoginUserUseCase implements ICommandHandler<
     }
 
     return { userId: user.id };
-  }
-
-  private buildDeviceInfo(userAgent: string): string {
-    const ua = UAParser(userAgent);
-
-    const deviceInfo = ua.device.type
-      ? `Device: ${ua.device.type} ${ua.device.vendor} ${ua.device.model};`
-      : '';
-    const osInfo = `OS: ${ua.os.name} ${ua.os.version};`;
-    const browserInfo = `Browser: ${ua.browser.name} ${ua.browser.version}`;
-
-    return `${deviceInfo} ${osInfo} ${browserInfo}`;
   }
 }
