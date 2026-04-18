@@ -1,15 +1,15 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SessionsRepository } from '../../infrastructure/sessions.repository';
-import { SessionEntity } from '../../domain/session.entity';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS } from '@snaptix/contracts';
+import { Logger } from '@nestjs/common';
 
 class UpdateSessionCommandRequest {
   userId: string;
   deviceId: string;
   ip: string | null;
-  deviceName: string;
-  issuedAt: Date;
+  oldIssuedAt: Date;
+  newIssuedAt: Date;
   expiresAt: Date;
 }
 
@@ -24,6 +24,8 @@ export class UpdateSessionUseCase implements ICommandHandler<
   UpdateSessionCommand,
   void
 > {
+  private logger = new Logger(UpdateSessionUseCase.name);
+
   constructor(private sessionsRepository: SessionsRepository) {}
 
   async execute({ dto }: UpdateSessionCommand): Promise<void> {
@@ -33,21 +35,26 @@ export class UpdateSessionUseCase implements ICommandHandler<
     );
 
     if (!session) {
+      this.logger.debug('session not found by user id and device id');
       throw new DomainException(COMMON_ERRORS.UNAUTHORIZED_ERROR);
     }
 
     if (session.isExpired()) {
+      this.logger.debug('session is expired');
       throw new DomainException(COMMON_ERRORS.UNAUTHORIZED_ERROR);
     }
 
-    const updatedSession = SessionEntity.restore({
-      ...session,
+    if (!session.isIssuedAtEqual(dto.oldIssuedAt)) {
+      this.logger.debug('session issued at is not equal to old issued at');
+      throw new DomainException(COMMON_ERRORS.UNAUTHORIZED_ERROR);
+    }
+
+    session.update({
       ip: dto.ip,
-      deviceName: dto.deviceName,
-      issuedAt: dto.issuedAt,
+      issuedAt: dto.newIssuedAt,
       expiresAt: dto.expiresAt,
     });
 
-    await this.sessionsRepository.update(updatedSession);
+    await this.sessionsRepository.update(session);
   }
 }

@@ -11,12 +11,11 @@ import { JwtAdapter } from '../../infrastructure/jwt.adapter';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS } from '@snaptix/contracts';
 import { AuthService, GenerateTokensResult } from '../services/auth.service';
-import { buildDeviceInfo } from '../helpers/build-device-info.helper';
+import { Logger } from '@nestjs/common';
 
 class RefreshTokensCommandRequest {
   refreshToken: string;
   ip: string | null;
-  userAgent: string;
 }
 
 export class RefreshTokensCommand extends Command<AccessAndRefreshTokensDto> {
@@ -30,6 +29,8 @@ export class RefreshTokensUseCase implements ICommandHandler<
   RefreshTokensCommand,
   AccessAndRefreshTokensDto
 > {
+  private logger = new Logger(RefreshTokensUseCase.name);
+
   constructor(
     private commandBus: CommandBus,
     private authService: AuthService,
@@ -44,6 +45,7 @@ export class RefreshTokensUseCase implements ICommandHandler<
     );
 
     if (!refreshTokenPayload) {
+      this.logger.debug('Refresh token is not valid');
       throw new DomainException(COMMON_ERRORS.UNAUTHORIZED_ERROR);
     }
 
@@ -52,15 +54,17 @@ export class RefreshTokensUseCase implements ICommandHandler<
       deviceId: refreshTokenPayload.deviceId,
     });
 
-    const deviceName = buildDeviceInfo(payload.userAgent);
+    const oldIssuedAtUnixTimestamp = refreshTokenPayload.iat;
+
+    const oldIssuedAt = new Date(oldIssuedAtUnixTimestamp * 1000);
 
     await this.commandBus.execute(
       new UpdateSessionCommand({
         userId: refreshTokenPayload.userId,
         deviceId: refreshTokenPayload.deviceId,
         ip: payload.ip,
-        deviceName,
-        issuedAt: tokens.refreshTokenIssuedAt,
+        oldIssuedAt: oldIssuedAt,
+        newIssuedAt: tokens.refreshTokenIssuedAt,
         expiresAt: tokens.refreshTokenExpiresAt,
       }),
     );

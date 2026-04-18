@@ -226,7 +226,6 @@ export class AuthController {
     >(USER_ACCOUNTS_PATTERNS.AUTH.REFRESH_TOKENS, {
       refreshToken,
       ip: clientDetails.ip,
-      userAgent: clientDetails.userAgent,
     });
 
     const tokens = await firstValueFrom(result);
