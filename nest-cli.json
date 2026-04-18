@@ -6,11 +6,17 @@
     "deleteOutDir": true,
     "webpack": true,
     "tsConfigPath": "apps/gateway/tsconfig.app.json",
+    "assets": [
+      {
+        "include": "**/*.hbs",
+        "watchAssets": true
+      }
+    ],
     "plugins": [
       {
         "name": "@nestjs/swagger",
         "options": {
-          "dtoFileNameSuffix": [".request-dto.ts", ".respone-dto.ts"],
+          "dtoFileNameSuffix": [".request-dto.ts", ".response-dto.ts"],
           "classValidatorShim": true,
           "introspectComments": true
         }
@@ -54,6 +60,15 @@
       "sourceRoot": "apps/gateway/src",
       "compilerOptions": {
         "tsConfigPath": "apps/gateway/tsconfig.app.json"
+      }
+    },
+    "notifications": {
+      "type": "application",
+      "root": "apps/notifications",
+      "entryFile": "main",
+      "sourceRoot": "apps/notifications/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notifications/tsconfig.app.json"
       }
     },
     "user-accounts": {
