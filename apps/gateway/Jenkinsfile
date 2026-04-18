@@ -26,8 +26,8 @@ pipeline {
                     sh '''
                        export NVM_DIR="$HOME/.nvm"
                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                       nvm use --lts
-                       npm install -g pnpm
+                       nvm use
+                       command -v pnpm || npm install -g pnpm@10.27.0
                        pnpm install
                        pnpm gateway:test
                     '''
@@ -40,8 +40,9 @@ pipeline {
                     sh '''
                        export NVM_DIR="$HOME/.nvm"
                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                       nvm use --lts
-                       npm install -g pnpm
+                       nvm use
+                       command -v pnpm || npm install -g pnpm@10.27.0
+                       pnpm install
                        pnpm gateway:test:e2e
                     '''
                 }
