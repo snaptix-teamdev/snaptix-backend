@@ -108,7 +108,6 @@ export class AuthController {
       new RefreshTokensCommand({
         refreshToken: payload.refreshToken,
         ip: payload.ip,
-        userAgent: payload.userAgent,
       }),
     );
   }
