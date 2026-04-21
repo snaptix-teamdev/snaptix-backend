@@ -80,6 +80,15 @@
         "tsConfigPath": "apps/notifications/tsconfig.app.json"
       }
     },
+    "posts": {
+      "type": "application",
+      "root": "apps/posts",
+      "entryFile": "main",
+      "sourceRoot": "apps/posts/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/posts/tsconfig.app.json"
+      }
+    },
     "user-accounts": {
       "type": "application",
       "root": "apps/user-accounts",

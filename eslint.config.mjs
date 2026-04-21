@@ -1,8 +1,31 @@
 // @ts-check
 import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import { readdirSync } from 'fs';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+
+const MICROSERVICES = readdirSync(new URL('./apps', import.meta.url), { withFileTypes: true })
+  .filter((d) => d.isDirectory())
+  .map((d) => d.name);
+
+const CROSS_SERVICE_MESSAGE =
+  'Direct imports between microservices are forbidden. Use @snaptix/contracts, @snaptix/common, or @snaptix/core instead.';
+
+const crossServiceRules = MICROSERVICES.map((app) => ({
+  files: [`apps/${app}/**/*.ts`],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: MICROSERVICES.filter((other) => other !== app).map((other) => ({
+          group: [`**/${other}`, `**/${other}/**`],
+          message: CROSS_SERVICE_MESSAGE,
+        })),
+      },
+    ],
+  },
+}));
 
 export default tseslint.config(
   {
@@ -41,4 +64,5 @@ export default tseslint.config(
   {
     ignores: ['node_modules/'],
   },
+  ...crossServiceRules,
 );
