@@ -18,7 +18,19 @@ import { ResetPasswordUseCase } from './application/commands/reset-password.usec
 import { RefreshTokensUseCase } from './application/commands/refresh-tokens.usecase';
 import { SessionsModule } from '../sessions/sessions.module';
 import { ResendEmailConfirmationCodeUseCase } from './application/commands/resend-email-confirmation-code.usecase';
-import { AuthService } from './application/services/auth.service';
+import { TokensService } from './application/services/tokens.service';
+import { LogoutUserUseCase } from './application/commands/logout-user.usecase';
+
+const useCases = [
+  RegisterUserUseCase,
+  ConfirmRegistrationUseCase,
+  ForgotPasswordUseCase,
+  LoginUserUseCase,
+  ResetPasswordUseCase,
+  RefreshTokensUseCase,
+  ResendEmailConfirmationCodeUseCase,
+  LogoutUserUseCase,
+];
 
 @Module({
   imports: [UsersModule, SessionsModule],
@@ -49,18 +61,12 @@ import { AuthService } from './application/services/auth.service';
       },
       inject: [AuthConfig],
     },
+    ...useCases,
     CryptoService,
-    RegisterUserUseCase,
-    ConfirmRegistrationUseCase,
     AuthConfig,
     GetMeQueryHandler,
-    ForgotPasswordUseCase,
-    LoginUserUseCase,
     JwtAdapter,
-    AuthService,
-    ResetPasswordUseCase,
-    RefreshTokensUseCase,
-    ResendEmailConfirmationCodeUseCase,
+    TokensService,
   ],
 })
 export class AuthModule {}

@@ -26,6 +26,8 @@ import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 import { ResetPasswordCommand } from '../application/commands/reset-password.usecase';
 import { RefreshTokensCommand } from '../application/commands/refresh-tokens.usecase';
 import { ResendEmailConfirmationCodeCommand } from '../application/commands/resend-email-confirmation-code.usecase';
+import { RefreshTokenPayload } from '@snaptix/contracts/user-accounts/refresh-token.payload';
+import { LogoutUserCommand } from '../application/commands/logout-user.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -108,6 +110,15 @@ export class AuthController {
       new RefreshTokensCommand({
         refreshToken: payload.refreshToken,
         ip: payload.ip,
+      }),
+    );
+  }
+
+  @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.LOGOUT)
+  async logout(@Payload() payload: RefreshTokenPayload): Promise<void> {
+    return this.commandBus.execute(
+      new LogoutUserCommand({
+        refreshToken: payload.refreshToken,
       }),
     );
   }
