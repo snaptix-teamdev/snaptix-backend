@@ -5,3 +5,4 @@ export * from './user-accounts/user-recovery-password.interface';
 export * from './errors/domain-error.interface';
 export * from './user-accounts/session.interface';
 export * from './files/file-record.interface';
+export * from './files/file-variant.interface';

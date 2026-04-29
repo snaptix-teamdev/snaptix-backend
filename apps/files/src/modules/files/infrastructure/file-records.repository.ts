@@ -32,4 +32,12 @@ export class FileRecordsRepository {
 
     return result ? this.converter.fromPrismaModelToEntity(result) : null;
   }
+
+  async findByStorageKey(storageKey: string): Promise<FileRecordEntity | null> {
+    const result = await this.prisma.fileRecord.findUnique({
+      where: { storageKey },
+    });
+
+    return result ? this.converter.fromPrismaModelToEntity(result) : null;
+  }
 }

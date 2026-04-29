@@ -37,6 +37,10 @@ export class GetDownloadUrlUseCase implements ICommandHandler<
       throw new DomainException(FILES_ERRORS.FILE_ACCESS_REVOKED);
     }
 
+    if (!fileRecord.isDownload) {
+      throw new DomainException(FILES_ERRORS.FILE_NOT_READY);
+    }
+
     const presignedUrl = await this.s3Service.getPresignedDownloadUrl(
       fileRecord.storageKey,
     );

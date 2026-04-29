@@ -7,6 +7,10 @@ export class FileRecordEntity implements IFileRecord {
   storageKey: string;
   fileName: string;
   mimeType: string;
+  fileSize: bigint | null;
+  isUploaded: boolean;
+  isValid: boolean | null;
+  isDownload: boolean;
   isRevoked: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +24,10 @@ export class FileRecordEntity implements IFileRecord {
     entity.storageKey = dto.storageKey;
     entity.fileName = dto.fileName;
     entity.mimeType = dto.mimeType;
+    entity.fileSize = null;
+    entity.isUploaded = false;
+    entity.isValid = null;
+    entity.isDownload = false;
     entity.isRevoked = false;
 
     return entity;
@@ -29,6 +37,20 @@ export class FileRecordEntity implements IFileRecord {
     const entity = new FileRecordEntity();
     Object.assign(entity, model);
     return entity;
+  }
+
+  markUploaded(fileSize: bigint): void {
+    this.isUploaded = true;
+    this.fileSize = fileSize;
+  }
+
+  markValid(): void {
+    this.isValid = true;
+    this.isDownload = true;
+  }
+
+  markInvalid(): void {
+    this.isValid = false;
   }
 
   revoke(): void {

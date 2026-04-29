@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { S3Config } from './s3.config';
 import {
+  CopyObjectCommand,
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -25,7 +27,7 @@ export class S3Service {
 
   async getPresignedUploadUrl(storageKey: string): Promise<string> {
     const command = new PutObjectCommand({
-      Bucket: this.s3Config.bucket,
+      Bucket: this.s3Config.tmpBucket,
       Key: storageKey,
     });
 
@@ -36,12 +38,62 @@ export class S3Service {
 
   async getPresignedDownloadUrl(storageKey: string): Promise<string> {
     const command = new GetObjectCommand({
-      Bucket: this.s3Config.bucket,
+      Bucket: this.s3Config.mainBucket,
       Key: storageKey,
     });
 
     return getSignedUrl(this.s3Client, command, {
       expiresIn: this.s3Config.presignedDownloadTtlSeconds,
     });
+  }
+
+  async copyToMain(storageKey: string): Promise<void> {
+    const command = new CopyObjectCommand({
+      Bucket: this.s3Config.mainBucket,
+      CopySource: `${this.s3Config.tmpBucket}/${storageKey}`,
+      Key: storageKey,
+    });
+
+    await this.s3Client.send(command);
+  }
+
+  async deleteFromTmp(storageKey: string): Promise<void> {
+    const command = new DeleteObjectCommand({
+      Bucket: this.s3Config.tmpBucket,
+      Key: storageKey,
+    });
+
+    await this.s3Client.send(command);
+  }
+
+  async getObjectBuffer(storageKey: string): Promise<Buffer> {
+    const command = new GetObjectCommand({
+      Bucket: this.s3Config.mainBucket,
+      Key: storageKey,
+    });
+
+    const response = await this.s3Client.send(command);
+    const chunks: Uint8Array[] = [];
+
+    for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
+      chunks.push(chunk);
+    }
+
+    return Buffer.concat(chunks);
+  }
+
+  async putObject(
+    storageKey: string,
+    body: Buffer,
+    contentType: string,
+  ): Promise<void> {
+    const command = new PutObjectCommand({
+      Bucket: this.s3Config.mainBucket,
+      Key: storageKey,
+      Body: body,
+      ContentType: contentType,
+    });
+
+    await this.s3Client.send(command);
   }
 }

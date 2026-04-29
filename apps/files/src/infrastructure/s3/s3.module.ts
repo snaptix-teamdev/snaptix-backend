@@ -4,6 +4,6 @@ import { S3Config } from './s3.config';
 
 @Module({
   providers: [S3Service, S3Config],
-  exports: [S3Service],
+  exports: [S3Service, S3Config],
 })
 export class S3Module {}

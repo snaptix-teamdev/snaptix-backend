@@ -15,14 +15,31 @@ datasource db {
 }
 
 model FileRecord {
-  id         String   @id @default(uuid(7)) @db.Uuid
-  userId     String   @map("user_id") @db.Uuid
-  storageKey String   @unique @map("storage_key")
-  fileName   String   @map("file_name")
-  mimeType   String   @map("mime_type")
-  isRevoked  Boolean  @default(false) @map("is_revoked") @db.Boolean
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  id         String    @id @default(uuid(7)) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  storageKey String    @unique @map("storage_key")
+  fileName   String    @map("file_name")
+  mimeType   String    @map("mime_type")
+  fileSize   BigInt?   @map("file_size")
+  isUploaded Boolean   @default(false) @map("is_uploaded") @db.Boolean
+  isValid    Boolean?  @map("is_valid") @db.Boolean
+  isDownload Boolean   @default(false) @map("is_download") @db.Boolean
+  isRevoked  Boolean   @default(false) @map("is_revoked") @db.Boolean
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  variants FileVariant[]
 
   @@map("file_records")
+}
+
+model FileVariant {
+  id           String     @id @default(uuid(7)) @db.Uuid
+  fileRecordId String     @map("file_record_id") @db.Uuid
+  width        Int
+  height       Int
+  storageKey   String     @unique @map("storage_key")
+  fileRecord   FileRecord @relation(fields: [fileRecordId], references: [id])
+
+  @@map("file_variants")
 }

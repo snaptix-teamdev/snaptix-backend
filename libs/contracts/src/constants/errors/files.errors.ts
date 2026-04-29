@@ -20,4 +20,10 @@ export const FILES_ERRORS = {
     httpCode: 403,
     field: 'id',
   },
+  FILE_NOT_READY: {
+    code: 'FILE_NOT_READY',
+    message: 'File is not ready for download yet',
+    httpCode: 409,
+    field: 'id',
+  },
 } satisfies Record<string, IDomainError<IFileRecord>>;
