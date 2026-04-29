@@ -53,6 +53,15 @@
         "tsConfigPath": "libs/core/tsconfig.lib.json"
       }
     },
+    "files": {
+      "type": "application",
+      "root": "apps/files",
+      "entryFile": "main",
+      "sourceRoot": "apps/files/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/files/tsconfig.app.json"
+      }
+    },
     "gateway": {
       "type": "application",
       "root": "apps/gateway",
@@ -69,6 +78,15 @@
       "sourceRoot": "apps/notifications/src",
       "compilerOptions": {
         "tsConfigPath": "apps/notifications/tsconfig.app.json"
+      }
+    },
+    "posts": {
+      "type": "application",
+      "root": "apps/posts",
+      "entryFile": "main",
+      "sourceRoot": "apps/posts/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/posts/tsconfig.app.json"
       }
     },
     "user-accounts": {

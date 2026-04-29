@@ -11,10 +11,15 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
+  ClientDetailsRequestDto,
+  ForgotPasswordPayload,
   ForgotPasswordRequestDto,
   ForgotPasswordResponseDto,
   GetMePayload,
   GetMeResponseDto,
+  LoginPayload,
+  LoginRequestDto,
+  LoginResponseDto,
   MICROSERVICE_NAME,
   RefreshTokensPayload,
   RefreshTokensResponseDto,
@@ -38,16 +43,11 @@ import { RefreshTokenAuthGuard } from '../../core/guards/cookie/refresh-token.gu
 import { ExtractUserFromRequest } from '../../core/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
 import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.swagger';
-import { ForgotPasswordPayload } from '@snaptix/contracts/user-accounts/password-forgot/forgot-password.payload';
 import { ApiForbiddenCustomResponse } from '../../core/swagger/forbidden.swagger';
 import { RecaptchaGuard } from '../../core/guards/recaptcha/recaptcha.guard';
-import { LoginRequestDto } from '@snaptix/contracts/user-accounts/login/login.request-dto';
-import { LoginResponseDto } from '@snaptix/contracts/user-accounts/login/login.response-dto';
 import { ExtractClientDetails } from '../../core/decorators/extract-client-details.decorator';
-import { ClientDetailsRequestDto } from '@snaptix/contracts/user-accounts/login/client-details.request-dto';
 import { Response } from 'express';
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
-import { LoginPayload } from '@snaptix/contracts/user-accounts/login/login.payload';
 import {
   ApiBearerAuth,
   ApiCookieAuth,
