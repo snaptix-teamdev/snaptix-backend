@@ -115,11 +115,12 @@ export class AuthController {
   }
 
   @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.LOGOUT)
-  async logout(@Payload() payload: RefreshTokenPayload): Promise<void> {
-    return this.commandBus.execute(
+  async logout(@Payload() payload: RefreshTokenPayload): Promise<object> {
+    await this.commandBus.execute(
       new LogoutUserCommand({
         refreshToken: payload.refreshToken,
       }),
     );
+    return {};
   }
 }
