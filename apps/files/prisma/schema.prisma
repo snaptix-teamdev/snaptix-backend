@@ -13,3 +13,16 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model FileRecord {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  storageKey String   @unique @map("storage_key")
+  fileName   String   @map("file_name")
+  mimeType   String   @map("mime_type")
+  isRevoked  Boolean  @default(false) @map("is_revoked") @db.Boolean
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("file_records")
+}
