@@ -26,7 +26,7 @@ import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 import { ResetPasswordCommand } from '../application/commands/reset-password.usecase';
 import { RefreshTokensCommand } from '../application/commands/refresh-tokens.usecase';
 import { ResendEmailConfirmationCodeCommand } from '../application/commands/resend-email-confirmation-code.usecase';
-import { RefreshTokenPayload } from '@snaptix/contracts/user-accounts/refresh-token.payload';
+import { RefreshTokenPayload } from '@snaptix/contracts/user-accounts/refresh-tokens/refresh-token.payload';
 import { LogoutUserCommand } from '../application/commands/logout-user.usecase';
 
 @Controller('auth')

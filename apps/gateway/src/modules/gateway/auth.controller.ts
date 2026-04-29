@@ -21,6 +21,7 @@ import {
   LoginRequestDto,
   LoginResponseDto,
   MICROSERVICE_NAME,
+  RefreshTokenPayload,
   RefreshTokensPayload,
   RefreshTokensResponseDto,
   RegisterUserRequestDto,
@@ -55,7 +56,6 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { ExtractRefreshTokenFromCookie } from '../../core/decorators/extract-refresh-token-from-cookie.decorator';
-import { RefreshTokenPayload } from '@snaptix/contracts/user-accounts/refresh-token.payload';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -266,12 +266,14 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(RefreshTokenAuthGuard)
-  async logout(@ExtractRefreshTokenFromCookie() refreshToken: string) {
+  async logout(
+    @ExtractRefreshTokenFromCookie() refreshToken: string,
+  ): Promise<void> {
     const result = this.userAccounts.send<void, RefreshTokenPayload>(
       USER_ACCOUNTS_PATTERNS.AUTH.LOGOUT,
       { refreshToken },
     );
 
-    return firstValueFrom(result);
+    await firstValueFrom(result);
   }
 }
