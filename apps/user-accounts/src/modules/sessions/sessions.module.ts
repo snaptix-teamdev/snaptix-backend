@@ -11,5 +11,6 @@ import { SessionsRepository } from './infrastructure/sessions.repository';
     CreateSessionUseCase,
     UpdateSessionUseCase,
   ],
+  exports: [SessionsRepository],
 })
 export class SessionsModule {}

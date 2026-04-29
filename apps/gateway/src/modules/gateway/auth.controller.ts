@@ -21,6 +21,7 @@ import {
   LoginRequestDto,
   LoginResponseDto,
   MICROSERVICE_NAME,
+  RefreshTokenPayload,
   RefreshTokensPayload,
   RefreshTokensResponseDto,
   RegisterUserRequestDto,
@@ -257,5 +258,22 @@ export class AuthController {
     );
 
     return firstValueFrom(result);
+  }
+
+  /**
+   * Выход из системы
+   */
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(RefreshTokenAuthGuard)
+  async logout(
+    @ExtractRefreshTokenFromCookie() refreshToken: string,
+  ): Promise<void> {
+    const result = this.userAccounts.send<void, RefreshTokenPayload>(
+      USER_ACCOUNTS_PATTERNS.AUTH.LOGOUT,
+      { refreshToken },
+    );
+
+    await firstValueFrom(result);
   }
 }

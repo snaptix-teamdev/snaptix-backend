@@ -43,4 +43,12 @@ export class SessionsRepository {
       },
     });
   }
+
+  async deleteById(sessionId: string): Promise<void> {
+    await this.prisma.session.delete({
+      where: {
+        id: sessionId,
+      },
+    });
+  }
 }
