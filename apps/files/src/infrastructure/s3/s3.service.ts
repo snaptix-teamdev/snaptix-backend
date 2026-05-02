@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { S3Config } from './s3.config';
 import {
   CopyObjectCommand,
@@ -25,14 +26,16 @@ export class S3Service {
     });
   }
 
-  async getPresignedUploadUrl(storageKey: string): Promise<string> {
-    const command = new PutObjectCommand({
+  async getPresignedUploadPost(
+    storageKey: string,
+  ): Promise<{ url: string; fields: Record<string, string> }> {
+    return createPresignedPost(this.s3Client, {
       Bucket: this.s3Config.tmpBucket,
       Key: storageKey,
-    });
-
-    return getSignedUrl(this.s3Client, command, {
-      expiresIn: this.s3Config.presignedUploadTtlSeconds,
+      Expires: this.s3Config.presignedUploadTtlSeconds,
+      Conditions: [
+        ['content-length-range', 1, this.s3Config.maxUploadSizeBytes],
+      ],
     });
   }
 

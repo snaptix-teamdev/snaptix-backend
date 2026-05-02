@@ -1,4 +1,5 @@
 export interface GetUploadUrlResponseDto {
   fileId: string;
-  presignedUrl: string;
+  url: string;
+  fields: Record<string, string>;
 }

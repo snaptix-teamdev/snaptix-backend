@@ -23,6 +23,7 @@ export class S3WebhooksController {
   @Post('tmp-uploaded')
   @HttpCode(200)
   async tmpUploaded(@Body() body: MinioEventBody): Promise<void> {
+    console.log(JSON.stringify(body));
     const record = body.Records?.[0];
     if (!record) return;
 

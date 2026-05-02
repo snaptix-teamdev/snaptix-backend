@@ -16,6 +16,7 @@ import {
   GetDownloadUrlPayload,
   GetDownloadUrlResponseDto,
   GetUploadUrlPayload,
+  GetUploadUrlRequestDto,
   GetUploadUrlResponseDto,
   MICROSERVICE_NAME,
   RevokeFileAccessPayload,
@@ -32,19 +33,6 @@ import {
 import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.swagger';
 import { ApiNotFoundCustomResponse } from '../../core/swagger/not-found.swagger';
 import { ApiForbiddenCustomResponse } from '../../core/swagger/forbidden.swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
-
-class GetUploadUrlRequestDto {
-  /** Имя файла */
-  @IsString()
-  @IsNotEmpty()
-  fileName: string;
-
-  /** MIME-тип файла */
-  @IsString()
-  @IsNotEmpty()
-  mimeType: string;
-}
 
 @Controller({ path: 'files', version: '1' })
 @UseGuards(AccessTokenAuthGuard)

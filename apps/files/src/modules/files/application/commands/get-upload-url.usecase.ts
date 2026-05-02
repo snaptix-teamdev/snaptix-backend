@@ -43,8 +43,9 @@ export class GetUploadUrlUseCase implements ICommandHandler<
     const saved: Pick<IFileRecord, 'id'> =
       await this.fileRecordsRepository.create(entity);
 
-    const presignedUrl = await this.s3Service.getPresignedUploadUrl(storageKey);
+    const { url, fields } =
+      await this.s3Service.getPresignedUploadPost(storageKey);
 
-    return { fileId: saved.id, presignedUrl };
+    return { fileId: saved.id, url, fields };
   }
 }

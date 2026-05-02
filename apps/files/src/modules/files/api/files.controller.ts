@@ -8,7 +8,6 @@ import {
   GetUploadUrlPayload,
   GetUploadUrlResponseDto,
   RevokeFileAccessPayload,
-  RevokeFileAccessResponseDto,
 } from '@snaptix/contracts';
 import { GetUploadUrlCommand } from '../application/commands/get-upload-url.usecase';
 import { GetDownloadUrlCommand } from '../application/commands/get-download-url.usecase';
@@ -35,7 +34,9 @@ export class FilesController {
   @MessagePattern(FILES_MICROSERVICE_PATTERNS.FILES.REVOKE_FILE_ACCESS)
   async revokeFileAccess(
     @Payload() payload: RevokeFileAccessPayload,
-  ): Promise<RevokeFileAccessResponseDto> {
-    return this.commandBus.execute(new RevokeFileAccessCommand(payload));
+  ): Promise<object> {
+    await this.commandBus.execute(new RevokeFileAccessCommand(payload));
+
+    return {};
   }
 }

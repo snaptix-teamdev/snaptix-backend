@@ -1,6 +1,6 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DomainException } from '@snaptix/common';
-import { FILES_ERRORS, RevokeFileAccessResponseDto } from '@snaptix/contracts';
+import { FILES_ERRORS } from '@snaptix/contracts';
 import { FileRecordsRepository } from '../../infrastructure/file-records.repository';
 
 class RevokeFileAccessCommandRequest {
@@ -8,7 +8,7 @@ class RevokeFileAccessCommandRequest {
   userId: string;
 }
 
-export class RevokeFileAccessCommand extends Command<RevokeFileAccessResponseDto> {
+export class RevokeFileAccessCommand extends Command<void> {
   constructor(public readonly dto: RevokeFileAccessCommandRequest) {
     super();
   }
@@ -17,13 +17,11 @@ export class RevokeFileAccessCommand extends Command<RevokeFileAccessResponseDto
 @CommandHandler(RevokeFileAccessCommand)
 export class RevokeFileAccessUseCase implements ICommandHandler<
   RevokeFileAccessCommand,
-  RevokeFileAccessResponseDto
+  void
 > {
   constructor(private readonly fileRecordsRepository: FileRecordsRepository) {}
 
-  async execute({
-    dto,
-  }: RevokeFileAccessCommand): Promise<RevokeFileAccessResponseDto> {
+  async execute({ dto }: RevokeFileAccessCommand): Promise<void> {
     const fileRecord = await this.fileRecordsRepository.findById(dto.fileId);
 
     if (!fileRecord) {
@@ -37,7 +35,5 @@ export class RevokeFileAccessUseCase implements ICommandHandler<
     fileRecord.revoke();
 
     await this.fileRecordsRepository.update(fileRecord);
-
-    return {};
   }
 }
