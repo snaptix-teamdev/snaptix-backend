@@ -13,3 +13,13 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Post {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  description String?
+  userId      String    @map("user_id") @db.Uuid
+  media       String[]  @db.Uuid
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz()
+}

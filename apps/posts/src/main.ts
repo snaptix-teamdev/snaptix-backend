@@ -4,12 +4,12 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { Logger } from '@nestjs/common';
 import { CoreConfig } from './core/config/core.config';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { PostsModule } from './posts.module';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const logger = new Logger('Posts');
 
-  const app = await NestFactory.create<NestExpressApplication>(PostsModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const coreConfig = app.get(CoreConfig);
 
