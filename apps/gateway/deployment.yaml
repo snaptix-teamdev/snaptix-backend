@@ -60,6 +60,16 @@ spec:
                  secretKeyRef:
                    name: main-gateway-production-config-secret
                    key: REFRESH_TOKEN_SECRET
+             - name: MICROSERVICE_POSTS_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: main-gateway-production-config-secret
+                   key: MICROSERVICE_POSTS_HOST
+             - name: MICROSERVICE_POSTS_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: main-gateway-production-config-secret
+                   key: MICROSERVICE_POSTS_PORT
              - name: NODE_ENV
                valueFrom:
                  secretKeyRef:
