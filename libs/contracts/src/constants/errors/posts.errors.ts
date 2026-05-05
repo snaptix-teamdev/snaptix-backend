@@ -1,9 +1,9 @@
 import { IDomainError, IPost } from '@snaptix/common';
 
 export const POSTS_ERRORS = {
-  POST_ATTACHMENTS_COUNT_INVALID: {
-    code: 'POST_ATTACHMENTS_COUNT_INVALID',
-    message: 'Post must have between 1 and 10 attachments',
+  POST_MEDIA_COUNT_INVALID: {
+    code: 'POST_MEDIA_COUNT_INVALID',
+    message: 'Post must have between 1 and 10 media',
     httpCode: 400,
     field: 'media',
   },
@@ -11,6 +11,6 @@ export const POSTS_ERRORS = {
     code: 'POST_NOT_FOUND',
     message: 'Post not found',
     httpCode: 404,
-    field: 'id',
+    field: null,
   },
 } satisfies Record<string, IDomainError<IPost>>;

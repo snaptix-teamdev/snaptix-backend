@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -13,16 +15,22 @@ import {
   CreatePostPayload,
   CreatePostRequestDto,
   CreatePostResponseDto,
+  GetPostByIdMsResponseDto,
+  GetPostByIdPayload,
+  GetPostByIdResponseDto,
   MICROSERVICE_NAME,
   POSTS_PATTERNS,
 } from '@snaptix/contracts';
 import { firstValueFrom } from 'rxjs';
 import { AccessTokenAuthGuard } from '../../core/guards/bearer/access-token.guard';
+import { AccessTokenOptionalAuthGuard } from '../../core/guards/bearer/access-token-optional-auth.guard';
 import { ExtractUserFromRequest } from '../../core/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { ApiBadRequestCustomResponse } from '../../core/swagger/bad-request.swagger';
 import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.swagger';
+import { ApiNotFoundCustomResponse } from '../../core/swagger/not-found.swagger';
+import { UUIDValidationOrNotFoundPipe } from '../../core/pipes/uuid-validation.pipe';
 
 @Controller({ path: 'posts', version: '1' })
 export class PostsController {
@@ -35,7 +43,6 @@ export class PostsController {
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AccessTokenAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Создать пост' })
   @ApiOkResponse({ type: CreatePostResponseDto })
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
@@ -51,6 +58,40 @@ export class PostsController {
         media: body.media,
       },
     );
+
+    const post = await firstValueFrom(result);
+
+    //TODO: убрать хардкод после реализации микросервиса files и добавить маппер
+    return {
+      ...post,
+      media: post.media.map((m) => ({
+        fileId: m.fileId,
+        url: 'https://swebtoon-phinf.pstatic.net/20241203_198/1733185516062oNh7H_PNG/thumbnail.jpg',
+      })),
+    };
+  }
+
+  /**
+   * Получение поста по id
+   */
+  @Get(':postId')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AccessTokenOptionalAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    description:
+      'Авторизация опциональная. Т.е. запрос можно делать как авторизованному, так и неавторизованному юзеру',
+  })
+  @ApiOkResponse({ type: GetPostByIdResponseDto })
+  @ApiBadRequestCustomResponse()
+  @ApiNotFoundCustomResponse()
+  async getPostById(
+    @Param('postId', UUIDValidationOrNotFoundPipe) postId: string,
+  ): Promise<GetPostByIdResponseDto> {
+    const result = this.posts.send<
+      GetPostByIdMsResponseDto,
+      GetPostByIdPayload
+    >(POSTS_PATTERNS.GET_POST_BY_ID, { id: postId });
 
     const post = await firstValueFrom(result);
 
