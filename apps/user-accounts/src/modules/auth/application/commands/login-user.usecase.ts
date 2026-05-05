@@ -11,7 +11,10 @@ import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS, USER_ACCOUNTS_ERRORS } from '@snaptix/contracts';
 import { CreateSessionCommand } from '../../../sessions/application/commands/create-session.usecase';
-import { AuthService, GenerateTokensResult } from '../services/auth.service';
+import {
+  TokensService,
+  GenerateTokensResult,
+} from '../services/tokens.service';
 import { buildDeviceInfo } from '../helpers/build-device-info.helper';
 
 class LoginUserCommandRequest {
@@ -35,7 +38,7 @@ export class LoginUserUseCase implements ICommandHandler<
   constructor(
     private usersRepository: UsersRepository,
     private cryptoService: CryptoService,
-    private authService: AuthService,
+    private tokensService: TokensService,
     private commandBus: CommandBus,
   ) {}
 
@@ -44,7 +47,7 @@ export class LoginUserUseCase implements ICommandHandler<
 
     const deviceId: string = crypto.randomUUID();
 
-    const tokens: GenerateTokensResult = this.authService.generateTokens({
+    const tokens: GenerateTokensResult = this.tokensService.generateTokens({
       userId,
       deviceId,
     });

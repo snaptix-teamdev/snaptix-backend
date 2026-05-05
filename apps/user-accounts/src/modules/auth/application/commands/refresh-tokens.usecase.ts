@@ -10,7 +10,10 @@ import { UpdateSessionCommand } from '../../../sessions/application/commands/upd
 import { JwtAdapter } from '../../infrastructure/jwt.adapter';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS } from '@snaptix/contracts';
-import { AuthService, GenerateTokensResult } from '../services/auth.service';
+import {
+  TokensService,
+  GenerateTokensResult,
+} from '../services/tokens.service';
 import { Logger } from '@nestjs/common';
 
 class RefreshTokensCommandRequest {
@@ -33,7 +36,7 @@ export class RefreshTokensUseCase implements ICommandHandler<
 
   constructor(
     private commandBus: CommandBus,
-    private authService: AuthService,
+    private tokensService: TokensService,
     private jwtAdapter: JwtAdapter,
   ) {}
 
@@ -49,7 +52,7 @@ export class RefreshTokensUseCase implements ICommandHandler<
       throw new DomainException(COMMON_ERRORS.UNAUTHORIZED_ERROR);
     }
 
-    const tokens: GenerateTokensResult = this.authService.generateTokens({
+    const tokens: GenerateTokensResult = this.tokensService.generateTokens({
       userId: refreshTokenPayload.userId,
       deviceId: refreshTokenPayload.deviceId,
     });
