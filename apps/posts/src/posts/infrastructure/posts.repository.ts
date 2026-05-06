@@ -19,4 +19,25 @@ export class PostsRepository {
 
     return this.postConverter.fromPrismaModelToEntity(result);
   }
+
+  async findById(id: string): Promise<PostEntity | null> {
+    const model = await this.prisma.post.findUnique({
+      where: { id, deletedAt: null },
+    });
+
+    if (!model) return null;
+
+    return this.postConverter.fromPrismaModelToEntity(model);
+  }
+
+  async update(entity: PostEntity): Promise<void> {
+    const model = this.postConverter.fromEntityToPrismaModel(entity);
+
+    const { updatedAt: _updatedAt, ...rest } = model;
+
+    await this.prisma.post.update({
+      where: { id: model.id },
+      data: { ...rest },
+    });
+  }
 }

@@ -7,8 +7,11 @@ import {
   GetPostByIdMsResponseDto,
   GetPostByIdPayload,
   POSTS_PATTERNS,
+  UpdatePostMsResponseDto,
+  UpdatePostPayload,
 } from '@snaptix/contracts';
 import { CreatePostCommand } from '../application/commands/create-post.usecase';
+import { UpdatePostCommand } from '../application/commands/update-post.usecase';
 import { GetPostByIdQuery } from '../application/queries/get-post-by-id.usecase';
 
 @Controller()
@@ -33,5 +36,14 @@ export class PostsController {
     @Payload() payload: GetPostByIdPayload,
   ): Promise<GetPostByIdMsResponseDto> {
     return this.queryBus.execute(new GetPostByIdQuery({ id: payload.id }));
+  }
+
+  @MessagePattern(POSTS_PATTERNS.UPDATE_POST)
+  async updatePost(
+    @Payload() payload: UpdatePostPayload,
+  ): Promise<UpdatePostMsResponseDto> {
+    await this.commandBus.execute(new UpdatePostCommand(payload));
+
+    return {};
   }
 }
