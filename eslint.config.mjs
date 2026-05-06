@@ -50,6 +50,7 @@ export default tseslint.config(
   },
   {
     rules: {
+      '@typescript-eslint/no-namespace': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
