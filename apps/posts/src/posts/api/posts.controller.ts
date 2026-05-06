@@ -4,6 +4,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   CreatePostMsResponseDto,
   CreatePostPayload,
+  GetPostByIdMsResponseDto,
+  GetPostByIdPayload,
   POSTS_PATTERNS,
 } from '@snaptix/contracts';
 import { CreatePostCommand } from '../application/commands/create-post.usecase';
@@ -24,5 +26,12 @@ export class PostsController {
       new CreatePostCommand(payload),
     );
     return this.queryBus.execute(new GetPostByIdQuery({ id }));
+  }
+
+  @MessagePattern(POSTS_PATTERNS.GET_POST_BY_ID)
+  async getPostById(
+    @Payload() payload: GetPostByIdPayload,
+  ): Promise<GetPostByIdMsResponseDto> {
+    return this.queryBus.execute(new GetPostByIdQuery({ id: payload.id }));
   }
 }

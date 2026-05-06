@@ -1,12 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { HttpStatus } from '@nestjs/common';
 
 class ForbiddenErrorMessageType {
   @ApiProperty({
     description: 'The HTTP status code of the response',
-    example: HttpStatus.FORBIDDEN,
+    example: 403,
   })
-  status: HttpStatus;
+  status: 403;
 
   @ApiProperty({
     description: 'The error code expressed as a string value',

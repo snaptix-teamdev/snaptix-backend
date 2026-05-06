@@ -15,7 +15,7 @@ export class PostEntity implements IPost {
 
   static create(dto: CreatePostDto): PostEntity {
     if (dto.media.length < 1 || dto.media.length > 10) {
-      throw new DomainException(POSTS_ERRORS.POST_ATTACHMENTS_COUNT_INVALID);
+      throw new DomainException(POSTS_ERRORS.POST_MEDIA_COUNT_INVALID);
     }
 
     const entity = new PostEntity();

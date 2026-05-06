@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ERRORS } from '@snaptix/contracts';
-import { HttpStatus } from '@nestjs/common';
 
 class ConflictErrorMessageType {
   @ApiProperty({
     description: 'The HTTP status code of the response',
-    example: HttpStatus.CONFLICT,
+    example: 409,
   })
-  status: HttpStatus;
+  status: 409;
 
   @ApiProperty({
     description: 'The error code expressed as a string value',

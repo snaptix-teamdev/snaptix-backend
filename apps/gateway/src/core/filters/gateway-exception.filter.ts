@@ -93,7 +93,7 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
       return;
     }
 
-    this.logger.error(exception);
+    this.logger.error({ type: 'Unknown Error', exception });
     const internalException = COMMON_ERRORS.INTERNAL_ERROR;
     response.status(internalException.httpCode).json({
       errors: [
