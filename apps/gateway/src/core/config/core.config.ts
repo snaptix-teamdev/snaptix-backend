@@ -51,6 +51,19 @@ export class CoreConfig {
   })
   microserviceFilesHost: string;
 
+  @IsNumber(
+    {},
+    {
+      message: 'Set Env variable MICROSERVICE_POSTS_PORT, example: 9005',
+    },
+  )
+  microservicePostsPort: number;
+
+  @IsNotEmpty({
+    message: 'Set Env variable MICROSERVICE_POSTS_HOST, example: 0.0.0.0',
+  })
+  microservicePostsHost: string;
+
   @IsEnum(Environments, {
     message:
       'Set correct NODE_ENV value, available values: ' +
@@ -102,6 +115,14 @@ export class CoreConfig {
 
     this.microserviceFilesHost = this.configService.get(
       'MICROSERVICE_FILES_HOST',
+    );
+
+    this.microservicePostsPort = parseInt(
+      this.configService.get<string>('MICROSERVICE_POSTS_PORT'),
+    );
+
+    this.microservicePostsHost = this.configService.get(
+      'MICROSERVICE_POSTS_HOST',
     );
 
     this.env = this.configService.get('NODE_ENV');

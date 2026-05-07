@@ -1,12 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { HttpStatus } from '@nestjs/common';
 
 class UnauthorizedErrorMessageType {
   @ApiProperty({
     description: 'The HTTP status code of the response',
-    example: HttpStatus.UNAUTHORIZED,
+    example: 401,
   })
-  status: HttpStatus;
+  status: 401;
 
   @ApiProperty({
     description: 'The error code expressed as a string value',
