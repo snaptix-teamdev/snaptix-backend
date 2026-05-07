@@ -1,6 +1,6 @@
-import { UserEntity } from '../domain/user/user.entity';
 import { IUser, UniversalConverter } from '@snaptix/common';
 import { Injectable } from '@nestjs/common';
+import { UserEntity } from '../domain/user/user.entity';
 
 const modelToEntity = (model: IUser): UserEntity => {
   if (!model.emailConfirmation) {

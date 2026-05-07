@@ -1,7 +1,7 @@
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
-import { UsersQueryRepository } from '../../infrastructure/query/users.query-repository';
 import { DomainException, IUser } from '@snaptix/common';
 import { USER_ACCOUNTS_ERRORS } from '@snaptix/contracts';
+import { UsersQueryRepository } from '../../../infrastructure/query/users.query-repository';
 
 class GetMeQueryPayload {
   id: string;

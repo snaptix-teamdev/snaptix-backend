@@ -15,18 +15,18 @@ import {
   USER_ACCOUNTS_PATTERNS,
 } from '@snaptix/contracts';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ForgotPasswordPayload } from '@snaptix/contracts/user-accounts/password-forgot/forgot-password.payload';
+import { LoginPayload } from '@snaptix/contracts/user-accounts/login/login.payload';
+import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
+import { RefreshTokenPayload } from '@snaptix/contracts/user-accounts/refresh-tokens/refresh-token.payload';
 import { RegisterUserCommand } from '../application/commands/auth-commands/register-user.usecase';
 import { ConfirmRegistrationCommand } from '../application/commands/auth-commands/confirm-registration.usecase';
-import { GetMeQuery } from '../application/queries/get-me.usecase';
-import { ForgotPasswordPayload } from '@snaptix/contracts/user-accounts/password-forgot/forgot-password.payload';
+import { GetMeQuery } from '../application/queries/get-me.query';
 import { ForgotPasswordCommand } from '../application/commands/auth-commands/forgot-password.usecase';
-import { LoginPayload } from '@snaptix/contracts/user-accounts/login/login.payload';
-import { LoginUserCommand } from '../application/commands/auth-commands/login-user.usecase';
-import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 import { ResetPasswordCommand } from '../application/commands/auth-commands/reset-password.usecase';
-import { RefreshTokensCommand } from '../application/commands/auth-commands/refresh-tokens.usecase';
+import { LoginUserCommand } from '../application/commands/auth-commands/login-user.usecase';
 import { ResendEmailConfirmationCodeCommand } from '../application/commands/auth-commands/resend-email-confirmation-code.usecase';
-import { RefreshTokenPayload } from '@snaptix/contracts/user-accounts/refresh-tokens/refresh-token.payload';
+import { RefreshTokensCommand } from '../application/commands/auth-commands/refresh-tokens.usecase';
 import { LogoutUserCommand } from '../application/commands/auth-commands/logout-user.usecase';
 
 @Controller('auth')

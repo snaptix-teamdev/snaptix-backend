@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { JwtAdapter } from '../../infrastructure/jwt.adapter';
 import { RefreshTokenPayloadDto } from '@snaptix/contracts/tokens';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS } from '@snaptix/contracts';
-import { SessionsRepository } from '../../infrastructure/sessions.repository';
 import { SessionEntity } from '../../domain/session/session.entity';
+import { JwtAdapter } from '../../../infrastructure/jwt.adapter';
+import { SessionsRepository } from '../../../infrastructure/sessions.repository';
 
 export interface GenerateTokensResult {
   accessToken: string;

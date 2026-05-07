@@ -1,10 +1,10 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../infrastructure/users.repository';
 import { IUser } from '@snaptix/common';
 import { USER_ACCOUNTS_EXCHANGE, USER_EVENTS } from '@snaptix/contracts';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { AuthConfig } from '../../../config/auth.config';
 import { Logger } from '@nestjs/common';
+import { UsersRepository } from '../../../../infrastructure/users.repository';
 
 export class ForgotPasswordCommand extends Command<void> {
   constructor(public readonly payload: { email: string }) {

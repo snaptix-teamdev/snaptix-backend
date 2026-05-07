@@ -1,6 +1,6 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { TokensService } from '../../services/tokens.service';
-import { SessionsRepository } from '../../../infrastructure/sessions.repository';
+import { SessionsRepository } from '../../../../infrastructure/sessions.repository';
 
 class DeactivateSessionsExcludingCurrentCommandRequest {
   refreshToken: string;

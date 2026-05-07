@@ -1,8 +1,8 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../infrastructure/users.repository';
-import { UserEntity } from '../../../domain/user/user.entity';
 import { DomainException } from '@snaptix/common';
 import { USER_ACCOUNTS_ERRORS } from '@snaptix/contracts';
+import { UsersRepository } from '../../../../infrastructure/users.repository';
+import { UserEntity } from '../../../domain/user/user.entity';
 
 export class ConfirmRegistrationCommand extends Command<void> {
   constructor(public dto: { code: string }) {

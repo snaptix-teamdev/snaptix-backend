@@ -1,8 +1,8 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SessionsRepository } from '../../../infrastructure/sessions.repository';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS } from '@snaptix/contracts';
 import { Logger } from '@nestjs/common';
+import { SessionsRepository } from '../../../../infrastructure/sessions.repository';
 
 class UpdateSessionCommandRequest {
   userId: string;

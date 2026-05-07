@@ -1,6 +1,6 @@
 import { ISession, UniversalConverter } from '@snaptix/common';
-import { SessionEntity } from '../domain/session/session.entity';
 import { Injectable } from '@nestjs/common';
+import { SessionEntity } from '../domain/session/session.entity';
 
 const modelToEntity = (model: ISession): SessionEntity => {
   return SessionEntity.restore(model);

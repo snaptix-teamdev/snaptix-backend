@@ -5,7 +5,6 @@ import {
   ICommandHandler,
 } from '@nestjs/cqrs';
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
-import { UsersRepository } from '../../../infrastructure/users.repository';
 import { CryptoService } from '../../services/crypto.service';
 import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
 import { DomainException } from '@snaptix/common';
@@ -16,6 +15,7 @@ import {
   GenerateTokensResult,
 } from '../../services/tokens.service';
 import { buildDeviceInfo } from '../../helpers/build-device-info.helper';
+import { UsersRepository } from '../../../../infrastructure/users.repository';
 
 class LoginUserCommandRequest {
   email: string;

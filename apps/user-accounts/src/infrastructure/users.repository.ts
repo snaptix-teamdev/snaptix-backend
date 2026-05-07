@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
-import { UserConverter } from '../converters/user.converter';
-import { UserEntity } from '../domain/user/user.entity';
 import { IUser } from '@snaptix/common';
+import { UserConverter } from '../accounts/converters/user.converter';
+import { UserEntity } from '../accounts/domain/user/user.entity';
 
 @Injectable()
 export class UsersRepository {

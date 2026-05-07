@@ -1,7 +1,4 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../infrastructure/users.repository';
-
-import { UserEntity } from '../../../domain/user/user.entity';
 import { DomainException, IUser } from '@snaptix/common';
 import {
   PasswordChangedEvent,
@@ -11,6 +8,8 @@ import {
 } from '@snaptix/contracts';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { CryptoService } from '../../services/crypto.service';
+import { UsersRepository } from '../../../../infrastructure/users.repository';
+import { UserEntity } from '../../../domain/user/user.entity';
 
 class ResetPasswordCommandRequest {
   password: string;

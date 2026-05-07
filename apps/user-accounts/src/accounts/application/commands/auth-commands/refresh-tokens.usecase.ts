@@ -7,7 +7,6 @@ import {
 import { AccessAndRefreshTokensDto } from '@snaptix/contracts/tokens';
 
 import { UpdateSessionCommand } from '../session-commands/update-session.usecase';
-import { JwtAdapter } from '../../../infrastructure/jwt.adapter';
 import { DomainException } from '@snaptix/common';
 import { COMMON_ERRORS } from '@snaptix/contracts';
 import {
@@ -15,6 +14,7 @@ import {
   GenerateTokensResult,
 } from '../../services/tokens.service';
 import { Logger } from '@nestjs/common';
+import { JwtAdapter } from '../../../../infrastructure/jwt.adapter';
 
 class RefreshTokensCommandRequest {
   refreshToken: string;

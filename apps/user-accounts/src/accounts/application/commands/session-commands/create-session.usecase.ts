@@ -1,6 +1,6 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { SessionsRepository } from '../../../../infrastructure/sessions.repository';
 import { SessionEntity } from '../../../domain/session/session.entity';
-import { SessionsRepository } from '../../../infrastructure/sessions.repository';
 
 class CreateSessionCommandRequest {
   userId: string;

@@ -1,7 +1,5 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DomainException, IUser } from '@snaptix/common';
-import { UsersRepository } from '../../../infrastructure/users.repository';
-import { UserEntity } from '../../../domain/user/user.entity';
 import {
   USER_ACCOUNTS_ERRORS,
   USER_ACCOUNTS_EXCHANGE,
@@ -11,6 +9,8 @@ import { CryptoService } from '../../services/crypto.service';
 import { AuthConfig } from '../../../config/auth.config';
 import { USER_EVENTS } from '@snaptix/contracts/constants/events';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { UsersRepository } from '../../../../infrastructure/users.repository';
+import { UserEntity } from '../../../domain/user/user.entity';
 
 class RegisterUserCommandRequest {
   email: string;
