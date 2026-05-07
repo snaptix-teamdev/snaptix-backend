@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ERRORS } from '@snaptix/contracts';
-import { HttpStatus } from '@nestjs/common';
 
 class NotFoundErrorMessageType {
   @ApiProperty({
     description: 'The HTTP status code of the response',
-    example: HttpStatus.NOT_FOUND,
+    example: 404,
   })
-  status: HttpStatus;
+  status: 404;
 
   @ApiProperty({
     description: 'The error code expressed as a string value',
@@ -16,7 +15,7 @@ class NotFoundErrorMessageType {
       .filter((error) => error.httpCode === 404)
       .map((error) => error.code),
   })
-  code: string;
+  code: string | null;
 
   @ApiProperty({
     description: 'The name of the field where the error occurred',

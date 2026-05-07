@@ -1,6 +1,7 @@
 import { DomainException, IPost } from '@snaptix/common';
 import { POSTS_ERRORS } from '@snaptix/contracts';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 export class PostEntity implements IPost {
   id: string;
@@ -15,7 +16,7 @@ export class PostEntity implements IPost {
 
   static create(dto: CreatePostDto): PostEntity {
     if (dto.media.length < 1 || dto.media.length > 10) {
-      throw new DomainException(POSTS_ERRORS.POST_ATTACHMENTS_COUNT_INVALID);
+      throw new DomainException(POSTS_ERRORS.POST_MEDIA_COUNT_INVALID);
     }
 
     const entity = new PostEntity();
@@ -34,5 +35,9 @@ export class PostEntity implements IPost {
     Object.assign(entity, model);
 
     return entity;
+  }
+
+  update(dto: UpdatePostDto): void {
+    if (dto.description !== undefined) this.description = dto.description;
   }
 }

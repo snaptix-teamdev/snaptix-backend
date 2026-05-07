@@ -4,6 +4,7 @@ import { PostConverter } from './converter/post.converter';
 import { PostsRepository } from './infrastructure/posts.repository';
 import { PostsQueryRepository } from './infrastructure/posts.query-repository';
 import { CreatePostUseCase } from './application/commands/create-post.usecase';
+import { UpdatePostUseCase } from './application/commands/update-post.usecase';
 import { GetPostByIdQueryHandler } from './application/queries/get-post-by-id.usecase';
 
 @Module({
@@ -13,6 +14,7 @@ import { GetPostByIdQueryHandler } from './application/queries/get-post-by-id.us
     PostsRepository,
     PostsQueryRepository,
     CreatePostUseCase,
+    UpdatePostUseCase,
     GetPostByIdQueryHandler,
   ],
 })

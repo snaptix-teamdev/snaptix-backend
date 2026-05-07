@@ -50,9 +50,19 @@ export default tseslint.config(
   },
   {
     rules: {
+      '@typescript-eslint/no-namespace': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: '^_',
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+        },
+      ],
     },
   },
   {
@@ -65,4 +75,26 @@ export default tseslint.config(
     ignores: ['node_modules/'],
   },
   ...crossServiceRules,
+  {
+    files: ['libs/contracts/src/constants/errors/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@snaptix/contracts',
+              message:
+                'Import directly from the source file (e.g. @snaptix/contracts/constants/errors/common.errors) to avoid circular dependencies through barrel exports.',
+            },
+            {
+              name: '@snaptix/contracts/constants',
+              message:
+                'Import directly from the source file (e.g. @snaptix/contracts/constants/errors/common.errors) to avoid circular dependencies through barrel exports.',
+            },
+          ],
+        },
+      ],
+    },
+  },
 );
