@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './api/auth.controller';
-import { PostsController } from './posts.controller';
+import { PostsController } from './api/posts.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_NAME } from '@snaptix/contracts';
 import { CoreConfig } from '../../core/config/core.config';
