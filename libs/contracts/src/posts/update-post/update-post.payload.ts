@@ -3,9 +3,9 @@ import { createZodDto } from 'nestjs-zod';
 import { CommonSchemas, PostSchemas } from '@snaptix/contracts/schemas';
 
 const payload = z.object({
+  postId: CommonSchemas.uuid,
   userId: CommonSchemas.uuid,
   description: PostSchemas.description,
-  media: PostSchemas.media,
 });
 
-export class CreatePostPayload extends createZodDto(payload) {}
+export class UpdatePostPayload extends createZodDto(payload) {}

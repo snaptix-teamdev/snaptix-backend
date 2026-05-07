@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -20,17 +21,21 @@ import {
   GetPostByIdResponseDto,
   MICROSERVICE_NAME,
   POSTS_PATTERNS,
+  UpdatePostMsResponseDto,
+  UpdatePostPayload,
+  UpdatePostRequestDto,
 } from '@snaptix/contracts';
 import { firstValueFrom } from 'rxjs';
-import { AccessTokenAuthGuard } from '../../core/guards/bearer/access-token.guard';
-import { AccessTokenOptionalAuthGuard } from '../../core/guards/bearer/access-token-optional-auth.guard';
-import { ExtractUserFromRequest } from '../../core/decorators/extract-user-from-request.decorator';
+import { AccessTokenAuthGuard } from '../../../core/guards/bearer/access-token.guard';
+import { AccessTokenOptionalAuthGuard } from '../../../core/guards/bearer/access-token-optional-auth.guard';
+import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
-import { ApiBadRequestCustomResponse } from '../../core/swagger/bad-request.swagger';
-import { ApiUnauthorizedCustomResponse } from '../../core/swagger/unauthorized.swagger';
-import { ApiNotFoundCustomResponse } from '../../core/swagger/not-found.swagger';
-import { UUIDValidationOrNotFoundPipe } from '../../core/pipes/uuid-validation.pipe';
+import { ApiBadRequestCustomResponse } from '../../../core/swagger/bad-request.swagger';
+import { ApiUnauthorizedCustomResponse } from '../../../core/swagger/unauthorized.swagger';
+import { ApiNotFoundCustomResponse } from '../../../core/swagger/not-found.swagger';
+import { ApiForbiddenCustomResponse } from '../../../core/swagger/forbidden.swagger';
+import { UUIDValidationOrNotFoundPipe } from '../../../core/pipes/uuid-validation.pipe';
 
 @Controller({ path: 'posts', version: '1' })
 export class PostsController {
@@ -69,6 +74,30 @@ export class PostsController {
         url: 'https://swebtoon-phinf.pstatic.net/20241203_198/1733185516062oNh7H_PNG/thumbnail.jpg',
       })),
     };
+  }
+
+  /**
+   * Редактирование поста
+   */
+  @Patch(':postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AccessTokenAuthGuard)
+  @ApiBearerAuth()
+  @ApiBadRequestCustomResponse()
+  @ApiUnauthorizedCustomResponse()
+  @ApiForbiddenCustomResponse()
+  @ApiNotFoundCustomResponse()
+  async updatePost(
+    @Param('postId', UUIDValidationOrNotFoundPipe) postId: string,
+    @Body() body: UpdatePostRequestDto,
+    @ExtractUserFromRequest() user: UserContextDto,
+  ): Promise<void> {
+    const result = this.posts.send<UpdatePostMsResponseDto, UpdatePostPayload>(
+      POSTS_PATTERNS.UPDATE_POST,
+      { postId, userId: user.userId, description: body.description },
+    );
+
+    await firstValueFrom(result);
   }
 
   /**

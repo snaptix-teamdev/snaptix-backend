@@ -1,6 +1,7 @@
 import { DomainException, IPost } from '@snaptix/common';
 import { POSTS_ERRORS } from '@snaptix/contracts';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 export class PostEntity implements IPost {
   id: string;
@@ -34,5 +35,9 @@ export class PostEntity implements IPost {
     Object.assign(entity, model);
 
     return entity;
+  }
+
+  update(dto: UpdatePostDto): void {
+    if (dto.description !== undefined) this.description = dto.description;
   }
 }
