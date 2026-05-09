@@ -15,7 +15,7 @@ class GetActiveDevicesQueryResponse implements Pick<
   title: string;
   lastActiveDate: string;
   deviceId: string;
-  current: boolean;
+  isCurrent: boolean;
 }
 
 export class GetActiveDevicesQuery extends Query<
@@ -43,18 +43,20 @@ export class GetActiveDevicesQueryHandler implements IQueryHandler<
       payload.refreshToken,
     );
 
-    const sessions = await this.sessionsQueryRepository.findAllByUserId(
+    const sessions = await this.sessionsQueryRepository.findByUserId(
       session.userId,
     );
 
-    return sessions.map((s) => {
-      return {
-        ip: s.ip,
-        title: s.deviceName,
-        lastActiveDate: s.issuedAt.toISOString(),
-        deviceId: s.deviceId,
-        current: s.deviceId === session.deviceId,
-      };
-    });
+    return sessions
+      .map((s) => {
+        return {
+          ip: s.ip,
+          title: s.deviceName,
+          lastActiveDate: s.issuedAt.toISOString(),
+          deviceId: s.deviceId,
+          isCurrent: s.deviceId === session.deviceId,
+        };
+      })
+      .sort((a, b) => Number(b.isCurrent) - Number(a.isCurrent));
   }
 }

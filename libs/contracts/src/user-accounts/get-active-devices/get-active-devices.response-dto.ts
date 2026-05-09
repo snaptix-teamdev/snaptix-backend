@@ -8,5 +8,5 @@ export class GetActiveDevicesResponseDto implements Pick<
   title: string;
   lastActiveDate: string;
   deviceId: string;
-  current: boolean;
+  isCurrent: boolean;
 }
