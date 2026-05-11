@@ -51,6 +51,11 @@ export class CoreConfig {
   })
   microserviceFilesHost: string;
 
+  @IsNotEmpty({
+    message: 'Set Env variable FILES_HTTP_URL, example: http://localhost:9010',
+  })
+  filesHttpUrl: string;
+
   @IsNumber(
     {},
     {
@@ -116,6 +121,8 @@ export class CoreConfig {
     this.microserviceFilesHost = this.configService.get(
       'MICROSERVICE_FILES_HOST',
     );
+
+    this.filesHttpUrl = this.configService.get('FILES_HTTP_URL');
 
     this.microservicePostsPort = parseInt(
       this.configService.get<string>('MICROSERVICE_POSTS_PORT'),

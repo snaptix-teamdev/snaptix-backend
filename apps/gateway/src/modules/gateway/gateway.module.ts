@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './api/auth.controller';
 import { PostsController } from './api/posts.controller';
-import { FilesController } from './files.controller';
+import { FilesController } from './api/files.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_NAME } from '@snaptix/contracts';
 import { CoreConfig } from '../../core/config/core.config';

@@ -26,4 +26,16 @@ export const FILES_ERRORS = {
     httpCode: 409,
     field: 'id',
   },
+  FILE_TOO_LARGE: {
+    code: 'FILE_TOO_LARGE',
+    message: 'File size exceeds the maximum allowed size',
+    httpCode: 413,
+    field: null,
+  },
+  INVALID_FILE_TYPE: {
+    code: 'INVALID_FILE_TYPE',
+    message: 'File content does not match the declared MIME type',
+    httpCode: 422,
+    field: null,
+  },
 } satisfies Record<string, IDomainError<IFileRecord>>;

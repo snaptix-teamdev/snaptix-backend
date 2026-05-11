@@ -8,7 +8,9 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
@@ -24,22 +26,34 @@ import {
   UpdatePostMsResponseDto,
   UpdatePostPayload,
   UpdatePostRequestDto,
+  UploadPostPhotoRequestDto,
 } from '@snaptix/contracts';
 import { firstValueFrom } from 'rxjs';
 import { AccessTokenAuthGuard } from '../../../core/guards/bearer/access-token.guard';
 import { AccessTokenOptionalAuthGuard } from '../../../core/guards/bearer/access-token-optional-auth.guard';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 import { ApiBadRequestCustomResponse } from '../../../core/swagger/bad-request.swagger';
 import { ApiUnauthorizedCustomResponse } from '../../../core/swagger/unauthorized.swagger';
 import { ApiNotFoundCustomResponse } from '../../../core/swagger/not-found.swagger';
 import { ApiForbiddenCustomResponse } from '../../../core/swagger/forbidden.swagger';
 import { UUIDValidationOrNotFoundPipe } from '../../../core/pipes/uuid-validation.pipe';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { SampleDto } from './sample.request-dto';
 
 @Controller({ path: 'posts', version: '1' })
 export class PostsController {
-  constructor(@Inject(MICROSERVICE_NAME.POSTS) private posts: ClientProxy) {}
+  constructor(
+    @Inject(MICROSERVICE_NAME.POSTS) private posts: ClientProxy,
+    @Inject(MICROSERVICE_NAME.FILES) private files: ClientProxy,
+  ) {}
 
   /**
    * Создание поста
@@ -74,6 +88,25 @@ export class PostsController {
         url: 'https://swebtoon-phinf.pstatic.net/20241203_198/1733185516062oNh7H_PNG/thumbnail.jpg',
       })),
     };
+  }
+
+  /**
+   * Загрузить фото поста
+   */
+  @Post('photo')
+  // @UseGuards(AccessTokenAuthGuard)
+  // @ApiBearerAuth()
+  @ApiBody({ type: SampleDto })
+  @ApiConsumes('multipart/form-data')
+  @ApiBadRequestCustomResponse()
+  @ApiUnauthorizedCustomResponse()
+  @UseInterceptors(FileInterceptor('photo'))
+  uploadPhoto(
+    @UploadedFile() photo: Express.Multer.File,
+    @Body() body: UploadPostPhotoRequestDto,
+  ) {
+    console.log(photo);
+    console.log(JSON.stringify(body));
   }
 
   /**

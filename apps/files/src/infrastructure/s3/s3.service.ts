@@ -9,6 +9,8 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import { Readable } from 'stream';
 
 @Injectable()
 export class S3Service {
@@ -98,5 +100,23 @@ export class S3Service {
     });
 
     await this.s3Client.send(command);
+  }
+
+  async putObjectStream(
+    storageKey: string,
+    body: Readable,
+    contentType: string,
+  ): Promise<void> {
+    const upload = new Upload({
+      client: this.s3Client,
+      params: {
+        Bucket: this.s3Config.mainBucket,
+        Key: storageKey,
+        Body: body,
+        ContentType: contentType,
+      },
+    });
+
+    await upload.done();
   }
 }
