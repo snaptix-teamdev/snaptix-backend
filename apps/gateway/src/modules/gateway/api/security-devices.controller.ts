@@ -1,12 +1,14 @@
 import {
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
   UseGuards,
 } from '@nestjs/common';
 import {
+  GetActiveDevicesResponseDto,
   MICROSERVICE_NAME,
   RefreshTokenPayload,
   USER_ACCOUNTS_PATTERNS,
@@ -23,6 +25,24 @@ export class SecurityDevicesController {
   constructor(
     @Inject(MICROSERVICE_NAME.USER_ACCOUNTS) private userAccounts: ClientProxy,
   ) {}
+
+  /**
+   * Получение списка девайсов
+   */
+  @Get()
+  @ApiUnauthorizedCustomResponse()
+  async getActiveDevices(
+    @ExtractRefreshTokenFromCookie() refreshToken: string,
+  ): Promise<GetActiveDevicesResponseDto[]> {
+    const result = this.userAccounts.send<
+      GetActiveDevicesResponseDto[],
+      RefreshTokenPayload
+    >(USER_ACCOUNTS_PATTERNS.SECURITY_DEVICES.GET_ACTIVE_DEVICES, {
+      refreshToken,
+    });
+
+    return firstValueFrom(result);
+  }
 
   /**
    * Деактивация всех сессий, кроме текущей
