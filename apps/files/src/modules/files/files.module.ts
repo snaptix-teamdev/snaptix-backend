@@ -5,7 +5,6 @@ import { FileVariantConverter } from './converter/file-variant.converter';
 import { FilesRepository } from './infrastructure/files.repository';
 import { FileVariantsRepository } from './infrastructure/file-variants.repository';
 import { GetUploadUrlUseCase } from './application/commands/get-upload-url.usecase';
-import { ProcessBucketUploadUseCase } from './application/commands/process-bucket-upload.usecase';
 import { S3Module } from '../../infrastructure/s3/s3.module';
 import { ConfirmUploadFileUseCase } from './application/commands/confirm-upload-file.use-case';
 import { FileValidationService } from './application/file-validation.service';
@@ -21,7 +20,6 @@ import { BulkLinkFilesToEntityUseCase } from './application/commands/bulk-link-f
     FilesRepository,
     FileVariantsRepository,
     GetUploadUrlUseCase,
-    ProcessBucketUploadUseCase,
     GetUploadUrlUseCase,
     ConfirmUploadFileUseCase,
     FileValidationService,

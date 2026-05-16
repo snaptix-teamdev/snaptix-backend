@@ -60,6 +60,7 @@ services:
         until mc alias set local http://localhost:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD > /dev/null 2>&1; do sleep 1; done
         mc mb --ignore-existing local/main-snaptix-files
         mc anonymous set download local/main-snaptix-files
+        mc mb --ignore-existing local/tmp-snaptix-files
         wait $$MINIO_PID
       "
     environment:
