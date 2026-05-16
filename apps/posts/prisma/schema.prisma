@@ -15,11 +15,23 @@ datasource db {
 }
 
 model Post {
-  id          String    @id @default(uuid(7)) @db.Uuid
+  id          String      @id @default(uuid(7)) @db.Uuid
   description String?
-  userId      String    @map("user_id") @db.Uuid
-  media       String[]  @db.Uuid
-  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz()
+  userId      String      @map("user_id") @db.Uuid
+  media       PostMedia[]
+  updatedAt   DateTime    @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz()
+  deletedAt   DateTime?   @map("deleted_at") @db.Timestamptz()
+}
+
+model PostMedia {
+  id         String @id @default(uuid(7)) @db.Uuid
+  fileId     String @map("file_id") @db.Uuid
+  storageKey String @map("storage_key")
+  order      Int    @db.SmallInt
+  post       Post   @relation(fields: [postId], references: [id])
+  postId     String @map("post_id") @db.Uuid
+
+  @@unique([postId, order])
+  @@map("post_media")
 }
