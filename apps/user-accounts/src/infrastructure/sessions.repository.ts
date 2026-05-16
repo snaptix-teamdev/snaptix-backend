@@ -10,16 +10,6 @@ export class SessionsRepository {
     private sessionConverter: SessionConverter,
   ) {}
 
-  async create(entity: SessionEntity): Promise<void> {
-    const model = this.sessionConverter.fromEntityToPrismaModel(entity);
-
-    await this.prisma.session.create({
-      data: {
-        ...model,
-      },
-    });
-  }
-
   async findByUserIdAndDeviceId(
     userId: string,
     deviceId: string,
@@ -31,6 +21,16 @@ export class SessionsRepository {
     if (!model) return null;
 
     return this.sessionConverter.fromPrismaModelToEntity(model);
+  }
+
+  async create(entity: SessionEntity): Promise<void> {
+    const model = this.sessionConverter.fromEntityToPrismaModel(entity);
+
+    await this.prisma.session.create({
+      data: {
+        ...model,
+      },
+    });
   }
 
   async update(entity: SessionEntity): Promise<void> {
