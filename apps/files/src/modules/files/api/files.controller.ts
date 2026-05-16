@@ -2,16 +2,20 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CommandBus } from '@nestjs/cqrs';
 import {
+  BulkLinkFilesToEntityMsResponseDto,
+  BulkLinkFilesToEntityPayload,
+  ConfirmUploadFilePayload,
   FILES_MICROSERVICE_PATTERNS,
-  GetDownloadUrlPayload,
-  GetDownloadUrlResponseDto,
   GetUploadUrlPayload,
   GetUploadUrlResponseDto,
-  RevokeFileAccessPayload,
+  LinkFileToEntityMsResponseDto,
+  LinkFileToEntityPayload,
 } from '@snaptix/contracts';
 import { GetUploadUrlCommand } from '../application/commands/get-upload-url.usecase';
-import { GetDownloadUrlCommand } from '../application/commands/get-download-url.usecase';
-import { RevokeFileAccessCommand } from '../application/commands/revoke-file-access.usecase';
+import { ConfirmUploadFileCommand } from '../application/commands/confirm-upload-file.use-case';
+import { ConfirmUploadFileMsResponseDto } from '@snaptix/contracts/files/confirm-upload-file/confirm-upload-file.ms-response-dto';
+import { LinkFileToEntityCommand } from '../application/commands/link-file-to-entity.use-case';
+import { BulkLinkFilesToEntityCommand } from '../application/commands/bulk-link-files-to-entity.use-case';
 
 @Controller()
 export class FilesController {
@@ -24,19 +28,25 @@ export class FilesController {
     return this.commandBus.execute(new GetUploadUrlCommand(payload));
   }
 
-  @MessagePattern(FILES_MICROSERVICE_PATTERNS.FILES.GET_DOWNLOAD_URL)
-  async getDownloadUrl(
-    @Payload() payload: GetDownloadUrlPayload,
-  ): Promise<GetDownloadUrlResponseDto> {
-    return this.commandBus.execute(new GetDownloadUrlCommand(payload));
+  @MessagePattern(FILES_MICROSERVICE_PATTERNS.FILES.CONFIRM_UPLOAD_FILE)
+  async confirmUploadFile(
+    @Payload() payload: ConfirmUploadFilePayload,
+  ): Promise<ConfirmUploadFileMsResponseDto> {
+    await this.commandBus.execute(new ConfirmUploadFileCommand(payload));
+    return {};
   }
 
-  @MessagePattern(FILES_MICROSERVICE_PATTERNS.FILES.REVOKE_FILE_ACCESS)
-  async revokeFileAccess(
-    @Payload() payload: RevokeFileAccessPayload,
-  ): Promise<object> {
-    await this.commandBus.execute(new RevokeFileAccessCommand(payload));
+  @MessagePattern(FILES_MICROSERVICE_PATTERNS.FILES.LINK_FILE_TO_ENTITY)
+  async linkFileToEntity(
+    @Payload() payload: LinkFileToEntityPayload,
+  ): Promise<LinkFileToEntityMsResponseDto> {
+    return this.commandBus.execute(new LinkFileToEntityCommand(payload));
+  }
 
-    return {};
+  @MessagePattern(FILES_MICROSERVICE_PATTERNS.FILES.BULK_LINK_FILES_TO_ENTITY)
+  async bulkLinkFilesToEntity(
+    @Payload() payload: BulkLinkFilesToEntityPayload,
+  ): Promise<BulkLinkFilesToEntityMsResponseDto> {
+    return this.commandBus.execute(new BulkLinkFilesToEntityCommand(payload));
   }
 }

@@ -1,7 +1,11 @@
 export interface IFileVariant {
   id: string;
-  fileRecordId: string;
-  width: number;
-  height: number;
   storageKey: string;
+  mimeType: string;
+  byteSize: bigint | null;
+  width: number | null;
+  height: number | null;
+  originalFileId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

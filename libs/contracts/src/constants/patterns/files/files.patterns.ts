@@ -1,5 +1,6 @@
 export const FILES_PATTERNS = {
   GET_UPLOAD_URL: 'files.get-upload-url',
-  GET_DOWNLOAD_URL: 'files.get-download-url',
-  REVOKE_FILE_ACCESS: 'files.revoke-file-access',
+  CONFIRM_UPLOAD_FILE: 'files.confirm-upload-file',
+  LINK_FILE_TO_ENTITY: 'files.link-file-to-entity',
+  BULK_LINK_FILES_TO_ENTITY: 'files.bulk-link-files-to-entity',
 } as const;

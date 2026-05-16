@@ -1,4 +1,4 @@
 export * from './get-upload-url/index';
-export * from './get-download-url/index';
-export * from './revoke-file-access/index';
-export * from './stream-upload/index';
+export * from './confirm-upload-file/index';
+export * from './link-file-to-entity/index';
+export * from './bulk-link-files-to-entity/index';

@@ -1,19 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { S3Config } from './s3.config';
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
+  GetObjectCommandOutput,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
-import { Readable } from 'stream';
 
 @Injectable()
 export class S3Service {
+  private readonly logger = new Logger(S3Service.name);
   private readonly s3Client: S3Client;
 
   constructor(private readonly s3Config: S3Config) {
@@ -21,48 +20,41 @@ export class S3Service {
       endpoint: s3Config.endpoint,
       region: s3Config.region,
       credentials: {
-        accessKeyId: s3Config.accessKey,
+        accessKeyId: s3Config.keyId,
         secretAccessKey: s3Config.secretKey,
       },
       forcePathStyle: true,
     });
   }
 
-  async getPresignedUploadPost(
+  async getPresignedUploadUrlFromTmpBucket(
     storageKey: string,
-  ): Promise<{ url: string; fields: Record<string, string> }> {
-    return createPresignedPost(this.s3Client, {
+    mimeType: string,
+    contentLength: number,
+  ): Promise<string> {
+    const command = new PutObjectCommand({
       Bucket: this.s3Config.tmpBucket,
       Key: storageKey,
-      Expires: this.s3Config.presignedUploadTtlSeconds,
-      Conditions: [
-        ['content-length-range', 1, this.s3Config.maxUploadSizeBytes],
-      ],
+      ContentType: mimeType,
+      ContentLength: contentLength,
     });
+    return getSignedUrl(this.s3Client, command, { expiresIn: 30 });
   }
 
-  async getPresignedDownloadUrl(storageKey: string): Promise<string> {
-    const command = new GetObjectCommand({
-      Bucket: this.s3Config.mainBucket,
-      Key: storageKey,
-    });
-
-    return getSignedUrl(this.s3Client, command, {
-      expiresIn: this.s3Config.presignedDownloadTtlSeconds,
-    });
-  }
-
-  async copyToMain(storageKey: string): Promise<void> {
+  async copyFromTmpToMainBucket(
+    tmpBucketStorageKey: string,
+    mainBucketStorageKey: string,
+  ): Promise<void> {
     const command = new CopyObjectCommand({
       Bucket: this.s3Config.mainBucket,
-      CopySource: `${this.s3Config.tmpBucket}/${storageKey}`,
-      Key: storageKey,
+      CopySource: `${this.s3Config.tmpBucket}/${tmpBucketStorageKey}`,
+      Key: mainBucketStorageKey,
     });
 
     await this.s3Client.send(command);
   }
 
-  async deleteFromTmp(storageKey: string): Promise<void> {
+  async deleteFromTmpBucket(storageKey: string): Promise<void> {
     const command = new DeleteObjectCommand({
       Bucket: this.s3Config.tmpBucket,
       Key: storageKey,
@@ -71,20 +63,31 @@ export class S3Service {
     await this.s3Client.send(command);
   }
 
-  async getObjectBuffer(storageKey: string): Promise<Buffer> {
+  async getObjectBufferLength(
+    storageKey: string,
+    bytesLength: number,
+  ): Promise<Buffer | null> {
     const command = new GetObjectCommand({
-      Bucket: this.s3Config.mainBucket,
+      Bucket: this.s3Config.tmpBucket,
       Key: storageKey,
+      Range: `bytes=0-${bytesLength - 1}`,
     });
+    let result: GetObjectCommandOutput;
 
-    const response = await this.s3Client.send(command);
-    const chunks: Uint8Array[] = [];
-
-    for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
-      chunks.push(chunk);
+    try {
+      result = await this.s3Client.send(command);
+    } catch (err) {
+      this.logger.debug(err);
+      return null;
     }
 
-    return Buffer.concat(chunks);
+    if (!result.Body) {
+      return null;
+    }
+
+    const bytes = await result.Body.transformToByteArray();
+
+    return Buffer.from(bytes);
   }
 
   async putObject(
@@ -93,30 +96,12 @@ export class S3Service {
     contentType: string,
   ): Promise<void> {
     const command = new PutObjectCommand({
-      Bucket: this.s3Config.mainBucket,
+      Bucket: this.s3Config.tmpBucket,
       Key: storageKey,
       Body: body,
       ContentType: contentType,
     });
 
     await this.s3Client.send(command);
-  }
-
-  async putObjectStream(
-    storageKey: string,
-    body: Readable,
-    contentType: string,
-  ): Promise<void> {
-    const upload = new Upload({
-      client: this.s3Client,
-      params: {
-        Bucket: this.s3Config.mainBucket,
-        Key: storageKey,
-        Body: body,
-        ContentType: contentType,
-      },
-    });
-
-    await upload.done();
   }
 }

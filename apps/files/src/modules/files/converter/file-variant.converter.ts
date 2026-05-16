@@ -7,10 +7,14 @@ const modelToEntity = (model: IFileVariant): FileVariantEntity =>
 
 const entityToModel = (entity: FileVariantEntity): IFileVariant => ({
   id: entity.id,
-  fileRecordId: entity.fileRecordId,
+  originalFileId: entity.originalFileId,
+  storageKey: entity.storageKey,
+  byteSize: entity.byteSize,
+  mimeType: entity.mimeType,
   width: entity.width,
   height: entity.height,
-  storageKey: entity.storageKey,
+  updatedAt: entity.updatedAt,
+  createdAt: entity.createdAt,
 });
 
 @Injectable()

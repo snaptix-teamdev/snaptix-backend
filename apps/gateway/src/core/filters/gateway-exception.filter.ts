@@ -6,7 +6,11 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { HttpStatus, IDomainError } from '@snaptix/common';
+import {
+  HttpStatus,
+  IBulkDomainExceptionPayload,
+  IDomainError,
+} from '@snaptix/common';
 import { COMMON_ERRORS, ERRORS } from '@snaptix/contracts';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
@@ -16,6 +20,17 @@ function isDomainException(exception: unknown): exception is IDomainError {
     typeof exception === 'object' &&
     exception !== null &&
     (exception as IDomainError).code in ERRORS
+  );
+}
+
+function isBulkDomainException(
+  exception: unknown,
+): exception is IBulkDomainExceptionPayload {
+  return (
+    typeof exception === 'object' &&
+    exception !== null &&
+    (exception as IBulkDomainExceptionPayload).isBulk &&
+    Array.isArray((exception as IBulkDomainExceptionPayload).errors)
   );
 }
 
@@ -73,6 +88,21 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
             message: exception.message,
           },
         ],
+      });
+      return;
+    }
+
+    if (isBulkDomainException(exception)) {
+      this.logger.error({ type: 'BulkDomainException', exception });
+
+      response.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        errors: exception.errors.map(({ itemId, error }) => ({
+          itemId,
+          status: error.httpCode,
+          code: error.code,
+          field: error.field,
+          message: error.message,
+        })),
       });
       return;
     }

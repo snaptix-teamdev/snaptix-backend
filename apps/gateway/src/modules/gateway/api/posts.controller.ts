@@ -8,51 +8,50 @@ import {
   Param,
   Patch,
   Post,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
+  ConfirmUploadFilePayload,
   CreatePostMsResponseDto,
   CreatePostPayload,
   CreatePostRequestDto,
   CreatePostResponseDto,
+  FILES_MICROSERVICE_PATTERNS,
   GetPostByIdMsResponseDto,
   GetPostByIdPayload,
   GetPostByIdResponseDto,
+  GetUploadUrlPayload,
+  GetUploadUrlRequestDto,
+  GetUploadUrlResponseDto,
   MICROSERVICE_NAME,
   POSTS_PATTERNS,
   UpdatePostMsResponseDto,
   UpdatePostPayload,
   UpdatePostRequestDto,
-  UploadPostPhotoRequestDto,
 } from '@snaptix/contracts';
 import { firstValueFrom } from 'rxjs';
 import { AccessTokenAuthGuard } from '../../../core/guards/bearer/access-token.guard';
 import { AccessTokenOptionalAuthGuard } from '../../../core/guards/bearer/access-token-optional-auth.guard';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiOkResponse,
-  ApiOperation,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { ApiBadRequestCustomResponse } from '../../../core/swagger/bad-request.swagger';
 import { ApiUnauthorizedCustomResponse } from '../../../core/swagger/unauthorized.swagger';
 import { ApiNotFoundCustomResponse } from '../../../core/swagger/not-found.swagger';
 import { ApiForbiddenCustomResponse } from '../../../core/swagger/forbidden.swagger';
 import { UUIDValidationOrNotFoundPipe } from '../../../core/pipes/uuid-validation.pipe';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { SampleDto } from './sample.request-dto';
+import { FileEntityType } from '@snaptix/common';
+import { GatewayConfig } from '../gateway.config';
+import { PostViewDto } from './mappers/post.mapper';
+import { ApiUnprocessableEntityCustomResponse } from '../../../core/swagger/unprocessable-entity.swagger';
 
 @Controller({ path: 'posts', version: '1' })
 export class PostsController {
   constructor(
     @Inject(MICROSERVICE_NAME.POSTS) private posts: ClientProxy,
     @Inject(MICROSERVICE_NAME.FILES) private files: ClientProxy,
+    private postsConfig: GatewayConfig,
   ) {}
 
   /**
@@ -62,9 +61,9 @@ export class PostsController {
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AccessTokenAuthGuard)
   @ApiBearerAuth()
-  @ApiOkResponse({ type: CreatePostResponseDto })
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
+  @ApiUnprocessableEntityCustomResponse()
   async createPost(
     @Body() body: CreatePostRequestDto,
     @ExtractUserFromRequest() user: UserContextDto,
@@ -80,33 +79,57 @@ export class PostsController {
 
     const post = await firstValueFrom(result);
 
-    //TODO: убрать хардкод после реализации микросервиса files и добавить маппер
-    return {
-      ...post,
-      media: post.media.map((m) => ({
-        fileId: m.fileId,
-        url: 'https://swebtoon-phinf.pstatic.net/20241203_198/1733185516062oNh7H_PNG/thumbnail.jpg',
-      })),
-    };
+    return new PostViewDto(post, this.postsConfig.filesStorageBaseUrl);
   }
 
   /**
-   * Загрузить фото поста
+   * Получить presignedUrl для загрузки фото поста
    */
-  @Post('photo')
-  // @UseGuards(AccessTokenAuthGuard)
-  // @ApiBearerAuth()
-  @ApiBody({ type: SampleDto })
-  @ApiConsumes('multipart/form-data')
+  @Post('photo/get-upload-url')
+  @UseGuards(AccessTokenAuthGuard)
+  @ApiBearerAuth()
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
-  @UseInterceptors(FileInterceptor('photo'))
-  uploadPhoto(
-    @UploadedFile() photo: Express.Multer.File,
-    @Body() body: UploadPostPhotoRequestDto,
-  ) {
-    console.log(photo);
-    console.log(JSON.stringify(body));
+  getUploadPhotoUrl(
+    @Body() body: GetUploadUrlRequestDto,
+    @ExtractUserFromRequest() user: UserContextDto,
+  ): Promise<GetUploadUrlResponseDto> {
+    const result = this.files.send<
+      GetUploadUrlResponseDto,
+      GetUploadUrlPayload
+    >(FILES_MICROSERVICE_PATTERNS.FILES.GET_UPLOAD_URL, {
+      userId: user.userId,
+      fileName: body.fileName,
+      contentLengthBytes: body.contentLengthBytes,
+      mimeType: body.mimeType,
+      fileEntityType: FileEntityType.POST_PHOTO,
+    });
+
+    return firstValueFrom(result);
+  }
+
+  /**
+   * Подтвердить загрузку фото поста
+   */
+  @Post(`photo/:photoId/confirm`)
+  @UseGuards(AccessTokenAuthGuard)
+  @ApiBearerAuth()
+  @ApiNotFoundCustomResponse()
+  @ApiBadRequestCustomResponse()
+  @ApiUnauthorizedCustomResponse()
+  async confirmUploadPhoto(
+    @ExtractUserFromRequest() user: UserContextDto,
+    @Param('photoId', UUIDValidationOrNotFoundPipe) photoId: string,
+  ): Promise<void> {
+    const result = this.files.send<void, ConfirmUploadFilePayload>(
+      FILES_MICROSERVICE_PATTERNS.FILES.CONFIRM_UPLOAD_FILE,
+      {
+        userId: user.userId,
+        fileId: photoId,
+      },
+    );
+
+    await firstValueFrom(result);
   }
 
   /**
@@ -157,13 +180,6 @@ export class PostsController {
 
     const post = await firstValueFrom(result);
 
-    //TODO: убрать хардкод после реализации микросервиса files и добавить маппер
-    return {
-      ...post,
-      media: post.media.map((m) => ({
-        fileId: m.fileId,
-        url: 'https://swebtoon-phinf.pstatic.net/20241203_198/1733185516062oNh7H_PNG/thumbnail.jpg',
-      })),
-    };
+    return new PostViewDto(post, this.postsConfig.filesStorageBaseUrl);
   }
 }

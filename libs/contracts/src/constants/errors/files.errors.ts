@@ -1,30 +1,29 @@
-import { IDomainError } from '@snaptix/common';
-import { IFileRecord } from '@snaptix/common';
+import { IDomainError, IFile } from '@snaptix/common';
 
 export const FILES_ERRORS = {
   FILE_NOT_FOUND: {
     code: 'FILE_NOT_FOUND',
-    message: 'File not found',
+    message: 'File with current id not found',
     httpCode: 404,
-    field: 'id',
+    field: null,
   },
-  FILE_ACCESS_REVOKED: {
-    code: 'FILE_ACCESS_REVOKED',
-    message: 'File access has been revoked',
-    httpCode: 403,
-    field: 'id',
+  FILE_MIME_TYPE_NOT_SUPPORTED: {
+    code: 'FILE_MIME_TYPE_NOT_SUPPORTED',
+    message: 'File mime type is not supported',
+    httpCode: 409,
+    field: null,
   },
-  FILE_ACCESS_FORBIDDEN: {
-    code: 'FILE_ACCESS_FORBIDDEN',
-    message: 'You do not have permission to perform this action on the file',
-    httpCode: 403,
-    field: 'id',
+  FILE_NOT_UPLOADED: {
+    code: 'FILE_NOT_UPLOADED',
+    message: 'File has not been uploaded yet',
+    httpCode: 409,
+    field: null,
   },
   FILE_NOT_READY: {
     code: 'FILE_NOT_READY',
     message: 'File is not ready for download yet',
     httpCode: 409,
-    field: 'id',
+    field: null,
   },
   FILE_TOO_LARGE: {
     code: 'FILE_TOO_LARGE',
@@ -38,4 +37,34 @@ export const FILES_ERRORS = {
     httpCode: 422,
     field: null,
   },
-} satisfies Record<string, IDomainError<IFileRecord>>;
+  FILE_ALREADY_CONFIRMED: {
+    code: 'FILE_ALREADY_CONFIRMED',
+    message: 'File already confirmed',
+    httpCode: 409,
+    field: null,
+  },
+  FILE_NOT_CONFIRMED: {
+    code: 'FILE_NOT_CONFIRMED',
+    message: 'File not confirmed',
+    httpCode: 409,
+    field: null,
+  },
+  FILE_NOT_BELONG_ENTITY: {
+    code: 'FILE_NOT_BELONG_ENTITY',
+    message: 'The file does not belong to this entity',
+    httpCode: 403,
+    field: null,
+  },
+  FILE_NOT_BELONG_USER: {
+    code: 'FILE_NOT_BELONG_USER',
+    message: 'The file does not belong to this user',
+    httpCode: 403,
+    field: null,
+  },
+  FILE_LINKED_TO_OTHER_ENTITY: {
+    code: 'FILE_LINKED_TO_OTHER_ENTITY',
+    message: 'The file is linked to another entity',
+    httpCode: 409,
+    field: null,
+  },
+} satisfies Record<string, IDomainError<IFile>>;

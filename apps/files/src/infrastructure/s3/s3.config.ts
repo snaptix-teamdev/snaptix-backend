@@ -5,13 +5,13 @@ import { configValidationUtility } from '@snaptix/common';
 
 export enum S3Provider {
   MINIO = 'minio',
-  YANDEX = 'yandex',
+  OTHER = 'other',
 }
 
 @Injectable()
 export class S3Config {
   @IsEnum(S3Provider, {
-    message: 'Set Env variable S3_PROVIDER: minio | yandex',
+    message: 'Set Env variable S3_PROVIDER: minio | other',
   })
   provider: S3Provider;
 
@@ -21,9 +21,9 @@ export class S3Config {
   endpoint: string;
 
   @IsNotEmpty({
-    message: 'Set Env variable S3_ACCESS_KEY',
+    message: 'Set Env variable S3_KEY_ID',
   })
-  accessKey: string;
+  keyId: string;
 
   @IsNotEmpty({
     message: 'Set Env variable S3_SECRET_KEY',
@@ -31,7 +31,7 @@ export class S3Config {
   secretKey: string;
 
   @IsNotEmpty({
-    message: 'Set Env variable S3_TMP_BUCKET, example: snaptix-files-tmp',
+    message: 'Set Env variable S3_TMP_BUCKET, example: snaptix-files',
   })
   tmpBucket: string;
 
@@ -45,24 +45,14 @@ export class S3Config {
   })
   region: string;
 
-  @IsNotEmpty({
-    message: 'Set Env variable S3_WEBHOOK_SECRET',
-  })
-  webhookSecret: string;
-
-  readonly presignedUploadTtlSeconds = 30;
-  readonly presignedDownloadTtlSeconds = 30;
-  readonly maxUploadSizeBytes = 10 * 1024 * 1024; // 10 MB
-
   constructor(private configService: ConfigService<any, true>) {
     this.provider = this.configService.get('S3_PROVIDER');
     this.endpoint = this.configService.get('S3_ENDPOINT');
-    this.accessKey = this.configService.get('S3_ACCESS_KEY');
+    this.keyId = this.configService.get('S3_KEY_ID');
     this.secretKey = this.configService.get('S3_SECRET_KEY');
     this.tmpBucket = this.configService.get('S3_TMP_BUCKET');
     this.mainBucket = this.configService.get('S3_MAIN_BUCKET');
     this.region = this.configService.get('S3_REGION');
-    this.webhookSecret = this.configService.get('S3_WEBHOOK_SECRET');
 
     configValidationUtility.validateConfig(this);
   }

@@ -104,7 +104,6 @@
     "amqp-connection-manager": "^5.0.0",
     "amqplib": "^1.0.3",
     "axios": "^1.15.0",
-    "busboy": "^1.6.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "cookie-parser": "^1.4.7",
@@ -121,7 +120,7 @@
     "rxjs": "^7.8.1",
     "sharp": "^0.34.5",
     "ua-parser-js": "^2.0.9",
-    "undici": "^8.2.0",
+    "uuid": "^14.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

@@ -1,19 +1,22 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { IFileRecord } from '@snaptix/common';
 import { randomUUID } from 'crypto';
-import { FileRecordsRepository } from '../../infrastructure/file-records.repository';
-import { FileRecordEntity } from '../../domain/file-record.entity';
 import { S3Service } from '../../../../infrastructure/s3/s3.service';
-import { GetUploadUrlResponseDto } from '@snaptix/contracts';
+import { FilesRepository } from '../../infrastructure/files.repository';
+import { FileEntity } from '../../domain/file.entity';
+import { FileEntityType, FileStatus } from '@snaptix/common';
 
-class GetUploadUrlCommandRequest {
+class GetUploadUrlCommandPayload {
   userId: string;
   fileName: string;
   mimeType: string;
+  contentLengthBytes: number;
+  fileEntityType: FileEntityType;
 }
 
-export class GetUploadUrlCommand extends Command<GetUploadUrlResponseDto> {
-  constructor(public readonly dto: GetUploadUrlCommandRequest) {
+type GetUploadUrlCommandResult = { url: string; fileId: string };
+
+export class GetUploadUrlCommand extends Command<GetUploadUrlCommandResult> {
+  constructor(public readonly payload: GetUploadUrlCommandPayload) {
     super();
   }
 }
@@ -21,31 +24,36 @@ export class GetUploadUrlCommand extends Command<GetUploadUrlResponseDto> {
 @CommandHandler(GetUploadUrlCommand)
 export class GetUploadUrlUseCase implements ICommandHandler<
   GetUploadUrlCommand,
-  GetUploadUrlResponseDto
+  GetUploadUrlCommandResult
 > {
   constructor(
-    private readonly fileRecordsRepository: FileRecordsRepository,
+    private readonly filesRepository: FilesRepository,
     private readonly s3Service: S3Service,
   ) {}
 
   async execute({
-    dto,
-  }: GetUploadUrlCommand): Promise<GetUploadUrlResponseDto> {
-    const storageKey = `${dto.userId}/${randomUUID()}`;
+    payload,
+  }: GetUploadUrlCommand): Promise<GetUploadUrlCommandResult> {
+    const storageKey = `${payload.userId}/${payload.fileEntityType.toLowerCase()}/${randomUUID()}`;
 
-    const entity = FileRecordEntity.create({
-      userId: dto.userId,
+    const entity = FileEntity.create({
+      ownerId: payload.userId,
+      status: FileStatus.PENDING,
+      entityType: payload.fileEntityType,
+      fileName: payload.fileName,
+      mimeType: payload.mimeType,
+      byteSize: payload.contentLengthBytes,
       storageKey,
-      fileName: dto.fileName,
-      mimeType: dto.mimeType,
     });
 
-    const saved: Pick<IFileRecord, 'id'> =
-      await this.fileRecordsRepository.create(entity);
+    const savedFile = await this.filesRepository.create(entity);
 
-    const { url, fields } =
-      await this.s3Service.getPresignedUploadPost(storageKey);
+    const url = await this.s3Service.getPresignedUploadUrlFromTmpBucket(
+      storageKey,
+      payload.mimeType,
+      payload.contentLengthBytes,
+    );
 
-    return { fileId: saved.id, url, fields };
+    return { url, fileId: savedFile.id };
   }
 }

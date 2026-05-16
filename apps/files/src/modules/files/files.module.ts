@@ -1,35 +1,32 @@
 import { Module } from '@nestjs/common';
 import { FilesController } from './api/files.controller';
-import { S3WebhooksController } from './api/s3-webhooks.controller';
-import { UploadStreamController } from './api/upload-stream.controller';
-import { S3WebhookGuard } from './api/guards/s3-webhook.guard';
-import { FileRecordConverter } from './converter/file-record.converter';
+import { FileConverter } from './converter/file.converter';
 import { FileVariantConverter } from './converter/file-variant.converter';
-import { FileRecordsRepository } from './infrastructure/file-records.repository';
+import { FilesRepository } from './infrastructure/files.repository';
 import { FileVariantsRepository } from './infrastructure/file-variants.repository';
 import { GetUploadUrlUseCase } from './application/commands/get-upload-url.usecase';
-import { GetDownloadUrlUseCase } from './application/commands/get-download-url.usecase';
-import { RevokeFileAccessUseCase } from './application/commands/revoke-file-access.usecase';
-import { ProcessTmpUploadUseCase } from './application/commands/process-tmp-upload.usecase';
-import { ProcessMainUploadUseCase } from './application/commands/process-main-upload.usecase';
-import { StreamUploadUseCase } from './application/commands/stream-upload.usecase';
+import { ProcessBucketUploadUseCase } from './application/commands/process-bucket-upload.usecase';
 import { S3Module } from '../../infrastructure/s3/s3.module';
+import { ConfirmUploadFileUseCase } from './application/commands/confirm-upload-file.use-case';
+import { FileValidationService } from './application/file-validation.service';
+import { LinkFileToEntityUseCase } from './application/commands/link-file-to-entity.use-case';
+import { BulkLinkFilesToEntityUseCase } from './application/commands/bulk-link-files-to-entity.use-case';
 
 @Module({
   imports: [S3Module],
-  controllers: [FilesController, S3WebhooksController, UploadStreamController],
+  controllers: [FilesController],
   providers: [
-    S3WebhookGuard,
-    FileRecordConverter,
+    FileConverter,
     FileVariantConverter,
-    FileRecordsRepository,
+    FilesRepository,
     FileVariantsRepository,
     GetUploadUrlUseCase,
-    GetDownloadUrlUseCase,
-    RevokeFileAccessUseCase,
-    ProcessTmpUploadUseCase,
-    ProcessMainUploadUseCase,
-    StreamUploadUseCase,
+    ProcessBucketUploadUseCase,
+    GetUploadUrlUseCase,
+    ConfirmUploadFileUseCase,
+    FileValidationService,
+    LinkFileToEntityUseCase,
+    BulkLinkFilesToEntityUseCase,
   ],
 })
 export class FilesFeatureModule {}
