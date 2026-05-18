@@ -6,3 +6,4 @@ export * from './register/index';
 export * from './registration-confirmation/index';
 export * from './resend-email-confirmation-code/index';
 export * from './login/index';
+export * from './get-active-devices/index';

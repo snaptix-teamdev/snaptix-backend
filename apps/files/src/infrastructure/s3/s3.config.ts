@@ -1,20 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { configValidationUtility } from '@snaptix/common';
-
-export enum S3Provider {
-  MINIO = 'minio',
-  OTHER = 'other',
-}
 
 @Injectable()
 export class S3Config {
-  @IsEnum(S3Provider, {
-    message: 'Set Env variable S3_PROVIDER: minio | other',
-  })
-  provider: S3Provider;
-
   @IsNotEmpty({
     message: 'Set Env variable S3_ENDPOINT, example: http://localhost:9000',
   })
@@ -46,7 +36,6 @@ export class S3Config {
   region: string;
 
   constructor(private configService: ConfigService<any, true>) {
-    this.provider = this.configService.get('S3_PROVIDER');
     this.endpoint = this.configService.get('S3_ENDPOINT');
     this.keyId = this.configService.get('S3_KEY_ID');
     this.secretKey = this.configService.get('S3_SECRET_KEY');

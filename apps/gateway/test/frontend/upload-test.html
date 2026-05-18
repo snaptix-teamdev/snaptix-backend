@@ -370,40 +370,6 @@
   let presignedUrl = null;
   let fileId = null;
 
-  // ── CRC32 ──────────────────────────────────────────────────────────────────
-  const CRC32_TABLE = (() => {
-    const t = new Uint32Array(256);
-    for (let i = 0; i < 256; i++) {
-      let c = i;
-      for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-      t[i] = c;
-    }
-    return t;
-  })();
-
-  function computeCRC32(bytes) {
-    let crc = 0xFFFFFFFF;
-    for (let i = 0; i < bytes.length; i++) {
-      crc = CRC32_TABLE[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
-    }
-    return (crc ^ 0xFFFFFFFF) >>> 0;
-  }
-
-  function crc32ToBase64(val) {
-    const b = new Uint8Array(4);
-    b[0] = (val >>> 24) & 0xFF;
-    b[1] = (val >>> 16) & 0xFF;
-    b[2] = (val >>>  8) & 0xFF;
-    b[3] =  val         & 0xFF;
-    return btoa(String.fromCharCode(...b));
-  }
-
-  async function fileCRC32Base64(file) {
-    const buf = await file.arrayBuffer();
-    const bytes = new Uint8Array(buf);
-    return crc32ToBase64(computeCRC32(bytes));
-  }
-
   // ── log ────────────────────────────────────────────────────────────────────
   function log(msg, level = 'info') {
     const el = document.createElement('div');
@@ -572,19 +538,6 @@
     const mimeType = selectedFile.type || 'application/octet-stream';
 
     try {
-      // Extract x-amz-checksum-crc32 from URL query params (if present)
-      const urlObj = new URL(presignedUrl);
-      const urlCrc32 = urlObj.searchParams.get('x-amz-checksum-crc32');
-
-      // Compute actual CRC32 of file
-      log('Вычисление CRC32...');
-      setProgress(0, 'Вычисление CRC32...');
-      const computedCrc32 = await fileCRC32Base64(selectedFile);
-      log(`CRC32: ${computedCrc32} ${urlCrc32 ? `(URL param: ${urlCrc32})` : ''}`, 'info');
-
-      // Use computed CRC32; fall back to URL param if needed
-      const checksumHeader = computedCrc32 || urlCrc32;
-
       log(`PUT ${presignedUrl.substring(0, 80)}...`);
       setProgress(0, 'Загрузка...');
 
@@ -610,10 +563,7 @@
         xhr.ontimeout = () => reject(new Error('Таймаут загрузки'));
 
         xhr.open('PUT', presignedUrl);
-        // xhr.setRequestHeader('Content-Type', mimeType);
-        // if (checksumHeader) {
-        //   xhr.setRequestHeader('x-amz-checksum-crc32', checksumHeader);
-        // }
+
         xhr.send(selectedFile);
       });
 

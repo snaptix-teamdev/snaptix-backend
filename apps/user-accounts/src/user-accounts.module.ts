@@ -32,6 +32,8 @@ import { TokensService } from './accounts/application/services/tokens.service';
 import { SessionConverter } from './accounts/converters/session.converter';
 import { SessionsRepository } from './infrastructure/sessions.repository';
 import { UserConverter } from './accounts/converters/user.converter';
+import { GetActiveDevicesQueryHandler } from './accounts/application/queries/get-active-devices.query';
+import { SessionsQueryRepository } from './infrastructure/query/sessions.query-repository';
 
 const authUseCases = [
   RegisterUserUseCase,
@@ -95,6 +97,8 @@ const sessionUseCases = [
     UserConverter,
     UsersRepository,
     UsersQueryRepository,
+    GetActiveDevicesQueryHandler,
+    SessionsQueryRepository,
   ],
 })
 export class UserAccountsModule {}
