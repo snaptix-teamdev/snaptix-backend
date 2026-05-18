@@ -28,6 +28,10 @@ class ConflictErrorMessageType {
     example: ERRORS.EMAIL_ALREADY_CONFIRMED.message,
   })
   message: string;
+
+  meta?: {
+    itemId?: string;
+  };
 }
 
 export class ConflictErrorsResponseDto {
