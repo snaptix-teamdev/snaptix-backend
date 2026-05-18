@@ -12,13 +12,18 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
+  ConfirmUploadFilePayload,
   CreatePostMsResponseDto,
   CreatePostPayload,
   CreatePostRequestDto,
   CreatePostResponseDto,
+  FILES_MICROSERVICE_PATTERNS,
   GetPostByIdMsResponseDto,
   GetPostByIdPayload,
   GetPostByIdResponseDto,
+  GetUploadUrlPayload,
+  GetUploadUrlRequestDto,
+  GetUploadUrlResponseDto,
   MICROSERVICE_NAME,
   POSTS_PATTERNS,
   UpdatePostMsResponseDto,
@@ -36,10 +41,18 @@ import { ApiUnauthorizedCustomResponse } from '../../../core/swagger/unauthorize
 import { ApiNotFoundCustomResponse } from '../../../core/swagger/not-found.swagger';
 import { ApiForbiddenCustomResponse } from '../../../core/swagger/forbidden.swagger';
 import { UUIDValidationOrNotFoundPipe } from '../../../core/pipes/uuid-validation.pipe';
+import { FileEntityType } from '@snaptix/common';
+import { GatewayConfig } from '../gateway.config';
+import { PostViewDto } from './mappers/post.mapper';
+import { ApiConflictCustomResponse } from '../../../core/swagger/conflict.swagger';
 
 @Controller({ path: 'posts', version: '1' })
 export class PostsController {
-  constructor(@Inject(MICROSERVICE_NAME.POSTS) private posts: ClientProxy) {}
+  constructor(
+    @Inject(MICROSERVICE_NAME.POSTS) private posts: ClientProxy,
+    @Inject(MICROSERVICE_NAME.FILES) private files: ClientProxy,
+    private postsConfig: GatewayConfig,
+  ) {}
 
   /**
    * Создание поста
@@ -47,10 +60,18 @@ export class PostsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AccessTokenAuthGuard)
+  @ApiOperation({
+    description: `
+      Шаги создания поста:
+      \n1. Получить \`presignedUrl\` и \`fileId\` (photo/get-upload-url)
+      \n2. После загрузки юзером фото - подтвердите (photo/:photoId/confirm) загрузку передав \`fileId\` из шага 1
+      \n3. Добавьте \`fileId\` в массив \`media\`
+      `,
+  })
   @ApiBearerAuth()
-  @ApiOkResponse({ type: CreatePostResponseDto })
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
+  @ApiConflictCustomResponse()
   async createPost(
     @Body() body: CreatePostRequestDto,
     @ExtractUserFromRequest() user: UserContextDto,
@@ -66,14 +87,64 @@ export class PostsController {
 
     const post = await firstValueFrom(result);
 
-    //TODO: убрать хардкод после реализации микросервиса files и добавить маппер
-    return {
-      ...post,
-      media: post.media.map((m) => ({
-        fileId: m.fileId,
-        url: 'https://swebtoon-phinf.pstatic.net/20241203_198/1733185516062oNh7H_PNG/thumbnail.jpg',
-      })),
-    };
+    return new PostViewDto(post, this.postsConfig.filesStorageBaseUrl);
+  }
+
+  /**
+   * Получить presignedUrl для загрузки фото поста
+   */
+  @Post('photo/get-upload-url')
+  @UseGuards(AccessTokenAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    description: `
+      Шаги загрузки фото:
+      \n1. Извлечь необходимые данные из файла и получить \`url\` и \`fileId\`
+      \n2. Загрузить файл отправив PUT запрос на url
+      `,
+  })
+  @ApiBadRequestCustomResponse()
+  @ApiUnauthorizedCustomResponse()
+  getUploadPhotoUrl(
+    @Body() body: GetUploadUrlRequestDto,
+    @ExtractUserFromRequest() user: UserContextDto,
+  ): Promise<GetUploadUrlResponseDto> {
+    const result = this.files.send<
+      GetUploadUrlResponseDto,
+      GetUploadUrlPayload
+    >(FILES_MICROSERVICE_PATTERNS.FILES.GET_UPLOAD_URL, {
+      userId: user.userId,
+      fileName: body.fileName,
+      contentLengthBytes: body.contentLengthBytes,
+      mimeType: body.mimeType,
+      fileEntityType: FileEntityType.POST_PHOTO,
+    });
+
+    return firstValueFrom(result);
+  }
+
+  /**
+   * Подтвердить загрузку фото поста
+   */
+  @Post(`photo/:fileId/confirm`)
+  @UseGuards(AccessTokenAuthGuard)
+  @ApiBearerAuth()
+  @ApiNotFoundCustomResponse()
+  @ApiBadRequestCustomResponse()
+  @ApiUnauthorizedCustomResponse()
+  async confirmUploadPhoto(
+    @ExtractUserFromRequest() user: UserContextDto,
+    @Param('fileId', UUIDValidationOrNotFoundPipe) fileId: string,
+  ): Promise<void> {
+    const result = this.files.send<void, ConfirmUploadFilePayload>(
+      FILES_MICROSERVICE_PATTERNS.FILES.CONFIRM_UPLOAD_FILE,
+      {
+        userId: user.userId,
+        fileId,
+      },
+    );
+
+    await firstValueFrom(result);
   }
 
   /**
@@ -117,6 +188,8 @@ export class PostsController {
   async getPostById(
     @Param('postId', UUIDValidationOrNotFoundPipe) postId: string,
   ): Promise<GetPostByIdResponseDto> {
+    //TODO получение поста со всей логикой вынести в post-aggregation.service.ts
+
     const result = this.posts.send<
       GetPostByIdMsResponseDto,
       GetPostByIdPayload
@@ -124,13 +197,6 @@ export class PostsController {
 
     const post = await firstValueFrom(result);
 
-    //TODO: убрать хардкод после реализации микросервиса files и добавить маппер
-    return {
-      ...post,
-      media: post.media.map((m) => ({
-        fileId: m.fileId,
-        url: 'https://swebtoon-phinf.pstatic.net/20241203_198/1733185516062oNh7H_PNG/thumbnail.jpg',
-      })),
-    };
+    return new PostViewDto(post, this.postsConfig.filesStorageBaseUrl);
   }
 }

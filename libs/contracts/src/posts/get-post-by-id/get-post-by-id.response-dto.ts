@@ -28,7 +28,7 @@ export class GetPostByIdResponseDto {
   @ApiProperty({
     type: [Media],
   })
-  media: { fileId: string; url: string }[];
+  media: { mediaId: string; url: string }[];
 
   updatedAt: Date;
   createdAt: Date;

@@ -1,5 +1,9 @@
 import { Catch, Logger, RpcExceptionFilter } from '@nestjs/common';
-import { DomainException, IDomainError } from '@snaptix/common';
+import {
+  BulkDomainException,
+  DomainException,
+  IDomainError,
+} from '@snaptix/common';
 import { Observable, throwError } from 'rxjs';
 import { COMMON_ERRORS } from '@snaptix/contracts';
 import { RpcException } from '@nestjs/microservices';
@@ -11,8 +15,17 @@ export class MicroserviceExceptionFilter implements RpcExceptionFilter<RpcExcept
   private logger = new Logger(MicroserviceExceptionFilter.name);
 
   catch(
-    exception: DomainException | Error | ZodValidationException,
+    exception:
+      | DomainException
+      | BulkDomainException
+      | Error
+      | ZodValidationException,
   ): Observable<IDomainError> {
+    if (exception instanceof BulkDomainException) {
+      this.logger.error(exception.getError());
+      return throwError(() => exception.getError());
+    }
+
     if (exception instanceof DomainException) {
       this.logger.error(exception.getError());
       return throwError(() => exception.getError());

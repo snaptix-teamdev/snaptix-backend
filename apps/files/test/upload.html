@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>S3 Presigned Upload Test</title>
+  <style>
+    body { font-family: monospace; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+    label { display: block; margin-top: 16px; font-weight: bold; }
+    input[type="text"], input[type="file"], textarea { width: 100%; box-sizing: border-box; margin-top: 4px; padding: 6px; }
+    textarea { height: 80px; resize: vertical; font-family: monospace; font-size: 12px; }
+    button { margin-top: 16px; padding: 8px 20px; cursor: pointer; }
+    #status { margin-top: 20px; white-space: pre-wrap; background: #f4f4f4; padding: 12px; min-height: 40px; }
+  </style>
+</head>
+<body>
+  <h2>Загрузка файла через presigned POST</h2>
+
+  <label>URL (поле url из ответа API)
+    <input type="text" id="url" placeholder="https://..." />
+  </label>
+
+  <label>Fields (JSON из поля fields ответа API)
+    <textarea id="fields" placeholder='{"key": "...", "Policy": "...", ...}'></textarea>
+  </label>
+
+  <label>Файл
+    <input type="file" id="file" />
+  </label>
+
+  <button onclick="upload()">Загрузить</button>
+
+  <div id="status">Статус: ожидание</div>
+
+  <script>
+    async function upload() {
+      const url = document.getElementById('url').value.trim();
+      const fieldsRaw = document.getElementById('fields').value.trim();
+      const file = document.getElementById('file').files[0];
+      const status = document.getElementById('status');
+
+      if (!url) { status.textContent = 'Ошибка: вставьте url'; return; }
+      if (!fieldsRaw) { status.textContent = 'Ошибка: вставьте fields (JSON)'; return; }
+      if (!file) { status.textContent = 'Ошибка: выберите файл'; return; }
+
+      let fields;
+      try {
+        fields = JSON.parse(fieldsRaw);
+      } catch {
+        status.textContent = 'Ошибка: fields невалидный JSON';
+        return;
+      }
+
+      status.textContent = 'Загружаю...';
+
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(fields)) {
+        formData.append(key, value);
+      }
+      // file должен быть последним полем
+      formData.append('file', file);
+
+      try {
+        const res = await fetch(url, { method: 'POST', body: formData });
+
+        if (res.ok || res.status === 204) {
+          status.textContent = `✅ Успешно загружен: ${file.name} (${file.size} байт)\nHTTP ${res.status}`;
+        } else {
+          const text = await res.text();
+          status.textContent = `❌ Ошибка HTTP ${res.status}:\n${text}`;
+        }
+      } catch (e) {
+        status.textContent = `❌ Сетевая ошибка:\n${e.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

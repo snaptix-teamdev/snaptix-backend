@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { PostConverter } from '../converter/post.converter';
 import { PostEntity } from '../domain/post.entity';
+import { Prisma } from '../../generated/prisma/client';
+
+const POST_INCLUDE = {
+  media: { orderBy: { order: 'asc' } },
+} satisfies Prisma.PostInclude;
 
 @Injectable()
 export class PostsRepository {
@@ -11,10 +16,20 @@ export class PostsRepository {
   ) {}
 
   async create(entity: PostEntity): Promise<PostEntity> {
-    const model = this.postConverter.fromEntityToPrismaModel(entity);
-
     const result = await this.prisma.post.create({
-      data: { ...model },
+      data: {
+        id: entity.id,
+        userId: entity.userId,
+        description: entity.description,
+        media: {
+          create: entity.media.map((m) => ({
+            fileId: m.fileId,
+            storageKey: m.storageKey,
+            order: m.order,
+          })),
+        },
+      },
+      include: POST_INCLUDE,
     });
 
     return this.postConverter.fromPrismaModelToEntity(result);
@@ -23,6 +38,7 @@ export class PostsRepository {
   async findById(id: string): Promise<PostEntity | null> {
     const model = await this.prisma.post.findUnique({
       where: { id, deletedAt: null },
+      include: POST_INCLUDE,
     });
 
     if (!model) return null;
@@ -31,13 +47,9 @@ export class PostsRepository {
   }
 
   async update(entity: PostEntity): Promise<void> {
-    const model = this.postConverter.fromEntityToPrismaModel(entity);
-
-    const { updatedAt: _updatedAt, ...rest } = model;
-
     await this.prisma.post.update({
-      where: { id: model.id },
-      data: { ...rest },
+      where: { id: entity.id },
+      data: { description: entity.description },
     });
   }
 }

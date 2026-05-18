@@ -1,3 +1,7 @@
-import { IPost } from '@snaptix/common';
+import { IPost, IPostMedia } from '@snaptix/common';
 
-export type CreatePostDto = Pick<IPost, 'description' | 'media' | 'userId'>;
+type MediaType = Pick<IPostMedia, 'fileId' | 'storageKey'>;
+
+export type CreatePostDto = Pick<IPost, 'id' | 'description' | 'userId'> & {
+  media: MediaType[];
+};

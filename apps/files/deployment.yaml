@@ -50,6 +50,36 @@ spec:
                  secretKeyRef:
                    name: files-microservices-production-config-secret
                    key: RABBITMQ_URI
+             - name: S3_ENDPOINT
+               valueFrom:
+                 secretKeyRef:
+                   name: files-microservices-production-config-secret
+                   key: S3_ENDPOINT
+             - name: S3_KEY_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: files-microservices-production-config-secret
+                   key: S3_KEY_ID
+             - name: S3_SECRET_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: files-microservices-production-config-secret
+                   key: S3_SECRET_KEY
+             - name: S3_TMP_BUCKET
+               valueFrom:
+                 secretKeyRef:
+                   name: files-microservices-production-config-secret
+                   key: S3_TMP_BUCKET
+             - name: S3_MAIN_BUCKET
+               valueFrom:
+                 secretKeyRef:
+                   name: files-microservices-production-config-secret
+                   key: S3_MAIN_BUCKET
+             - name: S3_REGION
+               valueFrom:
+                 secretKeyRef:
+                   name: files-microservices-production-config-secret
+                   key: S3_REGION
              - name: NODE_ENV
                valueFrom:
                  secretKeyRef:
