@@ -32,7 +32,10 @@ export class GetPostByIdQueryHandler implements IQueryHandler<
     return {
       id: post.id,
       description: post.description,
-      media: post.media.map((fileId) => ({ fileId })),
+      media: post.media.map((m) => ({
+        id: m.fileId,
+        storageKey: m.storageKey,
+      })),
       updatedAt: post.updatedAt,
       createdAt: post.createdAt,
     };

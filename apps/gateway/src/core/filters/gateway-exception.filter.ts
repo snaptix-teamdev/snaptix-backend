@@ -95,13 +95,13 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
     if (isBulkDomainException(exception)) {
       this.logger.error({ type: 'BulkDomainException', exception });
 
-      response.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+      response.status(HttpStatus.CONFLICT).json({
         errors: exception.errors.map(({ itemId, error }) => ({
-          itemId,
           status: error.httpCode,
           code: error.code,
           field: error.field,
           message: error.message,
+          meta: { itemId },
         })),
       });
       return;

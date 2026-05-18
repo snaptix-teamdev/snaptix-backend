@@ -6,8 +6,26 @@ import { PostsQueryRepository } from './infrastructure/posts.query-repository';
 import { CreatePostUseCase } from './application/commands/create-post.usecase';
 import { UpdatePostUseCase } from './application/commands/update-post.usecase';
 import { GetPostByIdQueryHandler } from './application/queries/get-post-by-id.usecase';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MICROSERVICE_NAME } from '@snaptix/contracts';
+import { CoreConfig } from '../core/config/core.config';
 
 @Module({
+  imports: [
+    ClientsModule.registerAsync([
+      {
+        name: MICROSERVICE_NAME.FILES,
+        inject: [CoreConfig],
+        useFactory: (coreConfig: CoreConfig) => ({
+          transport: Transport.TCP,
+          options: {
+            host: coreConfig.microserviceFilesHost,
+            port: coreConfig.microserviceFilesPort,
+          },
+        }),
+      },
+    ]),
+  ],
   controllers: [PostsController],
   providers: [
     PostConverter,

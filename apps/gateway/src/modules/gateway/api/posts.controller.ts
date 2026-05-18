@@ -44,7 +44,7 @@ import { UUIDValidationOrNotFoundPipe } from '../../../core/pipes/uuid-validatio
 import { FileEntityType } from '@snaptix/common';
 import { GatewayConfig } from '../gateway.config';
 import { PostViewDto } from './mappers/post.mapper';
-import { ApiUnprocessableEntityCustomResponse } from '../../../core/swagger/unprocessable-entity.swagger';
+import { ApiConflictCustomResponse } from '../../../core/swagger/conflict.swagger';
 
 @Controller({ path: 'posts', version: '1' })
 export class PostsController {
@@ -71,7 +71,7 @@ export class PostsController {
   @ApiBearerAuth()
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
-  @ApiUnprocessableEntityCustomResponse()
+  @ApiConflictCustomResponse()
   async createPost(
     @Body() body: CreatePostRequestDto,
     @ExtractUserFromRequest() user: UserContextDto,
@@ -126,7 +126,7 @@ export class PostsController {
   /**
    * Подтвердить загрузку фото поста
    */
-  @Post(`photo/:photoId/confirm`)
+  @Post(`photo/:fileId/confirm`)
   @UseGuards(AccessTokenAuthGuard)
   @ApiBearerAuth()
   @ApiNotFoundCustomResponse()
@@ -134,13 +134,13 @@ export class PostsController {
   @ApiUnauthorizedCustomResponse()
   async confirmUploadPhoto(
     @ExtractUserFromRequest() user: UserContextDto,
-    @Param('photoId', UUIDValidationOrNotFoundPipe) photoId: string,
+    @Param('fileId', UUIDValidationOrNotFoundPipe) fileId: string,
   ): Promise<void> {
     const result = this.files.send<void, ConfirmUploadFilePayload>(
       FILES_MICROSERVICE_PATTERNS.FILES.CONFIRM_UPLOAD_FILE,
       {
         userId: user.userId,
-        fileId: photoId,
+        fileId,
       },
     );
 
@@ -188,6 +188,8 @@ export class PostsController {
   async getPostById(
     @Param('postId', UUIDValidationOrNotFoundPipe) postId: string,
   ): Promise<GetPostByIdResponseDto> {
+    //TODO получение поста со всей логикой вынести в post-aggregation.service.ts
+
     const result = this.posts.send<
       GetPostByIdMsResponseDto,
       GetPostByIdPayload
