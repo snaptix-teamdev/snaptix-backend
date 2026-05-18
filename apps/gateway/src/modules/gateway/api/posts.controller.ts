@@ -60,6 +60,14 @@ export class PostsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AccessTokenAuthGuard)
+  @ApiOperation({
+    description: `
+      Шаги создания поста:
+      \n1. Получить \`presignedUrl\` и \`fileId\` (photo/get-upload-url)
+      \n2. После загрузки юзером фото - подтвердите (photo/:photoId/confirm) загрузку передав \`fileId\` из шага 1
+      \n3. Добавьте \`fileId\` в массив \`media\`
+      `,
+  })
   @ApiBearerAuth()
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
@@ -88,6 +96,13 @@ export class PostsController {
   @Post('photo/get-upload-url')
   @UseGuards(AccessTokenAuthGuard)
   @ApiBearerAuth()
+  @ApiOperation({
+    description: `
+      Шаги загрузки фото:
+      \n1. Извлечь необходимые данные из файла и получить \`url\` и \`fileId\`
+      \n2. Загрузить файл отправив PUT запрос на url
+      `,
+  })
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
   getUploadPhotoUrl(
