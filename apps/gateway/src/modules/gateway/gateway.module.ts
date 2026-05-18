@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './api/auth.controller';
 import { PostsController } from './api/posts.controller';
+import { UsersController } from './api/users.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_NAME } from '@snaptix/contracts';
 import { CoreConfig } from '../../core/config/core.config';
@@ -45,7 +46,12 @@ import { GatewayConfig } from './gateway.config';
       },
     ]),
   ],
-  controllers: [AuthController, SecurityDevicesController, PostsController],
+  controllers: [
+    AuthController,
+    SecurityDevicesController,
+    PostsController,
+    UsersController,
+  ],
   providers: [GatewayConfig],
 })
 export class GatewayModule {}

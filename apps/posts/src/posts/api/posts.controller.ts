@@ -4,6 +4,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   CreatePostMsResponseDto,
   CreatePostPayload,
+  GetMyPostsMsResponseDto,
+  GetMyPostsPayload,
   GetPostByIdMsResponseDto,
   GetPostByIdPayload,
   POSTS_PATTERNS,
@@ -13,6 +15,7 @@ import {
 import { CreatePostCommand } from '../application/commands/create-post.usecase';
 import { UpdatePostCommand } from '../application/commands/update-post.usecase';
 import { GetPostByIdQuery } from '../application/queries/get-post-by-id.usecase';
+import { GetMyPostsQuery } from '../application/queries/get-my-posts.usecase';
 
 @Controller()
 export class PostsController {
@@ -36,6 +39,13 @@ export class PostsController {
     @Payload() payload: GetPostByIdPayload,
   ): Promise<GetPostByIdMsResponseDto> {
     return this.queryBus.execute(new GetPostByIdQuery({ id: payload.id }));
+  }
+
+  @MessagePattern(POSTS_PATTERNS.GET_MY_POSTS)
+  async getMyPosts(
+    @Payload() payload: GetMyPostsPayload,
+  ): Promise<GetMyPostsMsResponseDto> {
+    return this.queryBus.execute(new GetMyPostsQuery(payload));
   }
 
   @MessagePattern(POSTS_PATTERNS.UPDATE_POST)
