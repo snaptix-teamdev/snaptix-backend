@@ -13,3 +13,52 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum FileEntityType {
+  POST_PHOTO
+  USER_AVATAR
+}
+
+enum FileStatus {
+  PENDING
+  INVALID
+  CONFIRMED
+  READY
+}
+
+model File {
+  id           String         @id @default(uuid(7)) @db.Uuid
+  ownerId      String         @map("owner_id") @db.Uuid
+  entityType   FileEntityType @map("entity_type")
+  entityId     String?        @map("entity_id") @db.Uuid
+  storageKey   String         @unique @map("storage_key")
+  fileName     String         @map("file_name")
+  mimeType     String         @map("mime_type")
+  byteSize     Int            @map("byte_size")
+  status       FileStatus
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz()
+  deletedAt    DateTime?      @map("deleted_at") @db.Timestamptz()
+  fileVariants FileVariant[]
+
+  @@index([ownerId])
+  @@index([entityType, entityId])
+  @@index([status])
+  @@map("files")
+}
+
+model FileVariant {
+  id             String   @id @default(uuid(7)) @db.Uuid
+  storageKey     String   @unique @map("storage_key")
+  mimeType       String   @map("mime_type")
+  byteSize       BigInt?  @map("byte_size")
+  width          Int?     @db.Integer
+  height         Int?     @db.Integer
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+  originalFileId String   @map("original_file_id") @db.Uuid
+  file           File     @relation(fields: [originalFileId], references: [id])
+
+  @@index([originalFileId])
+  @@map("file_variants")
+}

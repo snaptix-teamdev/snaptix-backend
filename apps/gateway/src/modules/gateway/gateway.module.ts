@@ -5,6 +5,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_NAME } from '@snaptix/contracts';
 import { CoreConfig } from '../../core/config/core.config';
 import { SecurityDevicesController } from './api/security-devices.controller';
+import { GatewayConfig } from './gateway.config';
 
 @Module({
   imports: [
@@ -17,6 +18,17 @@ import { SecurityDevicesController } from './api/security-devices.controller';
           options: {
             host: coreConfig.microserviceUserAccountsHost,
             port: coreConfig.microserviceUserAccountsPort,
+          },
+        }),
+      },
+      {
+        name: MICROSERVICE_NAME.FILES,
+        inject: [CoreConfig],
+        useFactory: (coreConfig: CoreConfig) => ({
+          transport: Transport.TCP,
+          options: {
+            host: coreConfig.microserviceFilesHost,
+            port: coreConfig.microserviceFilesPort,
           },
         }),
       },
@@ -34,5 +46,6 @@ import { SecurityDevicesController } from './api/security-devices.controller';
     ]),
   ],
   controllers: [AuthController, SecurityDevicesController, PostsController],
+  providers: [GatewayConfig],
 })
 export class GatewayModule {}

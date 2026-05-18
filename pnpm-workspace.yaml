@@ -6,3 +6,4 @@ onlyBuiltDependencies:
   - '@prisma/engines'
   - '@swc/core'
   - prisma
+  - sharp

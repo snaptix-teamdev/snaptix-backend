@@ -41,6 +41,19 @@ export class CoreConfig {
   @IsNumber(
     {},
     {
+      message: 'Set Env variable MICROSERVICE_FILES_PORT, example: 9004',
+    },
+  )
+  microserviceFilesPort: number;
+
+  @IsNotEmpty({
+    message: 'Set Env variable MICROSERVICE_FILES_HOST, example: 0.0.0.0',
+  })
+  microserviceFilesHost: string;
+
+  @IsNumber(
+    {},
+    {
       message: 'Set Env variable MICROSERVICE_POSTS_PORT, example: 9005',
     },
   )
@@ -94,6 +107,14 @@ export class CoreConfig {
 
     this.microserviceUserAccountsHost = this.configService.get(
       'MICROSERVICE_USER_ACCOUNTS_HOST',
+    );
+
+    this.microserviceFilesPort = parseInt(
+      this.configService.get<string>('MICROSERVICE_FILES_PORT'),
+    );
+
+    this.microserviceFilesHost = this.configService.get(
+      'MICROSERVICE_FILES_HOST',
     );
 
     this.microservicePostsPort = parseInt(

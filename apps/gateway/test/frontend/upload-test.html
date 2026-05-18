@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snaptix — тест загрузки файла</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #7c3aed;
+      margin-bottom: 2rem;
+      letter-spacing: 0.02em;
+    }
+
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 560px;
+      margin: 0 auto 1.25rem;
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .step-badge {
+      background: #7c3aed22;
+      border: 1px solid #7c3aed55;
+      color: #a78bfa;
+      border-radius: 50%;
+      width: 1.4rem;
+      height: 1.4rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-badge.done {
+      background: #05966922;
+      border-color: #05966955;
+      color: #34d399;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: #9ca3af;
+      margin-bottom: 0.3rem;
+      margin-top: 0.85rem;
+    }
+
+    label:first-of-type { margin-top: 0; }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    input[type="url"] {
+      width: 100%;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus { border-color: #7c3aed; }
+
+    .file-drop {
+      border: 2px dashed #2d3148;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+    }
+
+    .file-drop:hover, .file-drop.drag-over {
+      border-color: #7c3aed;
+      background: #7c3aed08;
+    }
+
+    .file-drop input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .file-drop-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+
+    .file-drop-text {
+      font-size: 0.82rem;
+      color: #6b7280;
+    }
+
+    .file-info {
+      display: none;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 0.6rem;
+      word-break: break-all;
+    }
+
+    .file-info strong { color: #e2e8f0; }
+
+    btn, button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    button:hover:not(:disabled) { background: #6d28d9; }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    button.secondary {
+      background: #1f2235;
+      border: 1px solid #2d3148;
+      color: #a78bfa;
+    }
+
+    button.secondary:hover:not(:disabled) { background: #252840; }
+
+    .token-display {
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.72rem;
+      color: #34d399;
+      word-break: break-all;
+      font-family: 'Courier New', monospace;
+      display: none;
+      margin-top: 0.6rem;
+      max-height: 4rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .url-display {
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.7rem;
+      color: #60a5fa;
+      word-break: break-all;
+      font-family: 'Courier New', monospace;
+      display: none;
+      margin-top: 0.6rem;
+      max-height: 5rem;
+      overflow-y: auto;
+    }
+
+    .progress-wrap {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-bottom: 0.35rem;
+    }
+
+    .progress-bar-bg {
+      background: #2d3148;
+      border-radius: 99px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7c3aed, #a78bfa);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.1s ease;
+    }
+
+    .log {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .log-entry {
+      font-size: 0.78rem;
+      font-family: 'Courier New', monospace;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 0.35rem;
+      line-height: 1.5;
+    }
+
+    .log-entry.info  { background: #1a1d27; color: #9ca3af; border-left: 3px solid #2d3148; }
+    .log-entry.ok    { background: #05966910; color: #34d399; border-left: 3px solid #059669; }
+    .log-entry.error { background: #dc262610; color: #f87171; border-left: 3px solid #dc2626; }
+    .log-entry.warn  { background: #d9770610; color: #fbbf24; border-left: 3px solid #d97706; }
+
+    .result-card {
+      display: none;
+      background: #05966910;
+      border: 1px solid #05966933;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      max-width: 560px;
+      margin: 0 auto 1.25rem;
+      text-align: center;
+    }
+
+    .result-card .icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    .result-card .msg { color: #34d399; font-weight: 600; font-size: 0.95rem; }
+    .result-card .sub { color: #6b7280; font-size: 0.78rem; margin-top: 0.3rem; }
+
+    .api-url-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .api-url-row label { margin: 0; white-space: nowrap; font-size: 0.78rem; }
+    .api-url-row input { margin-top: 0; flex: 1; }
+  </style>
+</head>
+<body>
+
+<h1>Snaptix — загрузка файла (PUT presigned URL)</h1>
+
+<!-- Step 1: Auth -->
+<div class="card" id="card-auth">
+  <div class="card-title">
+    <span class="step-badge" id="badge-1">1</span>
+    Авторизация
+  </div>
+
+  <div class="api-url-row">
+    <label for="apiBase">API:</label>
+    <input type="url" id="apiBase" value="http://localhost:9000" placeholder="http://localhost:9000">
+  </div>
+
+  <label for="email">Email</label>
+  <input type="email" id="email" placeholder="user@example.com" autocomplete="username">
+
+  <label for="password">Пароль</label>
+  <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+
+  <button id="btnLogin" onclick="doLogin()">Войти</button>
+
+  <div class="token-display" id="tokenDisplay"></div>
+</div>
+
+<!-- Step 2: File + get presigned URL -->
+<div class="card" id="card-upload">
+  <div class="card-title">
+    <span class="step-badge" id="badge-2">2</span>
+    Выбор файла и получение presigned URL
+  </div>
+
+  <div class="file-drop" id="fileDrop">
+    <input type="file" id="fileInput" onchange="onFileChange(this)">
+    <div class="file-drop-icon">📁</div>
+    <div class="file-drop-text">Перетащите файл или кликните для выбора</div>
+  </div>
+
+  <div class="file-info" id="fileInfo"></div>
+
+  <label for="fileName">Имя файла (можно изменить)</label>
+  <input type="text" id="fileName" placeholder="image.jpg">
+
+  <button id="btnGetUrl" onclick="doGetPresignedUrl()" disabled>Получить presigned URL</button>
+
+  <div class="url-display" id="urlDisplay"></div>
+</div>
+
+<!-- Step 3: Upload to S3 -->
+<div class="card" id="card-put">
+  <div class="card-title">
+    <span class="step-badge" id="badge-3">3</span>
+    Загрузка файла в S3
+  </div>
+
+  <button id="btnUpload" onclick="doUpload()" disabled>Загрузить в S3</button>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label">
+      <span id="progressLabel">Загрузка...</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Step 4: Confirm upload -->
+<div class="card" id="card-confirm">
+  <div class="card-title">
+    <span class="step-badge" id="badge-4">4</span>
+    Подтверждение загрузки
+  </div>
+
+  <div class="url-display" id="fileIdDisplay"></div>
+
+  <button id="btnConfirm" onclick="doConfirmUpload()" disabled>Подтвердить загрузку (confirm)</button>
+</div>
+
+<!-- Result -->
+<div class="result-card" id="resultCard">
+  <div class="icon">✅</div>
+  <div class="msg">Файл успешно загружен и подтверждён!</div>
+  <div class="sub" id="resultSub"></div>
+</div>
+
+<!-- Log -->
+<div class="log" id="log"></div>
+
+<script>
+  // ── state ──────────────────────────────────────────────────────────────────
+  let accessToken = null;
+  let selectedFile = null;
+  let presignedUrl = null;
+  let fileId = null;
+
+  // ── log ────────────────────────────────────────────────────────────────────
+  function log(msg, level = 'info') {
+    const el = document.createElement('div');
+    el.className = `log-entry ${level}`;
+    el.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    document.getElementById('log').prepend(el);
+  }
+
+  // ── drag-and-drop ──────────────────────────────────────────────────────────
+  const fileDrop = document.getElementById('fileDrop');
+  fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag-over'); });
+  fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
+  fileDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    fileDrop.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) applyFile(f);
+  });
+
+  function onFileChange(input) {
+    if (input.files[0]) applyFile(input.files[0]);
+  }
+
+  function applyFile(file) {
+    selectedFile = file;
+    presignedUrl = null;
+    fileId = null;
+    document.getElementById('fileName').value = file.name;
+    document.getElementById('urlDisplay').style.display = 'none';
+    document.getElementById('fileIdDisplay').style.display = 'none';
+    document.getElementById('btnUpload').disabled = true;
+    document.getElementById('btnConfirm').disabled = true;
+    document.getElementById('resultCard').style.display = 'none';
+    document.getElementById('progressWrap').style.display = 'none';
+    document.getElementById('progressFill').style.width = '0%';
+
+    const info = document.getElementById('fileInfo');
+    info.style.display = 'block';
+    info.innerHTML =
+      `<strong>${file.name}</strong> &nbsp;·&nbsp; ${file.type || 'application/octet-stream'} &nbsp;·&nbsp; ${formatBytes(file.size)}`;
+
+    document.getElementById('btnGetUrl').disabled = !accessToken;
+    log(`Файл выбран: ${file.name} (${formatBytes(file.size)})`);
+  }
+
+  function formatBytes(n) {
+    if (n < 1024) return n + ' B';
+    if (n < 1024 ** 2) return (n / 1024).toFixed(1) + ' KB';
+    if (n < 1024 ** 3) return (n / 1024 ** 2).toFixed(2) + ' MB';
+    return (n / 1024 ** 3).toFixed(2) + ' GB';
+  }
+
+  // ── step 1: login ──────────────────────────────────────────────────────────
+  async function doLogin() {
+    const base = document.getElementById('apiBase').value.replace(/\/$/, '');
+    const email = document.getElementById('email').value.trim();
+    const pwd = document.getElementById('password').value;
+
+    if (!email || !pwd) { log('Введите email и пароль', 'warn'); return; }
+
+    const btn = document.getElementById('btnLogin');
+    btn.disabled = true;
+    btn.textContent = 'Вход...';
+    log(`POST ${base}/api/v1/auth/login`);
+
+    try {
+      const res = await fetch(`${base}/api/v1/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password: pwd }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        log(`Ошибка входа ${res.status}: ${JSON.stringify(data?.errors?.[0] ?? data)}`, 'error');
+        return;
+      }
+
+      accessToken = data.accessToken;
+      const td = document.getElementById('tokenDisplay');
+      td.style.display = 'block';
+      td.textContent = accessToken;
+
+      document.getElementById('badge-1').classList.add('done');
+      document.getElementById('badge-1').textContent = '✓';
+      document.getElementById('btnGetUrl').disabled = !selectedFile;
+      log('Авторизация успешна, accessToken получен', 'ok');
+    } catch (e) {
+      log(`Сетевая ошибка: ${e.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Войти';
+    }
+  }
+
+  // ── step 2: get presigned PUT url ──────────────────────────────────────────
+  async function doGetPresignedUrl() {
+    if (!accessToken) { log('Сначала авторизуйтесь', 'warn'); return; }
+    if (!selectedFile) { log('Выберите файл', 'warn'); return; }
+
+    const base = document.getElementById('apiBase').value.replace(/\/$/, '');
+    const fileName = document.getElementById('fileName').value.trim() || selectedFile.name;
+    const mimeType = selectedFile.type || 'application/octet-stream';
+    const contentLengthBytes = selectedFile.size;
+
+    const btn = document.getElementById('btnGetUrl');
+    btn.disabled = true;
+    btn.textContent = 'Запрос...';
+    log(`POST ${base}/api/v1/files/upload-put-url  (${fileName}, ${mimeType}, ${contentLengthBytes} bytes)`);
+
+    try {
+      const res = await fetch(`${base}/api/v1/posts/photo/get-upload-url`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ fileName, mimeType, contentLengthBytes }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        log(`Ошибка ${res.status}: ${JSON.stringify(data?.errors?.[0] ?? data)}`, 'error');
+        return;
+      }
+
+      presignedUrl = data.url;
+      fileId = data.fileId;
+
+      const ud = document.getElementById('urlDisplay');
+      ud.style.display = 'block';
+      ud.textContent = presignedUrl;
+
+      const fd = document.getElementById('fileIdDisplay');
+      fd.style.display = 'block';
+      fd.textContent = `fileId: ${fileId}`;
+
+      document.getElementById('badge-2').classList.add('done');
+      document.getElementById('badge-2').textContent = '✓';
+      document.getElementById('btnUpload').disabled = false;
+      log(`Presigned URL получен · fileId: ${fileId}`, 'ok');
+    } catch (e) {
+      log(`Сетевая ошибка: ${e.message}`, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Получить presigned URL';
+    }
+  }
+
+  // ── step 3: upload ─────────────────────────────────────────────────────────
+  async function doUpload() {
+    if (!presignedUrl) { log('Сначала получите presigned URL', 'warn'); return; }
+    if (!selectedFile) { log('Файл не выбран', 'warn'); return; }
+
+    const btn = document.getElementById('btnUpload');
+    btn.disabled = true;
+    btn.textContent = 'Загрузка...';
+
+    document.getElementById('resultCard').style.display = 'none';
+    const pw = document.getElementById('progressWrap');
+    pw.style.display = 'block';
+
+    const mimeType = selectedFile.type || 'application/octet-stream';
+
+    try {
+      log(`PUT ${presignedUrl.substring(0, 80)}...`);
+      setProgress(0, 'Загрузка...');
+
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round(e.loaded / e.total * 100);
+            setProgress(pct, `Загрузка... ${formatBytes(e.loaded)} / ${formatBytes(e.total)}`);
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            reject(new Error(`S3 вернул ${xhr.status}: ${xhr.responseText}`));
+          }
+        };
+
+        xhr.onerror = () => reject(new Error('Сетевая ошибка при загрузке в S3'));
+        xhr.ontimeout = () => reject(new Error('Таймаут загрузки'));
+
+        xhr.open('PUT', presignedUrl);
+
+        xhr.send(selectedFile);
+      });
+
+      setProgress(100, 'Загружено');
+      document.getElementById('badge-3').classList.add('done');
+      document.getElementById('badge-3').textContent = '✓';
+      document.getElementById('btnConfirm').disabled = false;
+
+      log(`Файл загружен в S3: ${selectedFile.name} (${formatBytes(selectedFile.size)}) · нажмите Confirm`, 'ok');
+    } catch (e) {
+      log(e.message, 'error');
+      setProgress(0, 'Ошибка');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Загрузить в S3';
+    }
+  }
+
+  // ── step 4: confirm upload ─────────────────────────────────────────────────
+  async function doConfirmUpload() {
+    if (!fileId) { log('fileId не найден — сначала загрузите файл', 'warn'); return; }
+    if (!accessToken) { log('Сначала авторизуйтесь', 'warn'); return; }
+
+    const base = document.getElementById('apiBase').value.replace(/\/$/, '');
+    const btn = document.getElementById('btnConfirm');
+    btn.disabled = true;
+    btn.textContent = 'Подтверждение...';
+    log(`POST ${base}/api/v1/posts/photo/${fileId}/confirm`);
+
+    try {
+      const res = await fetch(`${base}/api/v1/posts/photo/${fileId}/confirm`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        log(`Ошибка ${res.status}: ${JSON.stringify(data?.errors?.[0] ?? data)}`, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Подтвердить загрузку (confirm)';
+        return;
+      }
+
+      btn.textContent = 'Подтвердить загрузку (confirm)';
+      document.getElementById('badge-4').classList.add('done');
+      document.getElementById('badge-4').textContent = '✓';
+
+      const rc = document.getElementById('resultCard');
+      rc.style.display = 'block';
+      document.getElementById('resultSub').textContent =
+        `${document.getElementById('fileName').value || selectedFile.name} · ${formatBytes(selectedFile.size)}`;
+
+      log(`Загрузка подтверждена · fileId: ${fileId}`, 'ok');
+    } catch (e) {
+      log(`Сетевая ошибка: ${e.message}`, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Подтвердить загрузку (confirm)';
+    }
+  }
+
+  function setProgress(pct, label) {
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+    document.getElementById('progressLabel').textContent = label;
+  }
+
+  // Enter to submit login form
+  ['email', 'password'].forEach(id =>
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    })
+  );
+</script>
+</body>
+</html>

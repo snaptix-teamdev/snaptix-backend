@@ -1,7 +1,7 @@
 export class CreatePostMsResponseDto {
   id: string;
   description: string | null;
-  media: { fileId: string }[];
+  media: { id: string; storageKey: string }[];
   updatedAt: Date;
   createdAt: Date;
 }
