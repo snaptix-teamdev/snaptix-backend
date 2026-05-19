@@ -8,6 +8,8 @@ import {
   GetMyPostsPayload,
   GetPostByIdMsResponseDto,
   GetPostByIdPayload,
+  GetUserPostsMsResponseDto,
+  GetUserPostsPayload,
   POSTS_PATTERNS,
   UpdatePostMsResponseDto,
   UpdatePostPayload,
@@ -16,6 +18,7 @@ import { CreatePostCommand } from '../application/commands/create-post.usecase';
 import { UpdatePostCommand } from '../application/commands/update-post.usecase';
 import { GetPostByIdQuery } from '../application/queries/get-post-by-id.usecase';
 import { GetMyPostsQuery } from '../application/queries/get-my-posts.usecase';
+import { GetUserPostsQuery } from '../application/queries/get-user-posts.usecase';
 
 @Controller()
 export class PostsController {
@@ -46,6 +49,13 @@ export class PostsController {
     @Payload() payload: GetMyPostsPayload,
   ): Promise<GetMyPostsMsResponseDto> {
     return this.queryBus.execute(new GetMyPostsQuery(payload));
+  }
+
+  @MessagePattern(POSTS_PATTERNS.GET_USER_POSTS)
+  async getUserPosts(
+    @Payload() payload: GetUserPostsPayload,
+  ): Promise<GetUserPostsMsResponseDto> {
+    return this.queryBus.execute(new GetUserPostsQuery(payload));
   }
 
   @MessagePattern(POSTS_PATTERNS.UPDATE_POST)

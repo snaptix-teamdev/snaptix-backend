@@ -40,7 +40,7 @@ import { ApiBadRequestCustomResponse } from '../../../core/swagger/bad-request.s
 import { ApiUnauthorizedCustomResponse } from '../../../core/swagger/unauthorized.swagger';
 import { ApiNotFoundCustomResponse } from '../../../core/swagger/not-found.swagger';
 import { ApiForbiddenCustomResponse } from '../../../core/swagger/forbidden.swagger';
-import { UUIDValidationOrNotFoundPipe } from '../../../core/pipes/uuid-validation.pipe';
+import { UUIDValidationOrBadRequestPipe } from '../../../core/pipes/uuid-validation.pipe';
 import { FileEntityType } from '@snaptix/common';
 import { GatewayConfig } from '../gateway.config';
 import { PostViewDto } from './mappers/post.mapper';
@@ -62,11 +62,10 @@ export class PostsController {
   @UseGuards(AccessTokenAuthGuard)
   @ApiOperation({
     description: `
-      Шаги создания поста:
-      \n1. Получить \`presignedUrl\` и \`fileId\` (photo/get-upload-url)
-      \n2. После загрузки юзером фото - подтвердите (photo/:photoId/confirm) загрузку передав \`fileId\` из шага 1
-      \n3. Добавьте \`fileId\` в массив \`media\`
-      `,
+Шаги создания поста:
+\n1. Получить \`presignedUrl\` и \`fileId\` (photo/get-upload-url)
+\n2. После загрузки юзером фото - подтвердите (photo/:photoId/confirm) загрузку передав \`fileId\` из шага 1
+\n3. Добавьте \`fileId\` в массив \`media\``,
   })
   @ApiBearerAuth()
   @ApiBadRequestCustomResponse()
@@ -98,10 +97,9 @@ export class PostsController {
   @ApiBearerAuth()
   @ApiOperation({
     description: `
-      Шаги загрузки фото:
-      \n1. Извлечь необходимые данные из файла и получить \`url\` и \`fileId\`
-      \n2. Загрузить файл отправив PUT запрос на url
-      `,
+Шаги загрузки фото:
+\n1. Извлечь необходимые данные из файла и получить \`url\` и \`fileId\`
+\n2. Загрузить файл отправив \`PUT\` запрос на \`url\``,
   })
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
@@ -134,7 +132,7 @@ export class PostsController {
   @ApiUnauthorizedCustomResponse()
   async confirmUploadPhoto(
     @ExtractUserFromRequest() user: UserContextDto,
-    @Param('fileId', UUIDValidationOrNotFoundPipe) fileId: string,
+    @Param('fileId', UUIDValidationOrBadRequestPipe) fileId: string,
   ): Promise<void> {
     const result = this.files.send<void, ConfirmUploadFilePayload>(
       FILES_MICROSERVICE_PATTERNS.FILES.CONFIRM_UPLOAD_FILE,
@@ -159,7 +157,7 @@ export class PostsController {
   @ApiForbiddenCustomResponse()
   @ApiNotFoundCustomResponse()
   async updatePost(
-    @Param('postId', UUIDValidationOrNotFoundPipe) postId: string,
+    @Param('postId', UUIDValidationOrBadRequestPipe) postId: string,
     @Body() body: UpdatePostRequestDto,
     @ExtractUserFromRequest() user: UserContextDto,
   ): Promise<void> {
@@ -186,7 +184,7 @@ export class PostsController {
   @ApiBadRequestCustomResponse()
   @ApiNotFoundCustomResponse()
   async getPostById(
-    @Param('postId', UUIDValidationOrNotFoundPipe) postId: string,
+    @Param('postId', UUIDValidationOrBadRequestPipe) postId: string,
   ): Promise<GetPostByIdResponseDto> {
     //TODO получение поста со всей логикой вынести в post-aggregation.service.ts
 
