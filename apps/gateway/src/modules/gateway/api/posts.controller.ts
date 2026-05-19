@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -17,6 +18,7 @@ import {
   CreatePostPayload,
   CreatePostRequestDto,
   CreatePostResponseDto,
+  DeletePostPayload,
   FILES_MICROSERVICE_PATTERNS,
   GetPostByIdMsResponseDto,
   GetPostByIdPayload,
@@ -164,6 +166,29 @@ export class PostsController {
     const result = this.posts.send<UpdatePostMsResponseDto, UpdatePostPayload>(
       POSTS_PATTERNS.UPDATE_POST,
       { postId, userId: user.userId, description: body.description },
+    );
+
+    await firstValueFrom(result);
+  }
+
+  /**
+   * Удаление поста
+   */
+  @Delete(':postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AccessTokenAuthGuard)
+  @ApiBearerAuth()
+  @ApiBadRequestCustomResponse()
+  @ApiUnauthorizedCustomResponse()
+  @ApiForbiddenCustomResponse()
+  @ApiNotFoundCustomResponse()
+  async deletePost(
+    @Param('postId', UUIDValidationOrBadRequestPipe) postId: string,
+    @ExtractUserFromRequest() user: UserContextDto,
+  ): Promise<void> {
+    const result = this.posts.send<void, DeletePostPayload>(
+      POSTS_PATTERNS.DELETE_POST,
+      { postId, userId: user.userId },
     );
 
     await firstValueFrom(result);

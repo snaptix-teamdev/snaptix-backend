@@ -4,6 +4,7 @@ import { PostConverter } from './converter/post.converter';
 import { PostsRepository } from './infrastructure/posts.repository';
 import { PostsQueryRepository } from './infrastructure/posts.query-repository';
 import { CreatePostUseCase } from './application/commands/create-post.usecase';
+import { DeletePostUseCase } from './application/commands/delete-post.usecase';
 import { UpdatePostUseCase } from './application/commands/update-post.usecase';
 import { GetPostByIdQueryHandler } from './application/queries/get-post-by-id.usecase';
 import { GetMyPostsQueryHandler } from './application/queries/get-my-posts.usecase';
@@ -34,6 +35,7 @@ import { CoreConfig } from '../core/config/core.config';
     PostsRepository,
     PostsQueryRepository,
     CreatePostUseCase,
+    DeletePostUseCase,
     UpdatePostUseCase,
     GetPostByIdQueryHandler,
     GetMyPostsQueryHandler,
