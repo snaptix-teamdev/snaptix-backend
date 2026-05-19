@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ZodValidationException } from 'nestjs-zod';
 
 @Injectable()
-export class UUIDValidationOrNotFoundPipe implements PipeTransform {
+export class UUIDValidationOrBadRequestPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata): any {
     const field = metadata.data ?? 'value';
     const result = z
