@@ -18,6 +18,15 @@ export class PostsQueryRepository {
     });
   }
 
+  async findLatestPosts(limit: number = 4): Promise<IPost[]> {
+    return this.prisma.post.findMany({
+      where: { deletedAt: null },
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: POST_INCLUDE,
+    });
+  }
+
   async findByUserId(
     userId: string,
     cursorId?: string,
