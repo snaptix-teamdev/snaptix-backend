@@ -4,8 +4,11 @@ import {
   GetLatestPostsMsResponseDto,
   GetLatestPostsPayload,
   GetLatestPostsResponseDto,
+  GetRegisteredUsersCountMsResponseDto,
+  GetRegisteredUsersCountResponseDto,
   MICROSERVICE_NAME,
   POSTS_PATTERNS,
+  USER_ACCOUNTS_PATTERNS,
 } from '@snaptix/contracts';
 import { firstValueFrom } from 'rxjs';
 import { GatewayConfig } from '../gateway.config';
@@ -18,6 +21,15 @@ export class HomeService {
     @Inject(MICROSERVICE_NAME.USER_ACCOUNTS) private userAccounts: ClientProxy,
     private gatewayConfig: GatewayConfig,
   ) {}
+
+  async getRegisteredUsersCount(): Promise<GetRegisteredUsersCountResponseDto> {
+    return firstValueFrom(
+      this.userAccounts.send<GetRegisteredUsersCountMsResponseDto, object>(
+        USER_ACCOUNTS_PATTERNS.USERS.GET_REGISTERED_USERS_COUNT,
+        {},
+      ),
+    );
+  }
 
   async getLatestPosts(pageSize: number): Promise<GetLatestPostsResponseDto> {
     const { posts } = await firstValueFrom(
