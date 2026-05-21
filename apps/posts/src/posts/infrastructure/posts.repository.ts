@@ -53,8 +53,9 @@ export class PostsRepository {
     });
   }
 
-  async softDelete(id: string): Promise<void> {
-    await this.prisma.post.update({
+  async softDelete(id: string, tx?: Prisma.TransactionClient): Promise<void> {
+    const client = tx ?? this.prisma;
+    await client.post.update({
       where: { id },
       data: { deletedAt: new Date() },
     });

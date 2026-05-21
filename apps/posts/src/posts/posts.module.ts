@@ -9,6 +9,7 @@ import { UpdatePostUseCase } from './application/commands/update-post.usecase';
 import { GetPostByIdQueryHandler } from './application/queries/get-post-by-id.usecase';
 import { GetMyPostsQueryHandler } from './application/queries/get-my-posts.usecase';
 import { GetUserPostsQueryHandler } from './application/queries/get-user-posts.usecase';
+import { PostsOutboxPublisher } from './infrastructure/posts-outbox.publisher';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_NAME } from '@snaptix/contracts';
 import { CoreConfig } from '../core/config/core.config';
@@ -34,6 +35,7 @@ import { CoreConfig } from '../core/config/core.config';
     PostConverter,
     PostsRepository,
     PostsQueryRepository,
+    PostsOutboxPublisher,
     CreatePostUseCase,
     DeletePostUseCase,
     UpdatePostUseCase,

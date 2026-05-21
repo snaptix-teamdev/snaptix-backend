@@ -18,6 +18,7 @@ import {
   CreatePostPayload,
   CreatePostRequestDto,
   CreatePostResponseDto,
+  DeletePostMsResponseDto,
   DeletePostPayload,
   FILES_MICROSERVICE_PATTERNS,
   GetPostByIdMsResponseDto,
@@ -186,7 +187,7 @@ export class PostsController {
     @Param('postId', UUIDValidationOrBadRequestPipe) postId: string,
     @ExtractUserFromRequest() user: UserContextDto,
   ): Promise<void> {
-    const result = this.posts.send<void, DeletePostPayload>(
+    const result = this.posts.send<DeletePostMsResponseDto, DeletePostPayload>(
       POSTS_PATTERNS.DELETE_POST,
       { postId, userId: user.userId },
     );

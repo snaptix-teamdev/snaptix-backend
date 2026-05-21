@@ -4,6 +4,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   CreatePostMsResponseDto,
   CreatePostPayload,
+  DeletePostMsResponseDto,
   DeletePostPayload,
   GetMyPostsMsResponseDto,
   GetMyPostsPayload,
@@ -70,7 +71,11 @@ export class PostsController {
   }
 
   @MessagePattern(POSTS_PATTERNS.DELETE_POST)
-  async deletePost(@Payload() payload: DeletePostPayload): Promise<void> {
+  async deletePost(
+    @Payload() payload: DeletePostPayload,
+  ): Promise<DeletePostMsResponseDto> {
     await this.commandBus.execute(new DeletePostCommand(payload));
+
+    return {};
   }
 }

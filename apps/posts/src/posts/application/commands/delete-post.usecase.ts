@@ -1,8 +1,9 @@
 import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DomainException } from '@snaptix/common';
 import { POSTS_ERRORS } from '@snaptix/contracts';
+import { TransactionManager } from '../../../infrastructure/prisma/transaction.manager';
+import { PostsOutboxPublisher } from '../../infrastructure/posts-outbox.publisher';
 import { PostsRepository } from '../../infrastructure/posts.repository';
-import { PostsEventPublisher } from '../../../infrastructure/rabbitmq/posts-event.publisher';
 
 class DeletePostCommandRequest {
   postId: string;
@@ -22,7 +23,8 @@ export class DeletePostUseCase implements ICommandHandler<
 > {
   constructor(
     private postsRepository: PostsRepository,
-    private postsEventPublisher: PostsEventPublisher,
+    private postsOutboxPublisher: PostsOutboxPublisher,
+    private transactionManager: TransactionManager,
   ) {}
 
   async execute({ dto }: DeletePostCommand): Promise<void> {
@@ -36,11 +38,12 @@ export class DeletePostUseCase implements ICommandHandler<
       throw new DomainException(POSTS_ERRORS.POST_FORBIDDEN);
     }
 
-    await this.postsRepository.softDelete(post.id);
-
-    await this.postsEventPublisher.postDeleted({
-      postId: post.id,
-      userId: post.userId,
+    await this.transactionManager.run(async (tx) => {
+      await this.postsRepository.softDelete(post.id, tx);
+      await this.postsOutboxPublisher.postDeleted(
+        { postId: post.id, userId: post.userId },
+        tx,
+      );
     });
   }
 }

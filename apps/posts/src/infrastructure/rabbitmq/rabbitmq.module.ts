@@ -3,7 +3,6 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { POSTS_EXCHANGE } from '@snaptix/contracts';
 import { CoreModule } from '../../core/core.module';
 import { CoreConfig } from '../../core/config/core.config';
-import { PostsEventPublisher } from './posts-event.publisher';
 
 @Global()
 @Module({
@@ -23,7 +22,6 @@ import { PostsEventPublisher } from './posts-event.publisher';
       }),
     }),
   ],
-  providers: [PostsEventPublisher],
-  exports: [RabbitMQModule, PostsEventPublisher],
+  exports: [RabbitMQModule],
 })
 export class RabbitmqModule {}
