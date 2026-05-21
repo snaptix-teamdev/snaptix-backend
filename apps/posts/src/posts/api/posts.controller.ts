@@ -4,6 +4,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   CreatePostMsResponseDto,
   CreatePostPayload,
+  DeletePostMsResponseDto,
+  DeletePostPayload,
   GetMyPostsMsResponseDto,
   GetMyPostsPayload,
   GetPostByIdMsResponseDto,
@@ -15,6 +17,7 @@ import {
   UpdatePostPayload,
 } from '@snaptix/contracts';
 import { CreatePostCommand } from '../application/commands/create-post.usecase';
+import { DeletePostCommand } from '../application/commands/delete-post.usecase';
 import { UpdatePostCommand } from '../application/commands/update-post.usecase';
 import { GetPostByIdQuery } from '../application/queries/get-post-by-id.usecase';
 import { GetMyPostsQuery } from '../application/queries/get-my-posts.usecase';
@@ -63,6 +66,15 @@ export class PostsController {
     @Payload() payload: UpdatePostPayload,
   ): Promise<UpdatePostMsResponseDto> {
     await this.commandBus.execute(new UpdatePostCommand(payload));
+
+    return {};
+  }
+
+  @MessagePattern(POSTS_PATTERNS.DELETE_POST)
+  async deletePost(
+    @Payload() payload: DeletePostPayload,
+  ): Promise<DeletePostMsResponseDto> {
+    await this.commandBus.execute(new DeletePostCommand(payload));
 
     return {};
   }

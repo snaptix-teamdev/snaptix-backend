@@ -24,6 +24,18 @@ model Post {
   deletedAt   DateTime?   @map("deleted_at") @db.Timestamptz()
 }
 
+model OutboxEvent {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  type        String
+  exchange    String
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  publishedAt DateTime? @map("published_at") @db.Timestamptz()
+
+  @@index([publishedAt, createdAt])
+  @@map("outbox_event")
+}
+
 model PostMedia {
   id         String @id @default(uuid(7)) @db.Uuid
   fileId     String @map("file_id") @db.Uuid

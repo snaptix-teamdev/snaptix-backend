@@ -1,7 +1,7 @@
 export const MICROSERVICE_NAME = {
-  GATEWAY: 'GATEWAY',
-  USER_ACCOUNTS: 'USER_ACCOUNTS',
-  NOTIFICATIONS: 'NOTIFICATIONS',
-  FILES: 'FILES',
-  POSTS: 'POSTS',
+  GATEWAY: 'gateway',
+  USER_ACCOUNTS: 'user-accounts',
+  NOTIFICATIONS: 'notifications',
+  FILES: 'files',
+  POSTS: 'posts',
 };

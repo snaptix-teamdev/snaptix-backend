@@ -48,6 +48,10 @@ export class PostEntity implements IPost {
     return entity;
   }
 
+  isOwner(userId: string): boolean {
+    return this.userId === userId;
+  }
+
   update(dto: UpdatePostDto): void {
     if (dto.description !== undefined) this.description = dto.description;
   }

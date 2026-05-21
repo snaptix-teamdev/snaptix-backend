@@ -29,7 +29,7 @@ export class UpdatePostUseCase implements ICommandHandler<
       throw new DomainException(POSTS_ERRORS.POST_NOT_FOUND);
     }
 
-    if (post.userId !== dto.userId) {
+    if (!post.isOwner(dto.userId)) {
       throw new DomainException(POSTS_ERRORS.POST_FORBIDDEN);
     }
 

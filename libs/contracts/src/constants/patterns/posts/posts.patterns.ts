@@ -4,4 +4,5 @@ export const POSTS_PATTERNS = {
   GET_MY_POSTS: 'posts.get-my-posts',
   GET_USER_POSTS: 'posts.get-user-posts',
   UPDATE_POST: 'posts.update-post',
+  DELETE_POST: 'posts.delete-post',
 } as const;

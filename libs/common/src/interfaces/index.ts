@@ -6,3 +6,4 @@ export * from './errors/domain-error.interface';
 export * from './user-accounts/session.interface';
 export * from './posts/post.interface';
 export * from './files/index';
+export * from './events/index';
