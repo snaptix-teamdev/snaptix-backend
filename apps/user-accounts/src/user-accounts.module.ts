@@ -33,6 +33,7 @@ import { SessionConverter } from './accounts/converters/session.converter';
 import { SessionsRepository } from './infrastructure/sessions.repository';
 import { UserConverter } from './accounts/converters/user.converter';
 import { GetActiveDevicesQueryHandler } from './accounts/application/queries/get-active-devices.query';
+import { GetRegisteredUsersCountQueryHandler } from './accounts/application/queries/get-registered-users-count.query';
 import { SessionsQueryRepository } from './infrastructure/query/sessions.query-repository';
 
 const authUseCases = [
@@ -98,6 +99,7 @@ const sessionUseCases = [
     UsersRepository,
     UsersQueryRepository,
     GetActiveDevicesQueryHandler,
+    GetRegisteredUsersCountQueryHandler,
     SessionsQueryRepository,
   ],
 })

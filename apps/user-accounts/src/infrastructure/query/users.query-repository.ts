@@ -5,6 +5,15 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UsersQueryRepository {
   constructor(private prisma: PrismaService) {}
 
+  async getRegisteredUsersCount(): Promise<number> {
+    return this.prisma.user.count({
+      where: {
+        deletedAt: null,
+        emailConfirmation: { isVerified: true },
+      },
+    });
+  }
+
   async findById(id: string) {
     const result = await this.prisma.user.findUnique({
       where: {

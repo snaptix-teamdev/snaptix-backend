@@ -6,6 +6,8 @@ import {
   CreatePostPayload,
   DeletePostMsResponseDto,
   DeletePostPayload,
+  GetLatestPostsMsResponseDto,
+  GetLatestPostsPayload,
   GetMyPostsMsResponseDto,
   GetMyPostsPayload,
   GetPostByIdMsResponseDto,
@@ -22,6 +24,7 @@ import { UpdatePostCommand } from '../application/commands/update-post.usecase';
 import { GetPostByIdQuery } from '../application/queries/get-post-by-id.usecase';
 import { GetMyPostsQuery } from '../application/queries/get-my-posts.usecase';
 import { GetUserPostsQuery } from '../application/queries/get-user-posts.usecase';
+import { GetLatestPostsQuery } from '../application/queries/get-latest-posts.usecase';
 
 @Controller()
 export class PostsController {
@@ -59,6 +62,15 @@ export class PostsController {
     @Payload() payload: GetUserPostsPayload,
   ): Promise<GetUserPostsMsResponseDto> {
     return this.queryBus.execute(new GetUserPostsQuery(payload));
+  }
+
+  @MessagePattern(POSTS_PATTERNS.GET_LATEST_POSTS)
+  async getLatestPosts(
+    @Payload() payload: GetLatestPostsPayload,
+  ): Promise<GetLatestPostsMsResponseDto> {
+    return this.queryBus.execute(
+      new GetLatestPostsQuery({ pageSize: payload.pageSize }),
+    );
   }
 
   @MessagePattern(POSTS_PATTERNS.UPDATE_POST)
