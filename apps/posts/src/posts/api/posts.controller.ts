@@ -4,18 +4,24 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import {
   CreatePostMsResponseDto,
   CreatePostPayload,
+  DeletePostMsResponseDto,
+  DeletePostPayload,
   GetMyPostsMsResponseDto,
   GetMyPostsPayload,
   GetPostByIdMsResponseDto,
   GetPostByIdPayload,
+  GetUserPostsMsResponseDto,
+  GetUserPostsPayload,
   POSTS_PATTERNS,
   UpdatePostMsResponseDto,
   UpdatePostPayload,
 } from '@snaptix/contracts';
 import { CreatePostCommand } from '../application/commands/create-post.usecase';
+import { DeletePostCommand } from '../application/commands/delete-post.usecase';
 import { UpdatePostCommand } from '../application/commands/update-post.usecase';
 import { GetPostByIdQuery } from '../application/queries/get-post-by-id.usecase';
 import { GetMyPostsQuery } from '../application/queries/get-my-posts.usecase';
+import { GetUserPostsQuery } from '../application/queries/get-user-posts.usecase';
 
 @Controller()
 export class PostsController {
@@ -48,11 +54,27 @@ export class PostsController {
     return this.queryBus.execute(new GetMyPostsQuery(payload));
   }
 
+  @MessagePattern(POSTS_PATTERNS.GET_USER_POSTS)
+  async getUserPosts(
+    @Payload() payload: GetUserPostsPayload,
+  ): Promise<GetUserPostsMsResponseDto> {
+    return this.queryBus.execute(new GetUserPostsQuery(payload));
+  }
+
   @MessagePattern(POSTS_PATTERNS.UPDATE_POST)
   async updatePost(
     @Payload() payload: UpdatePostPayload,
   ): Promise<UpdatePostMsResponseDto> {
     await this.commandBus.execute(new UpdatePostCommand(payload));
+
+    return {};
+  }
+
+  @MessagePattern(POSTS_PATTERNS.DELETE_POST)
+  async deletePost(
+    @Payload() payload: DeletePostPayload,
+  ): Promise<DeletePostMsResponseDto> {
+    await this.commandBus.execute(new DeletePostCommand(payload));
 
     return {};
   }

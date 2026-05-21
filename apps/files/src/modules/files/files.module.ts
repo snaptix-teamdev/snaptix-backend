@@ -10,6 +10,9 @@ import { ConfirmUploadFileUseCase } from './application/commands/confirm-upload-
 import { FileValidationService } from './application/file-validation.service';
 import { LinkFileToEntityUseCase } from './application/commands/link-file-to-entity.use-case';
 import { BulkLinkFilesToEntityUseCase } from './application/commands/bulk-link-files-to-entity.use-case';
+import { DeletePostFilesUseCase } from './application/commands/delete-post-files.use-case';
+import { PostDeletedHandler } from './events/post-deleted.handler';
+import { PostDeletedDeadLetterHandler } from './events/post-deleted-dead-letter.handler';
 
 @Module({
   imports: [S3Module],
@@ -25,6 +28,9 @@ import { BulkLinkFilesToEntityUseCase } from './application/commands/bulk-link-f
     FileValidationService,
     LinkFileToEntityUseCase,
     BulkLinkFilesToEntityUseCase,
+    DeletePostFilesUseCase,
+    PostDeletedHandler,
+    PostDeletedDeadLetterHandler,
   ],
 })
 export class FilesFeatureModule {}

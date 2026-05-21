@@ -7,6 +7,7 @@ import {
   GetObjectCommand,
   GetObjectCommandOutput,
   PutObjectCommand,
+  PutObjectTaggingCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
 
@@ -88,6 +89,18 @@ export class S3Service {
     const bytes = await result.Body.transformToByteArray();
 
     return Buffer.from(bytes);
+  }
+
+  async tagObjectForDeletion(storageKey: string): Promise<void> {
+    const command = new PutObjectTaggingCommand({
+      Bucket: this.s3Config.mainBucket,
+      Key: storageKey,
+      Tagging: {
+        TagSet: [{ Key: 'delete', Value: 'true' }],
+      },
+    });
+
+    await this.s3Client.send(command);
   }
 
   async putObject(

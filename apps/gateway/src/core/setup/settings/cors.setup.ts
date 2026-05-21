@@ -8,7 +8,9 @@ export function corsSetup(
 ): void {
   const allowedOrigins =
     coreConfig.env === Environments.PRODUCTION
-      ? coreConfig.corsAllowedOrigins
+      ? coreConfig.corsAllowedOrigins.includes('*')
+        ? true
+        : coreConfig.corsAllowedOrigins
       : true;
 
   app.enableCors({
