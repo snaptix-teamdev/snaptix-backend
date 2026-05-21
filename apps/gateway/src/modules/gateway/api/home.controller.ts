@@ -3,11 +3,11 @@ import {
   GetLatestPostsQueryRequestDto,
   GetLatestPostsResponseDto,
 } from '@snaptix/contracts';
-import { PostsService } from '../application/posts.service';
+import { HomeService } from '../application/home.service';
 
 @Controller({ path: 'home', version: '1' })
 export class HomeController {
-  constructor(private postsService: PostsService) {}
+  constructor(private homeService: HomeService) {}
 
   /**
    * Последние посты всех пользователей
@@ -17,6 +17,6 @@ export class HomeController {
   async getLatestPosts(
     @Query() query: GetLatestPostsQueryRequestDto,
   ): Promise<GetLatestPostsResponseDto> {
-    return this.postsService.getLatestPosts(query.pageSize);
+    return this.homeService.getLatestPosts(query.pageSize);
   }
 }

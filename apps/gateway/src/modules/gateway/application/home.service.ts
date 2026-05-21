@@ -12,7 +12,7 @@ import { GatewayConfig } from '../gateway.config';
 import { LatestPostViewDto } from '../api/mappers/latest-post.mapper';
 
 @Injectable()
-export class PostsService {
+export class HomeService {
   constructor(
     @Inject(MICROSERVICE_NAME.POSTS) private posts: ClientProxy,
     @Inject(MICROSERVICE_NAME.USER_ACCOUNTS) private userAccounts: ClientProxy,

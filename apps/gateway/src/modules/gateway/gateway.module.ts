@@ -8,7 +8,7 @@ import { CoreConfig } from '../../core/config/core.config';
 import { SecurityDevicesController } from './api/security-devices.controller';
 import { GatewayConfig } from './gateway.config';
 import { HomeController } from './api/home.controller';
-import { PostsService } from './application/posts.service';
+import { HomeService } from './application/home.service';
 
 @Module({
   imports: [
@@ -55,6 +55,6 @@ import { PostsService } from './application/posts.service';
     UsersController,
     HomeController,
   ],
-  providers: [GatewayConfig, PostsService],
+  providers: [GatewayConfig, HomeService],
 })
 export class GatewayModule {}
