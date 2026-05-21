@@ -7,4 +7,4 @@ const request = z.object({
   pageSize: CommonSchemas.pageSize.optional(),
 });
 
-export class GetUserPostsRequestDto extends createZodDto(request) {}
+export class GetUserPostsQueryRequestDto extends createZodDto(request) {}

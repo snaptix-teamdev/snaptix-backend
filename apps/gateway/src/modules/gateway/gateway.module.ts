@@ -7,6 +7,8 @@ import { MICROSERVICE_NAME } from '@snaptix/contracts';
 import { CoreConfig } from '../../core/config/core.config';
 import { SecurityDevicesController } from './api/security-devices.controller';
 import { GatewayConfig } from './gateway.config';
+import { HomeController } from './api/home.controller';
+import { HomeService } from './application/home.service';
 
 @Module({
   imports: [
@@ -51,7 +53,8 @@ import { GatewayConfig } from './gateway.config';
     SecurityDevicesController,
     PostsController,
     UsersController,
+    HomeController,
   ],
-  providers: [GatewayConfig],
+  providers: [GatewayConfig, HomeService],
 })
 export class GatewayModule {}

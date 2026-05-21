@@ -16,7 +16,7 @@ import {
   GetMyPostsResponseDto,
   GetUserPostsMsResponseDto,
   GetUserPostsPayload,
-  GetUserPostsRequestDto,
+  GetUserPostsQueryRequestDto,
   GetUserPostsResponseDto,
   MICROSERVICE_NAME,
   POSTS_PATTERNS,
@@ -92,7 +92,7 @@ export class UsersController {
   @ApiBadRequestCustomResponse()
   async getUserPosts(
     @Param('userId', UUIDValidationOrBadRequestPipe) userId: string,
-    @Query() query: GetUserPostsRequestDto,
+    @Query() query: GetUserPostsQueryRequestDto,
   ): Promise<GetUserPostsResponseDto> {
     const result = this.posts.send<
       GetUserPostsMsResponseDto,
