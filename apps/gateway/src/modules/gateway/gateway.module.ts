@@ -9,6 +9,7 @@ import { SecurityDevicesController } from './api/security-devices.controller';
 import { GatewayConfig } from './gateway.config';
 import { HomeController } from './api/home.controller';
 import { HomeService } from './application/home.service';
+import { GeoController } from './api/geo.controller';
 
 @Module({
   imports: [
@@ -46,6 +47,17 @@ import { HomeService } from './application/home.service';
           },
         }),
       },
+      {
+        name: MICROSERVICE_NAME.GEO,
+        inject: [CoreConfig],
+        useFactory: (coreConfig: CoreConfig) => ({
+          transport: Transport.TCP,
+          options: {
+            host: coreConfig.microserviceGeoHost,
+            port: coreConfig.microserviceGeoPort,
+          },
+        }),
+      },
     ]),
   ],
   controllers: [
@@ -54,6 +66,7 @@ import { HomeService } from './application/home.service';
     PostsController,
     UsersController,
     HomeController,
+    GeoController,
   ],
   providers: [GatewayConfig, HomeService],
 })

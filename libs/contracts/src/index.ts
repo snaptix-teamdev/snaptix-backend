@@ -4,3 +4,4 @@ export * from './posts/index';
 export * from './events/index';
 export * from './schemas/index';
 export * from './files/index';
+export * from './geo/index';

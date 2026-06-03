@@ -71,6 +71,15 @@
         "tsConfigPath": "apps/gateway/tsconfig.app.json"
       }
     },
+    "geo": {
+      "type": "application",
+      "root": "apps/geo",
+      "entryFile": "main",
+      "sourceRoot": "apps/geo/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/geo/tsconfig.app.json"
+      }
+    },
     "notifications": {
       "type": "application",
       "root": "apps/notifications",

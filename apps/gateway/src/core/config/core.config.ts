@@ -64,6 +64,19 @@ export class CoreConfig {
   })
   microservicePostsHost: string;
 
+  @IsNumber(
+    {},
+    {
+      message: 'Set Env variable MICROSERVICE_GEO_PORT, example: 9006',
+    },
+  )
+  microserviceGeoPort: number;
+
+  @IsNotEmpty({
+    message: 'Set Env variable MICROSERVICE_GEO_HOST, example: 0.0.0.0',
+  })
+  microserviceGeoHost: string;
+
   @IsEnum(Environments, {
     message:
       'Set correct NODE_ENV value, available values: ' +
@@ -124,6 +137,12 @@ export class CoreConfig {
     this.microservicePostsHost = this.configService.get(
       'MICROSERVICE_POSTS_HOST',
     );
+
+    this.microserviceGeoPort = parseInt(
+      this.configService.get<string>('MICROSERVICE_GEO_PORT'),
+    );
+
+    this.microserviceGeoHost = this.configService.get('MICROSERVICE_GEO_HOST');
 
     this.env = this.configService.get('NODE_ENV');
 

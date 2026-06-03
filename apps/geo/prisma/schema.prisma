@@ -1,0 +1,70 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Country {
+  id           Int                  @id
+  iso2         String               @unique
+  iso3         String               @unique
+  regions      Region[]
+  translations CountryTranslation[]
+
+  @@map("countries")
+}
+
+model CountryTranslation {
+  countryId Int     @map("country_id")
+  lang      String
+  name      String
+  country   Country @relation(fields: [countryId], references: [id])
+
+  @@id([countryId, lang])
+  @@map("country_translations")
+}
+
+model Region {
+  id           Int                 @id
+  countryId    Int                 @map("country_id")
+  country      Country             @relation(fields: [countryId], references: [id])
+  cities       City[]
+  translations RegionTranslation[]
+
+  @@index([countryId])
+  @@map("regions")
+}
+
+model RegionTranslation {
+  regionId Int    @map("region_id")
+  lang     String
+  name     String
+  region   Region @relation(fields: [regionId], references: [id])
+
+  @@id([regionId, lang])
+  @@map("region_translations")
+}
+
+model City {
+  id           Int               @id
+  regionId     Int               @map("region_id")
+  region       Region            @relation(fields: [regionId], references: [id])
+  translations CityTranslation[]
+
+  @@index([regionId])
+  @@map("cities")
+}
+
+model CityTranslation {
+  cityId Int    @map("city_id")
+  lang   String
+  name   String
+  city   City   @relation(fields: [cityId], references: [id])
+
+  @@id([cityId, lang])
+  @@map("city_translations")
+}
