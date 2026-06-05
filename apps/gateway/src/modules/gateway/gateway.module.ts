@@ -10,6 +10,7 @@ import { GatewayConfig } from './gateway.config';
 import { HomeController } from './api/home.controller';
 import { HomeService } from './application/home.service';
 import { GeoController } from './api/geo.controller';
+import { PostAggregationService } from './application/post-aggregation.service';
 
 @Module({
   imports: [
@@ -68,6 +69,6 @@ import { GeoController } from './api/geo.controller';
     HomeController,
     GeoController,
   ],
-  providers: [GatewayConfig, HomeService],
+  providers: [GatewayConfig, HomeService, PostAggregationService],
 })
 export class GatewayModule {}

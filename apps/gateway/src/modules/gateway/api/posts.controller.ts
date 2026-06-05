@@ -14,15 +14,11 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import {
   ConfirmUploadFilePayload,
-  CreatePostMsResponseDto,
-  CreatePostPayload,
   CreatePostRequestDto,
   CreatePostResponseDto,
   DeletePostMsResponseDto,
   DeletePostPayload,
   FILES_MICROSERVICE_PATTERNS,
-  GetPostByIdMsResponseDto,
-  GetPostByIdPayload,
   GetPostByIdResponseDto,
   GetUploadUrlPayload,
   GetUploadUrlRequestDto,
@@ -46,8 +42,8 @@ import { ApiForbiddenCustomResponse } from '../../../core/swagger/forbidden.swag
 import { UUIDValidationOrBadRequestPipe } from '../../../core/pipes/uuid-validation.pipe';
 import { FileEntityType } from '@snaptix/common';
 import { GatewayConfig } from '../gateway.config';
-import { PostViewDto } from './mappers/post.mapper';
 import { ApiConflictCustomResponse } from '../../../core/swagger/conflict.swagger';
+import { PostAggregationService } from '../application/post-aggregation.service';
 
 @Controller({ path: 'posts', version: '1' })
 export class PostsController {
@@ -55,6 +51,7 @@ export class PostsController {
     @Inject(MICROSERVICE_NAME.POSTS) private posts: ClientProxy,
     @Inject(MICROSERVICE_NAME.FILES) private files: ClientProxy,
     private postsConfig: GatewayConfig,
+    private postAggregationService: PostAggregationService,
   ) {}
 
   /**
@@ -78,18 +75,10 @@ export class PostsController {
     @Body() body: CreatePostRequestDto,
     @ExtractUserFromRequest() user: UserContextDto,
   ): Promise<CreatePostResponseDto> {
-    const result = this.posts.send<CreatePostMsResponseDto, CreatePostPayload>(
-      POSTS_PATTERNS.CREATE_POST,
-      {
-        userId: user.userId,
-        description: body.description,
-        media: body.media,
-      },
-    );
-
-    const post = await firstValueFrom(result);
-
-    return new PostViewDto(post, this.postsConfig.filesStorageBaseUrl);
+    return this.postAggregationService.createPost({
+      userId: user.userId,
+      body,
+    });
   }
 
   /**
@@ -214,13 +203,6 @@ export class PostsController {
   ): Promise<GetPostByIdResponseDto> {
     //TODO получение поста со всей логикой вынести в post-aggregation.service.ts
 
-    const result = this.posts.send<
-      GetPostByIdMsResponseDto,
-      GetPostByIdPayload
-    >(POSTS_PATTERNS.GET_POST_BY_ID, { id: postId });
-
-    const post = await firstValueFrom(result);
-
-    return new PostViewDto(post, this.postsConfig.filesStorageBaseUrl);
+    return this.postAggregationService.getPostById(postId);
   }
 }

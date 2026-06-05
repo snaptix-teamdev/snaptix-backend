@@ -5,6 +5,10 @@ export class GetLatestPostsResponseDto {
     media: { mediaId: string; url: string }[];
     updatedAt: Date;
     createdAt: Date;
-    owner: { firstName: string; lastName: string; avatar: string | null };
+    owner: {
+      userId: string;
+      username: string;
+      avatar: string | null;
+    };
   }[];
 }
