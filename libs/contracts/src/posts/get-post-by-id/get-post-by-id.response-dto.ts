@@ -14,6 +14,24 @@ class Media {
   url: string;
 }
 
+class Owner {
+  @ApiProperty({
+    example: randomUUID(),
+  })
+  userId: string;
+
+  @ApiProperty({
+    example: 'user-name',
+  })
+  username: string;
+
+  @ApiProperty({
+    example:
+      'https://swebtoon-phinf.pstatic.net/20241203_198/1733185516062oNh7H_PNG/thumbnail.jpg',
+  })
+  avatar: string | null;
+}
+
 export class GetPostByIdResponseDto {
   @ApiProperty({
     example: randomUUID(),
@@ -30,6 +48,7 @@ export class GetPostByIdResponseDto {
   })
   media: { mediaId: string; url: string }[];
 
+  owner: Owner;
   updatedAt: Date;
   createdAt: Date;
 }
