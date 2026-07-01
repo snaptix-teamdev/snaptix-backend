@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 import * as countries from 'i18n-iso-countries';
 import { PrismaClient } from '../../apps/geo/src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { GeoLang } from '../../libs/contracts/src/geo/enums/geo-lang.enum';
 
 config({ path: path.join(__dirname, '../../apps/geo/.env.development') });
 
@@ -77,7 +78,7 @@ async function importCountries(
 
   const countryMap = new Map<string, number>();
   const countryData: { id: number; iso2: string; iso3: string }[] = [];
-  const translations: { countryId: number; lang: string; name: string }[] = [];
+  const translations: { countryId: number; lang: GeoLang; name: string }[] = [];
 
   for (const line of lines) {
     if (line.startsWith('#') || !line.trim()) continue;
@@ -91,12 +92,17 @@ async function importCountries(
 
     if (!iso2 || !geonameid) continue;
 
+    // Пропускаем упразднённые страны ISO 3166 (например, AN — Netherlands
+    // Antilles, CS — Serbia and Montenegro): у них нет ни ru-перевода, ни
+    // admin1-регионов, GeoNames держит их в хвосте countryInfo.txt.
+    if (!countries.isValid(iso2)) continue;
+
     const nameRu =
-      countries.getName(iso2, 'ru') ?? ruMap.get(geonameid) ?? nameEn;
+      countries.getName(iso2, GeoLang.RU) ?? ruMap.get(geonameid) ?? nameEn;
 
     countryData.push({ id: geonameid, iso2, iso3 });
-    translations.push({ countryId: geonameid, lang: 'en', name: nameEn });
-    translations.push({ countryId: geonameid, lang: 'ru', name: nameRu });
+    translations.push({ countryId: geonameid, lang: GeoLang.EN, name: nameEn });
+    translations.push({ countryId: geonameid, lang: GeoLang.RU, name: nameRu });
     countryMap.set(iso2, geonameid);
   }
 
@@ -120,7 +126,7 @@ async function importRegions(
 
   const regionMap = new Map<string, number>();
   const regionData: { id: number; countryId: number }[] = [];
-  const translations: { regionId: number; lang: string; name: string }[] = [];
+  const translations: { regionId: number; lang: GeoLang; name: string }[] = [];
 
   for (const line of lines) {
     if (!line.trim()) continue;
@@ -140,8 +146,8 @@ async function importRegions(
     const nameRu = ruMap.get(geonameid) ?? nameEn;
 
     regionData.push({ id: geonameid, countryId });
-    translations.push({ regionId: geonameid, lang: 'en', name: nameEn });
-    translations.push({ regionId: geonameid, lang: 'ru', name: nameRu });
+    translations.push({ regionId: geonameid, lang: GeoLang.EN, name: nameEn });
+    translations.push({ regionId: geonameid, lang: GeoLang.RU, name: nameRu });
     regionMap.set(key, geonameid);
   }
 
@@ -168,7 +174,7 @@ async function importCities(
   });
 
   let cityBatch: { id: number; regionId: number }[] = [];
-  let translationBatch: { cityId: number; lang: string; name: string }[] = [];
+  let translationBatch: { cityId: number; lang: GeoLang; name: string }[] = [];
   let totalCities = 0;
   let skippedCities = 0;
 
@@ -207,8 +213,16 @@ async function importCities(
     const nameRu = ruMap.get(geonameid) ?? nameEn;
 
     cityBatch.push({ id: geonameid, regionId });
-    translationBatch.push({ cityId: geonameid, lang: 'en', name: nameEn });
-    translationBatch.push({ cityId: geonameid, lang: 'ru', name: nameRu });
+    translationBatch.push({
+      cityId: geonameid,
+      lang: GeoLang.EN,
+      name: nameEn,
+    });
+    translationBatch.push({
+      cityId: geonameid,
+      lang: GeoLang.RU,
+      name: nameRu,
+    });
 
     if (cityBatch.length >= BATCH_SIZE) {
       await flush();

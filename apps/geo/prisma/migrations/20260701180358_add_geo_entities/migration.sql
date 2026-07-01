@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "Lang" AS ENUM ('en', 'ru');
+
 -- CreateTable
 CREATE TABLE "countries" (
     "id" INTEGER NOT NULL,
@@ -10,7 +13,7 @@ CREATE TABLE "countries" (
 -- CreateTable
 CREATE TABLE "country_translations" (
     "country_id" INTEGER NOT NULL,
-    "lang" TEXT NOT NULL,
+    "lang" "Lang" NOT NULL,
     "name" TEXT NOT NULL,
 
     CONSTRAINT "country_translations_pkey" PRIMARY KEY ("country_id","lang")
@@ -27,7 +30,7 @@ CREATE TABLE "regions" (
 -- CreateTable
 CREATE TABLE "region_translations" (
     "region_id" INTEGER NOT NULL,
-    "lang" TEXT NOT NULL,
+    "lang" "Lang" NOT NULL,
     "name" TEXT NOT NULL,
 
     CONSTRAINT "region_translations_pkey" PRIMARY KEY ("region_id","lang")
@@ -44,7 +47,7 @@ CREATE TABLE "cities" (
 -- CreateTable
 CREATE TABLE "city_translations" (
     "city_id" INTEGER NOT NULL,
-    "lang" TEXT NOT NULL,
+    "lang" "Lang" NOT NULL,
     "name" TEXT NOT NULL,
 
     CONSTRAINT "city_translations_pkey" PRIMARY KEY ("city_id","lang")

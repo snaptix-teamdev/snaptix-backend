@@ -14,7 +14,7 @@ export class FindGeoQuery extends Query<FindGeoMsResponseDto> {
 }
 
 @QueryHandler(FindGeoQuery)
-export class GetGeoQueryHandler implements IQueryHandler<
+export class FindGeoQueryHandler implements IQueryHandler<
   FindGeoQuery,
   FindGeoMsResponseDto
 > {

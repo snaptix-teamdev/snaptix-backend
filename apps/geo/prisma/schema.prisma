@@ -8,6 +8,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Lang {
+  en
+  ru
+}
+
 model Country {
   id           Int                  @id
   iso2         String               @unique
@@ -20,7 +25,7 @@ model Country {
 
 model CountryTranslation {
   countryId Int     @map("country_id")
-  lang      String
+  lang      Lang
   name      String
   country   Country @relation(fields: [countryId], references: [id])
 
@@ -41,7 +46,7 @@ model Region {
 
 model RegionTranslation {
   regionId Int    @map("region_id")
-  lang     String
+  lang     Lang
   name     String
   region   Region @relation(fields: [regionId], references: [id])
 
@@ -61,7 +66,7 @@ model City {
 
 model CityTranslation {
   cityId Int    @map("city_id")
-  lang   String
+  lang   Lang
   name   String
   city   City   @relation(fields: [cityId], references: [id])
 

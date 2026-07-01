@@ -16,21 +16,25 @@ export class GetGeoQueryHandler implements IQueryHandler<
   constructor(private readonly repo: GeoQueryRepository) {}
 
   async execute({ payload }: GetGeoQuery): Promise<GetGeoMsResponseDto> {
-    const { countryId, regionId } = payload;
+    const { countryId, regionId, lang } = payload;
 
     if (regionId && !countryId) return { result: [] };
 
     if (!countryId) {
-      const result = await this.repo.findCountries();
+      const result = await this.repo.findCountries(lang);
       return { result };
     }
 
     if (!regionId) {
-      const result = await this.repo.findRegionsByCountry(countryId);
+      const result = await this.repo.findRegionsByCountry(countryId, lang);
       return { result };
     }
 
-    const result = await this.repo.findCitiesByRegion(countryId, regionId);
+    const result = await this.repo.findCitiesByRegion(
+      countryId,
+      regionId,
+      lang,
+    );
 
     return { result };
   }

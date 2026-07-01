@@ -1,7 +1,6 @@
 class GetGeoMsResult {
-  value: string;
-  en: string;
-  ru: string;
+  id: number;
+  name: string;
 }
 
 export class GetGeoMsResponseDto {
