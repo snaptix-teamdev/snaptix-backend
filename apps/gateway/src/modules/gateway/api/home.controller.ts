@@ -5,10 +5,15 @@ import {
   GetRegisteredUsersCountResponseDto,
 } from '@snaptix/contracts';
 import { HomeService } from '../application/home.service';
+import { PostAggregationService } from '../application/post-aggregation.service';
 
 @Controller({ path: 'home', version: '1' })
 export class HomeController {
-  constructor(private homeService: HomeService) {}
+  constructor(
+    private postAggregationService: PostAggregationService,
+
+    private homeService: HomeService,
+  ) {}
 
   /**
    * Количество зарегистрированных пользователей (с подтверждённой почтой)
@@ -27,6 +32,6 @@ export class HomeController {
   async getLatestPosts(
     @Query() query: GetLatestPostsQueryRequestDto,
   ): Promise<GetLatestPostsResponseDto> {
-    return this.homeService.getLatestPosts(query.pageSize);
+    return this.postAggregationService.getLatestPosts(query.pageSize);
   }
 }

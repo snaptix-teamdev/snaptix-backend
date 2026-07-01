@@ -9,6 +9,7 @@ import { SecurityDevicesController } from './api/security-devices.controller';
 import { GatewayConfig } from './gateway.config';
 import { HomeController } from './api/home.controller';
 import { HomeService } from './application/home.service';
+import { PostAggregationService } from './application/post-aggregation.service';
 
 @Module({
   imports: [
@@ -55,6 +56,6 @@ import { HomeService } from './application/home.service';
     UsersController,
     HomeController,
   ],
-  providers: [GatewayConfig, HomeService],
+  providers: [GatewayConfig, HomeService, PostAggregationService],
 })
 export class GatewayModule {}
