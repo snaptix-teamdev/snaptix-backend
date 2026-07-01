@@ -81,6 +81,7 @@
     "geo:build": "nest build geo",
     "geo:start": "node dist/apps/geo/main",
     "geo:test": "jest --testPathPattern=apps/geo --passWithNoTests",
+    "geo:test:e2e": "jest --config ./apps/geo/test/jest-e2e.json",
     "--------------------------": "",
     "docker:up": "docker compose -f docker-compose.yml up -d --wait",
     "docker:stop": "docker compose -f docker-compose.yml stop",
