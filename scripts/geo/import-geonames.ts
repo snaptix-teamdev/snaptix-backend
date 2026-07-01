@@ -6,8 +6,9 @@ import * as countries from 'i18n-iso-countries';
 import { PrismaClient } from '../../apps/geo/src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { GeoLang } from '../../libs/contracts/src/geo/enums/geo-lang.enum';
+import { envFilePath } from '../../libs/common/src/index';
 
-config({ path: path.join(__dirname, '../../apps/geo/.env.development') });
+config({ path: envFilePath('apps/geo') });
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 countries.registerLocale(require('i18n-iso-countries/langs/ru.json'));
