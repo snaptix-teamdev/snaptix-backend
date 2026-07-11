@@ -66,6 +66,13 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 409,
     field: 'code',
   },
+  USER_IS_DELETED: {
+    code: 'USER_IS_DELETED',
+    message:
+      'The account associated with the data from the external account has been deleted or blocked',
+    httpCode: 403,
+    field: null,
+  },
 } satisfies Record<
   string,
   IDomainError<IUser | IUserEmailConfirmation | IUserRecoveryPassword>

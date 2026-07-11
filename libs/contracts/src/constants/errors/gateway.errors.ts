@@ -7,6 +7,13 @@ export const GATEWAY_ERRORS = {
     httpCode: 401,
     field: 'recaptchaToken',
   },
+  EMAIL_IS_MISSING: {
+    code: 'EMAIL_IS_MISSING',
+    message:
+      'The external account did not provide the required data, email not received',
+    httpCode: 409,
+    field: null,
+  },
 } satisfies Record<
   string,
   IDomainError<{

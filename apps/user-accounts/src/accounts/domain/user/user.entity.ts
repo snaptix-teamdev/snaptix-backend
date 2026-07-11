@@ -50,6 +50,10 @@ export class UserEntity implements IUser {
     return entity;
   }
 
+  isDeleted(): boolean {
+    return !!this.deletedAt;
+  }
+
   isEmailConfirmationCodeExpired(): boolean {
     return this.emailConfirmation.isEmailConfirmationCodeExpired();
   }

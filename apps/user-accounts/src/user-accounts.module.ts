@@ -35,6 +35,9 @@ import { UserConverter } from './accounts/converters/user.converter';
 import { GetActiveDevicesQueryHandler } from './accounts/application/queries/get-active-devices.query';
 import { GetRegisteredUsersCountQueryHandler } from './accounts/application/queries/get-registered-users-count.query';
 import { SessionsQueryRepository } from './infrastructure/query/sessions.query-repository';
+import { AuthenticateWithGoogleUseCase } from './accounts/application/commands/auth-commands/authenticate-with-google.usecase';
+import { UserProvidersRepository } from './infrastructure/user-providers.repository';
+import { UserProviderConverter } from './accounts/converters/user-provider.converter';
 
 const authUseCases = [
   RegisterUserUseCase,
@@ -45,6 +48,7 @@ const authUseCases = [
   RefreshTokensUseCase,
   ResendEmailConfirmationCodeUseCase,
   LogoutUserUseCase,
+  AuthenticateWithGoogleUseCase,
 ];
 const sessionUseCases = [
   CreateSessionUseCase,
@@ -101,6 +105,8 @@ const sessionUseCases = [
     GetActiveDevicesQueryHandler,
     GetRegisteredUsersCountQueryHandler,
     SessionsQueryRepository,
+    UserProvidersRepository,
+    UserProviderConverter,
   ],
 })
 export class UserAccountsModule {}

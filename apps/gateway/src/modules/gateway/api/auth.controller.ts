@@ -17,6 +17,7 @@ import {
   ForgotPasswordResponseDto,
   GetMePayload,
   GetMeResponseDto,
+  CallbackGooglePayload,
   LoginPayload,
   LoginRequestDto,
   LoginResponseDto,
@@ -41,8 +42,14 @@ import { ApiNotFoundCustomResponse } from '../../../core/swagger/not-found.swagg
 import { ApiTooManyRequestsCustomResponse } from '../../../core/swagger/too-many-requests.swagger';
 import { AccessTokenAuthGuard } from '../../../core/guards/bearer/access-token.guard';
 import { RefreshTokenAuthGuard } from '../../../core/guards/cookie/refresh-token.guard';
-import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
-import { UserContextDto } from '@snaptix/common/dto/user-context.dto';
+import {
+  ExtractOAuthUserFromRequest,
+  ExtractUserFromRequest,
+} from '../../../core/decorators/extract-user-from-request.decorator';
+import {
+  UserContextDto,
+  UserOAuthContextDto,
+} from '@snaptix/common/dto/user-context.dto';
 import { ApiUnauthorizedCustomResponse } from '../../../core/swagger/unauthorized.swagger';
 import { ApiForbiddenCustomResponse } from '../../../core/swagger/forbidden.swagger';
 import { RecaptchaGuard } from '../../../core/guards/recaptcha/recaptcha.guard';
@@ -56,6 +63,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { ExtractRefreshTokenFromCookie } from '../../../core/decorators/extract-refresh-token-from-cookie.decorator';
+import { GoogleAuthGuard } from '../../../core/guards/google-oauth/google-auth.guard';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -189,6 +197,40 @@ export class AuthController {
     >(USER_ACCOUNTS_PATTERNS.AUTH.LOGIN, {
       email: body.email,
       password: body.password,
+      ip: clientDetails.ip,
+      userAgent: clientDetails.userAgent,
+    });
+
+    const tokens = await firstValueFrom(result);
+
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken: tokens.accessToken };
+  }
+
+  @Get('google/login')
+  @UseGuards(GoogleAuthGuard)
+  loginGoogle() {
+    return { msg: 'Google Authentication' };
+  }
+
+  @Get('google/redirect')
+  @UseGuards(GoogleAuthGuard)
+  async callbackGoogle(
+    @ExtractOAuthUserFromRequest() user: UserOAuthContextDto,
+    @ExtractClientDetails() clientDetails: ClientDetailsRequestDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = this.userAccounts.send<
+      AccessAndRefreshTokensDto,
+      CallbackGooglePayload
+    >(USER_ACCOUNTS_PATTERNS.AUTH.CALLBACK_GOOGLE, {
+      email: user.email,
+      externalProviderId: user.externalProviderId,
+      provider: user.provider,
       ip: clientDetails.ip,
       userAgent: clientDetails.userAgent,
     });
