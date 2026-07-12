@@ -16,6 +16,7 @@ import {
 import { buildDeviceInfo } from '../../helpers/build-device-info.helper';
 import { CreateSessionCommand } from '../session-commands/create-session.usecase';
 import { UsersRepository } from '../../../../infrastructure/users.repository';
+import { UserEntity } from '../../../domain/user/user.entity';
 
 class AuthenticateWithGoogleCommandRequest {
   email: string;
@@ -43,53 +44,12 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
     private usersRepository: UsersRepository,
   ) {}
 
-  async execute({
-    dto,
-  }: AuthenticateWithGoogleCommand): Promise<AccessAndRefreshTokensDto> {
-    const { email, externalProviderId, provider, ip, userAgent } = dto;
-
-    const userProvider: UserProviderEntity | null =
-      await this.userProvidersRepository.findByProviderAndProviderId(
-        externalProviderId,
-        provider,
-      );
-
-    if (!userProvider) {
-      // const user: UserEntity | null =
-      //   await this.usersRepository.findByEmail(email);
-      //
-      // if (!user) {
-      //   return;
-      // }
-      //
-      // if (user.isDeleted()) {
-      //   throw new DomainException(USER_ACCOUNTS_ERRORS.USER_IS_DELETED);
-      // }
-      //
-      // const isCompareEmail = user.email === email;
-      //
-      // if (!isCompareEmail) {
-      // }
-
-      return {
-        accessToken: '',
-        refreshToken: '',
-      };
-    }
-
-    if (userProvider.user.isDeleted()) {
-      throw new DomainException(USER_ACCOUNTS_ERRORS.USER_IS_DELETED);
-    }
-
-    const isCompareEmail = userProvider.email === email;
-
-    if (!isCompareEmail) {
-      userProvider.changeEmail(email);
-      await this.userProvidersRepository.updateEmail(userProvider);
-    }
-
+  private async createSessionWithTokens(
+    userId: string,
+    userAgent: string,
+    ip: string | null,
+  ): Promise<AccessAndRefreshTokensDto> {
     const deviceId: string = crypto.randomUUID();
-    const userId = userProvider.user.id;
     const tokens: GenerateTokensResult = this.tokensService.generateTokens({
       userId,
       deviceId,
@@ -111,5 +71,77 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };
+  }
+
+  async execute({
+    dto,
+  }: AuthenticateWithGoogleCommand): Promise<AccessAndRefreshTokensDto> {
+    const { email, externalProviderId, provider, ip, userAgent } = dto;
+
+    const userProvider: UserProviderEntity | null =
+      await this.userProvidersRepository.findByProviderAndProviderId(
+        externalProviderId,
+        provider,
+      );
+
+    if (!userProvider) {
+      const user: UserEntity | null =
+        await this.usersRepository.findByEmail(email);
+
+      if (!user) {
+        const userProvider: UserProviderEntity | null =
+          await this.userProvidersRepository.findByEmail(email);
+
+        if (!userProvider) {
+          return {
+            accessToken: '',
+            refreshToken: '',
+          };
+        }
+
+        // const user: UserEntity | null = await this.usersRepository.findById(
+        //   userProvider.user.id,
+        // );
+
+        return {
+          accessToken: '',
+          refreshToken: '',
+        };
+      }
+
+      if (user.isDeleted()) {
+        throw new DomainException(USER_ACCOUNTS_ERRORS.USER_IS_DELETED);
+      }
+
+      if (!user.isEmailVerified()) {
+        user.confirmEmailByOAuthProvider();
+
+        await this.usersRepository.update(user);
+      }
+
+      const userProvider: UserProviderEntity = UserProviderEntity.create({
+        provider,
+        externalProviderId,
+        email,
+        user,
+      });
+
+      await this.userProvidersRepository.create(userProvider);
+
+      return this.createSessionWithTokens(user.id, userAgent, ip);
+    }
+
+    if (userProvider.user.isDeleted()) {
+      throw new DomainException(USER_ACCOUNTS_ERRORS.USER_IS_DELETED);
+    }
+
+    const isCompareEmail = userProvider.email === email;
+
+    if (!isCompareEmail) {
+      userProvider.changeEmail(email);
+      await this.userProvidersRepository.updateEmail(userProvider);
+    }
+
+    return this.createSessionWithTokens(userProvider.user.id, userAgent, ip);
   }
 }

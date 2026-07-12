@@ -80,6 +80,23 @@ export class UserProvidersRepository {
     });
   }
 
+  async create(entity: UserProviderEntity): Promise<void> {
+    const model = this.userProviderConverter.fromEntityToPrismaModel(entity);
+
+    await this.prisma.userProvider.create({
+      data: {
+        id: model.id,
+        provider: model.provider,
+        externalProviderId: model.externalProviderId,
+        email: model.email,
+        userId: model.user.id,
+        createdAt: model.createdAt,
+        updatedAt: model.updatedAt,
+        deletedAt: model.deletedAt,
+      },
+    });
+  }
+
   async updateEmail(entity: UserProviderEntity): Promise<void> {
     const model = this.userProviderConverter.fromEntityToPrismaModel(entity);
 

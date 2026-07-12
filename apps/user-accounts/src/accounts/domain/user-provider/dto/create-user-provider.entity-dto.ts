@@ -1,6 +1,6 @@
-import { IUserProvider } from '@snaptix/common';
+import { UserProviderEntity } from '../user-provider.entity';
 
 export type CreateUserProviderEntityDto = Pick<
-  IUserProvider,
+  UserProviderEntity,
   'provider' | 'externalProviderId' | 'email' | 'user'
 >;

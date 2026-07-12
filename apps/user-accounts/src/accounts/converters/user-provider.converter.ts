@@ -13,10 +13,38 @@ const entityToModel = (entity: UserProviderEntity): IUserProvider => {
     provider: entity.provider,
     externalProviderId: entity.externalProviderId,
     email: entity.email,
-    user: entity.user,
     createdAt: entity.createdAt,
     updatedAt: entity.updatedAt,
     deletedAt: entity.deletedAt,
+    user: {
+      id: entity.user.id,
+      email: entity.user.email,
+      username: entity.user.username,
+      passwordHash: entity.user.passwordHash,
+      updatedAt: entity.user.updatedAt,
+      createdAt: entity.user.createdAt,
+      deletedAt: entity.user.deletedAt,
+      emailConfirmation: {
+        id: entity.user.emailConfirmation.id,
+        code: entity.user.emailConfirmation.code,
+        isVerified: entity.user.emailConfirmation.isVerified,
+        userId: entity.user.emailConfirmation.userId,
+        expiresAt: entity.user.emailConfirmation.expiresAt,
+        createdAt: entity.user.emailConfirmation.createdAt,
+        updatedAt: entity.user.emailConfirmation.updatedAt,
+      },
+      recoveryPassword: entity.user.recoveryPassword
+        ? {
+            id: entity.user.recoveryPassword.id,
+            userId: entity.user.recoveryPassword.userId,
+            code: entity.user.recoveryPassword.code,
+            isCodeAlreadyUsed: entity.user.recoveryPassword.isCodeAlreadyUsed,
+            expiresAt: entity.user.recoveryPassword.expiresAt,
+            createdAt: entity.user.recoveryPassword.createdAt,
+            updatedAt: entity.user.recoveryPassword.updatedAt,
+          }
+        : null,
+    },
   };
 };
 

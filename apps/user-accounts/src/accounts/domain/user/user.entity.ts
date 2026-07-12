@@ -62,8 +62,12 @@ export class UserEntity implements IUser {
     return this.emailConfirmation.isEmailConfirmationCodeVerified();
   }
 
-  confirmEmail(code: string): void {
-    this.emailConfirmation.confirmEmail(code);
+  confirmEmailByCode(code: string): void {
+    this.emailConfirmation.confirmEmailByCode(code);
+  }
+
+  confirmEmailByOAuthProvider(): void {
+    this.emailConfirmation.confirmEmailByOAuthProvider();
   }
 
   createPasswordRecoveryCode(passwordResetCodeTtlHours: number): string {

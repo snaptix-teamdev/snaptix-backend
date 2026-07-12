@@ -85,7 +85,7 @@ export class UsersRepository {
     });
   }
 
-  async findOne(id: string): Promise<UserEntity | null> {
+  async findById(id: string): Promise<UserEntity | null> {
     const result = await this.prisma.user.findUnique({
       where: {
         id,
