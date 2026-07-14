@@ -17,6 +17,8 @@ import { buildDeviceInfo } from '../../helpers/build-device-info.helper';
 import { CreateSessionCommand } from '../session-commands/create-session.usecase';
 import { UsersRepository } from '../../../../infrastructure/users.repository';
 import { UserEntity } from '../../../domain/user/user.entity';
+import { randomInt } from 'crypto';
+import { AuthConfig } from '../../../config/auth.config';
 
 class AuthenticateWithGoogleCommandRequest {
   email: string;
@@ -42,6 +44,7 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
     private tokensService: TokensService,
     private commandBus: CommandBus,
     private usersRepository: UsersRepository,
+    private authConfig: AuthConfig,
   ) {}
 
   private async createSessionWithTokens(
@@ -73,6 +76,38 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
     };
   }
 
+  private async createUserWithProvider(
+    email: string,
+    provider: OAuthProviderType,
+    externalProviderId: string,
+  ): Promise<UserEntity> {
+    const username = `client${randomInt(100_000, 999_999)}`;
+
+    const user: UserEntity = UserEntity.create(
+      {
+        username,
+        email,
+        passwordHash: null,
+      },
+      this.authConfig.EMAIL_CONFIRMATION_CODE_TTL_HOURS,
+    );
+
+    user.confirmEmailByOAuthProvider();
+
+    const createdUser: UserEntity = await this.usersRepository.create(user);
+
+    const userProvider: UserProviderEntity = UserProviderEntity.create({
+      provider,
+      externalProviderId,
+      email,
+      user: createdUser,
+    });
+
+    await this.userProvidersRepository.create(userProvider);
+
+    return createdUser;
+  }
+
   async execute({
     dto,
   }: AuthenticateWithGoogleCommand): Promise<AccessAndRefreshTokensDto> {
@@ -93,15 +128,28 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
           await this.userProvidersRepository.findByEmail(email);
 
         if (!userProvider) {
-          return {
-            accessToken: '',
-            refreshToken: '',
-          };
+          const createdUser = await this.createUserWithProvider(
+            email,
+            provider,
+            externalProviderId,
+          );
+
+          return this.createSessionWithTokens(createdUser.id, userAgent, ip);
         }
 
-        // const user: UserEntity | null = await this.usersRepository.findById(
-        //   userProvider.user.id,
-        // );
+        const user: UserEntity | null = await this.usersRepository.findById(
+          userProvider.user.id,
+        );
+
+        if (!user) {
+          const createdUser = await this.createUserWithProvider(
+            email,
+            provider,
+            externalProviderId,
+          );
+
+          return this.createSessionWithTokens(createdUser.id, userAgent, ip);
+        }
 
         return {
           accessToken: '',

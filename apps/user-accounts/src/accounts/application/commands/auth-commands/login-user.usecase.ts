@@ -81,6 +81,10 @@ export class LoginUserUseCase implements ICommandHandler<
       throw new DomainException(COMMON_ERRORS.UNAUTHORIZED_ERROR);
     }
 
+    if (!user.passwordHash) {
+      throw new DomainException(COMMON_ERRORS.UNAUTHORIZED_ERROR);
+    }
+
     const isPasswordValid = await this.cryptoService.compareHash(
       password,
       user.passwordHash,

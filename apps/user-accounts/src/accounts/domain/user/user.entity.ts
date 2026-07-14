@@ -7,7 +7,7 @@ export class UserEntity implements IUser {
   id: string;
   username: string;
   email: string;
-  passwordHash: string;
+  passwordHash: string | null;
   updatedAt: Date;
   createdAt: Date;
   deletedAt: Date | null;
