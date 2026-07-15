@@ -36,6 +36,11 @@ export class UserProviderEntity implements IUserProvider {
     return entity;
   }
 
+  update(externalProviderId: string, email: string): void {
+    this.externalProviderId = externalProviderId;
+    this.email = email;
+  }
+
   changeEmail(email: string): void {
     this.email = email;
   }

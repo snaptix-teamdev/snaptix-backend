@@ -19,6 +19,7 @@ import { UsersRepository } from '../../../../infrastructure/users.repository';
 import { UserEntity } from '../../../domain/user/user.entity';
 import { randomInt } from 'crypto';
 import { AuthConfig } from '../../../config/auth.config';
+import { Logger } from '@nestjs/common';
 
 class AuthenticateWithGoogleCommandRequest {
   email: string;
@@ -39,6 +40,8 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
   AuthenticateWithGoogleCommand,
   AccessAndRefreshTokensDto
 > {
+  private logger = new Logger(AuthenticateWithGoogleUseCase.name);
+
   constructor(
     private userProvidersRepository: UserProvidersRepository,
     private tokensService: TokensService,
@@ -137,6 +140,11 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
           return this.createSessionWithTokens(createdUser.id, userAgent, ip);
         }
 
+        this.logger.warn(
+          `UserProvider found by email but not by providerId. ` +
+            `provider=${provider}, oldProviderId=${userProvider.externalProviderId}, newProviderId=${externalProviderId}`,
+        );
+
         const user: UserEntity | null = await this.usersRepository.findById(
           userProvider.user.id,
         );
@@ -151,10 +159,17 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
           return this.createSessionWithTokens(createdUser.id, userAgent, ip);
         }
 
-        return {
-          accessToken: '',
-          refreshToken: '',
-        };
+        if (user.isDeleted()) {
+          throw new DomainException(USER_ACCOUNTS_ERRORS.USER_IS_DELETED);
+        }
+
+        userProvider.update(externalProviderId, email);
+
+        await this.userProvidersRepository.updateProviderIdAndEmail(
+          userProvider,
+        );
+
+        return this.createSessionWithTokens(user.id, userAgent, ip);
       }
 
       if (user.isDeleted()) {

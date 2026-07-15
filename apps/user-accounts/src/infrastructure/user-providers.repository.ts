@@ -105,4 +105,16 @@ export class UserProvidersRepository {
       data: { email: model.email },
     });
   }
+
+  async updateProviderIdAndEmail(entity: UserProviderEntity): Promise<void> {
+    const model = this.userProviderConverter.fromEntityToPrismaModel(entity);
+
+    await this.prisma.userProvider.update({
+      where: { id: model.id },
+      data: {
+        email: model.email,
+        externalProviderId: model.externalProviderId,
+      },
+    });
+  }
 }
