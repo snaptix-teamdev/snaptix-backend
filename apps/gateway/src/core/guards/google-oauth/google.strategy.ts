@@ -17,26 +17,27 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
       clientSecret: gatewayConfig.googleClientSecret,
       callbackURL: gatewayConfig.googleCallbackUrl,
       scope: ['email', 'profile'],
+      state: false, // TODO: Enable OAuth state validation (CSRF protection) using Redis-backed state storage or express-session.
     });
   }
 
   validate(
-    accessToken: string,
-    refreshToken: string,
+    _accessToken: string,
+    _refreshToken: string,
     profile: Profile,
   ): UserOAuthContextDto {
-    console.log(accessToken);
-    console.log(refreshToken);
-    console.log(profile);
+    const emailEntry = profile.emails?.[0];
 
-    const email = profile.emails?.[0]?.value;
-
-    if (!email) {
+    if (!emailEntry?.value) {
       throw new DomainException(GATEWAY_ERRORS.EMAIL_IS_MISSING);
     }
 
+    if (!emailEntry.verified) {
+      throw new DomainException(GATEWAY_ERRORS.EMAIL_NOT_VERIFIED_BY_PROVIDER);
+    }
+
     return {
-      email,
+      email: emailEntry.value,
       externalProviderId: profile.id,
       provider: OAuthProviderType.GOOGLE,
     };

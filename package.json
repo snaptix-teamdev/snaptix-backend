@@ -19,6 +19,7 @@
     "user-accounts:prisma:migrate:dev": "pnpm user-accounts:prisma-wrapper:dev \"prisma migrate dev --config=apps/user-accounts/prisma/prisma.config.ts\"",
     "user-accounts:prisma:deploy:dev": "pnpm user-accounts:prisma-wrapper:dev \"prisma migrate deploy --config=apps/user-accounts/prisma/prisma.config.ts\"",
     "user-accounts:prisma:studio:dev": "pnpm user-accounts:prisma-wrapper:dev \"prisma studio --config=apps/user-accounts/prisma/prisma.config.ts\"",
+    "user-accounts:prisma:reset:dev": "pnpm user-accounts:prisma-wrapper:dev \"prisma migrate reset --force --config=apps/user-accounts/prisma/prisma.config.ts\"",
     "user-accounts:prisma-wrapper:dev": "cross-env NODE_ENV=development ts-node scripts/prisma/prisma-wrapper.ts \"apps/user-accounts\"",
     "user-accounts:prisma:deploy:prod": "prisma migrate deploy --config=apps/user-accounts/prisma/prisma.config.ts",
     "preuser-accounts:start:dev": "pnpm docker:up && pnpm user-accounts:prisma:generate && pnpm user-accounts:prisma:deploy:dev",

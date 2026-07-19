@@ -3,6 +3,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { UserProviderEntity } from '../accounts/domain/user-provider/user-provider.entity';
 import { UserProviderConverter } from '../accounts/converters/user-provider.converter';
 import { OAuthProviderType } from '@snaptix/common';
+import { Prisma } from '../generated/prisma/client';
 
 @Injectable()
 export class UserProvidersRepository {
@@ -11,7 +12,6 @@ export class UserProvidersRepository {
     private userProviderConverter: UserProviderConverter,
   ) {}
 
-  // TODO: рассмотреть вариант IUserProvider: IUser | null
   async findByEmail(email: string): Promise<UserProviderEntity | null> {
     const result = await this.prisma.userProvider.findFirst({
       where: { email },
@@ -80,10 +80,14 @@ export class UserProvidersRepository {
     });
   }
 
-  async create(entity: UserProviderEntity): Promise<void> {
+  async create(
+    entity: UserProviderEntity,
+    tx?: Prisma.TransactionClient,
+  ): Promise<void> {
+    const client = tx ?? this.prisma;
     const model = this.userProviderConverter.fromEntityToPrismaModel(entity);
 
-    await this.prisma.userProvider.create({
+    await client.userProvider.create({
       data: {
         id: model.id,
         provider: model.provider,

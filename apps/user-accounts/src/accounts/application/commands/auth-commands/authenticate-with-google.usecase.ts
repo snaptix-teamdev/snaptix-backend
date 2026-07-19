@@ -20,6 +20,7 @@ import { UserEntity } from '../../../domain/user/user.entity';
 import { randomInt } from 'crypto';
 import { AuthConfig } from '../../../config/auth.config';
 import { Logger } from '@nestjs/common';
+import { TransactionManager } from '../../../../infrastructure/prisma/transaction.manager';
 
 class AuthenticateWithGoogleCommandRequest {
   email: string;
@@ -48,6 +49,7 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
     private commandBus: CommandBus,
     private usersRepository: UsersRepository,
     private authConfig: AuthConfig,
+    private transactionManager: TransactionManager,
   ) {}
 
   private async createSessionWithTokens(
@@ -84,31 +86,36 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
     provider: OAuthProviderType,
     externalProviderId: string,
   ): Promise<UserEntity> {
-    const username = `client${randomInt(100_000, 999_999)}`;
+    return this.transactionManager.run(async (tx) => {
+      const username = `client${randomInt(100_000, 999_999)}`;
 
-    const user: UserEntity = UserEntity.create(
-      {
-        username,
+      const user: UserEntity = UserEntity.create(
+        {
+          username,
+          email,
+          passwordHash: null,
+        },
+        this.authConfig.EMAIL_CONFIRMATION_CODE_TTL_HOURS,
+      );
+
+      user.confirmEmailByOAuthProvider();
+
+      const createdUser: UserEntity = await this.usersRepository.create(
+        user,
+        tx,
+      );
+
+      const userProvider: UserProviderEntity = UserProviderEntity.create({
+        provider,
+        externalProviderId,
         email,
-        passwordHash: null,
-      },
-      this.authConfig.EMAIL_CONFIRMATION_CODE_TTL_HOURS,
-    );
+        user: createdUser,
+      });
 
-    user.confirmEmailByOAuthProvider();
+      await this.userProvidersRepository.create(userProvider, tx);
 
-    const createdUser: UserEntity = await this.usersRepository.create(user);
-
-    const userProvider: UserProviderEntity = UserProviderEntity.create({
-      provider,
-      externalProviderId,
-      email,
-      user: createdUser,
+      return createdUser;
     });
-
-    await this.userProvidersRepository.create(userProvider);
-
-    return createdUser;
   }
 
   async execute({
@@ -145,21 +152,7 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
             `provider=${provider}, oldProviderId=${userProvider.externalProviderId}, newProviderId=${externalProviderId}`,
         );
 
-        const user: UserEntity | null = await this.usersRepository.findById(
-          userProvider.user.id,
-        );
-
-        if (!user) {
-          const createdUser = await this.createUserWithProvider(
-            email,
-            provider,
-            externalProviderId,
-          );
-
-          return this.createSessionWithTokens(createdUser.id, userAgent, ip);
-        }
-
-        if (user.isDeleted()) {
+        if (userProvider.user.isDeleted()) {
           throw new DomainException(USER_ACCOUNTS_ERRORS.USER_IS_DELETED);
         }
 
@@ -169,7 +162,11 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
           userProvider,
         );
 
-        return this.createSessionWithTokens(user.id, userAgent, ip);
+        return this.createSessionWithTokens(
+          userProvider.user.id,
+          userAgent,
+          ip,
+        );
       }
 
       if (user.isDeleted()) {

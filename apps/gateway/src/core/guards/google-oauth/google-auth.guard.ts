@@ -1,6 +1,5 @@
 import { AuthGuard } from '@nestjs/passport';
-import { ExecutionContext, Injectable } from '@nestjs/common';
-import { Request } from 'express';
+import { Injectable } from '@nestjs/common';
 import { DomainException, UserOAuthContextDto } from '@snaptix/common';
 import { COMMON_ERRORS } from '@snaptix/contracts';
 
@@ -23,10 +22,10 @@ export class GoogleAuthGuard extends AuthGuard('google') {
     return user;
   }
 
-  async canActivate(context: ExecutionContext) {
-    const activate = (await super.canActivate(context)) as boolean;
-    const request = context.switchToHttp().getRequest<Request>();
-    await super.logIn(request);
-    return activate;
-  }
+  // async canActivate(context: ExecutionContext) {
+  //   const activate = (await super.canActivate(context)) as boolean;
+  //   const request = context.switchToHttp().getRequest<Request>();
+  //   await super.logIn(request);
+  //   return activate;
+  // }
 }

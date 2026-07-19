@@ -3,6 +3,7 @@ import { PrismaService } from './prisma/prisma.service';
 import { IUser } from '@snaptix/common';
 import { UserConverter } from '../accounts/converters/user.converter';
 import { UserEntity } from '../accounts/domain/user/user.entity';
+import { Prisma } from '../generated/prisma/client';
 
 @Injectable()
 export class UsersRepository {
@@ -11,10 +12,14 @@ export class UsersRepository {
     private userConverter: UserConverter,
   ) {}
 
-  async create(entity: UserEntity): Promise<UserEntity> {
+  async create(
+    entity: UserEntity,
+    tx?: Prisma.TransactionClient,
+  ): Promise<UserEntity> {
+    const client = tx ?? this.prisma;
     const model = this.userConverter.fromEntityToPrismaModel(entity);
 
-    const result = await this.prisma.user.create({
+    const result = await client.user.create({
       data: {
         ...model,
         emailConfirmation: {
