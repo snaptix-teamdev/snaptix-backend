@@ -56,3 +56,7 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 /apps/*/src/generated
+
+# GeoNames dump — раздаётся через GitHub Release (pnpm geo:data:download), не в git
+/scripts/geo/data/
+/scripts/geo/*.tar.gz

@@ -4,4 +4,5 @@ export const MICROSERVICE_NAME = {
   NOTIFICATIONS: 'notifications',
   FILES: 'files',
   POSTS: 'posts',
+  GEO: 'geo',
 };
