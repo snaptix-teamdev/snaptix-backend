@@ -217,7 +217,7 @@ export class AuthController {
     return { msg: 'Google Authentication' };
   }
 
-  @Get('google/redirect')
+  @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   async callbackGoogle(
     @ExtractOAuthUserFromRequest() user: UserOAuthContextDto,

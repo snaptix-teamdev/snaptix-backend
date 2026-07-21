@@ -44,4 +44,8 @@ export class UserProviderEntity implements IUserProvider {
   changeEmail(email: string): void {
     this.email = email;
   }
+
+  isCompareEmail(email: string): boolean {
+    return this.email === email;
+  }
 }

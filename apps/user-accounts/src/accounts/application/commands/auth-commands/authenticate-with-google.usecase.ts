@@ -17,7 +17,7 @@ import { buildDeviceInfo } from '../../helpers/build-device-info.helper';
 import { CreateSessionCommand } from '../session-commands/create-session.usecase';
 import { UsersRepository } from '../../../../infrastructure/users.repository';
 import { UserEntity } from '../../../domain/user/user.entity';
-import { randomInt } from 'crypto';
+import { nanoid } from 'nanoid';
 import { AuthConfig } from '../../../config/auth.config';
 import { Logger } from '@nestjs/common';
 import { TransactionManager } from '../../../../infrastructure/prisma/transaction.manager';
@@ -87,7 +87,7 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
     externalProviderId: string,
   ): Promise<UserEntity> {
     return this.transactionManager.run(async (tx) => {
-      const username = `client${randomInt(100_000, 999_999)}`;
+      const username = `client_${nanoid(6)}`;
 
       const user: UserEntity = UserEntity.create(
         {
@@ -195,9 +195,7 @@ export class AuthenticateWithGoogleUseCase implements ICommandHandler<
       throw new DomainException(USER_ACCOUNTS_ERRORS.USER_IS_DELETED);
     }
 
-    const isCompareEmail = userProvider.email === email;
-
-    if (!isCompareEmail) {
+    if (!userProvider.isCompareEmail(email)) {
       userProvider.changeEmail(email);
       await this.userProvidersRepository.updateEmail(userProvider);
     }
