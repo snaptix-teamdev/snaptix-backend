@@ -211,12 +211,29 @@ export class AuthController {
     return { accessToken: tokens.accessToken };
   }
 
+  /**
+   * Вход в систему через Google OAuth.
+   */
+  @ApiOperation({
+    description: 'Откройте endpoint в браузере, а не через Execute',
+  })
   @Get('google/login')
   @UseGuards(GoogleAuthGuard)
   loginGoogle() {
     return { msg: 'Google Authentication' };
   }
 
+  /**
+   * Завершение аутентификации Google OAuth.
+   */
+  @ApiOkResponse({
+    description: 'Успешный логин. `refreshToken` записывается в `cookie`',
+    type: LoginResponseDto,
+  })
+  @ApiUnauthorizedCustomResponse()
+  @ApiBadRequestCustomResponse()
+  @ApiConflictCustomResponse()
+  @ApiForbiddenCustomResponse()
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   async callbackGoogle(
