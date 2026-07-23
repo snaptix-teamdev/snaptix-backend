@@ -14,6 +14,14 @@ datasource db {
   provider = "postgresql"
 }
 
+// При изменении обновить файл libs/contracts/src/enums/oauth-provider.enum
+enum OAuthProvider {
+  GOOGLE
+  YANDEX
+  VK
+  GITHUB
+}
+
 model Session {
   id         String   @id @default(uuid(7)) @db.Uuid
   userId     String   @map("user_id") @db.Uuid
@@ -33,13 +41,14 @@ model User {
   id                String                 @id @default(uuid(7)) @db.Uuid
   email             String                 @unique @map("email")
   username          String                 @unique @map("username")
-  passwordHash      String                 @map("password_hash") @db.VarChar()
+  passwordHash      String?                @map("password_hash") @db.VarChar()
   updatedAt         DateTime               @updatedAt @map("updated_at") @db.Timestamptz()
   createdAt         DateTime               @default(now()) @map("created_at") @db.Timestamptz()
   deletedAt         DateTime?              @map("deleted_at") @db.Timestamptz()
   emailConfirmation UserEmailConfirmation? @relation("UserEmailConfirmation")
   recoveryPassword  UserRecoveryPassword?  @relation("UserRecoveryPassword")
   sessions          Session[]              @relation("Session")
+  UserProvider      UserProvider[]         @relation("UserProvider")
 
   @@map("users")
 }
@@ -68,4 +77,21 @@ model UserRecoveryPassword {
   user              User     @relation(fields: [userId], references: [id], name: "UserRecoveryPassword")
 
   @@map("user_recovery_password")
+}
+
+model UserProvider {
+  id                 String        @id @default(uuid(7)) @db.Uuid
+  provider           OAuthProvider
+  externalProviderId String
+  email              String
+
+  userId String @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], name: "UserProvider")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz()
+
+  @@unique([provider, externalProviderId])
+  @@map("user_providers")
 }

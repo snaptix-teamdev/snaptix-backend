@@ -7,7 +7,7 @@ export interface IUser {
   id: string;
   email: string;
   username: string;
-  passwordHash: string;
+  passwordHash: string | null;
   updatedAt: Date;
   createdAt: Date;
   deletedAt: Date | null;

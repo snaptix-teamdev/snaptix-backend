@@ -11,6 +11,8 @@ import { HomeController } from './api/home.controller';
 import { HomeService } from './application/home.service';
 import { GeoController } from './api/geo.controller';
 import { PostAggregationService } from './application/post-aggregation.service';
+import { GoogleStrategy } from '../../core/guards/google-oauth/google.strategy';
+import { GoogleAuthGuard } from '../../core/guards/google-oauth/google-auth.guard';
 
 @Module({
   imports: [
@@ -69,6 +71,13 @@ import { PostAggregationService } from './application/post-aggregation.service';
     HomeController,
     GeoController,
   ],
-  providers: [GatewayConfig, HomeService, PostAggregationService],
+  providers: [
+    GatewayConfig,
+    HomeService,
+    PostAggregationService,
+    GoogleStrategy,
+    GoogleAuthGuard,
+  ],
+  exports: [GatewayConfig],
 })
 export class GatewayModule {}
