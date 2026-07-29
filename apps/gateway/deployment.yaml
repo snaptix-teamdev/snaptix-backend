@@ -95,11 +95,6 @@ spec:
                  secretKeyRef:
                    name: main-gateway-production-config-secret
                    key: MICROSERVICE_GEO_PORT
-             - name: GOOGLE_CALLBACK_URL
-               valueFrom:
-                 secretKeyRef:
-                   name: main-gateway-production-config-secret
-                   key: GOOGLE_CALLBACK_URL
              - name: GOOGLE_CLIENT_ID
                valueFrom:
                  secretKeyRef:
@@ -110,6 +105,11 @@ spec:
                  secretKeyRef:
                    name: main-gateway-production-config-secret
                    key: GOOGLE_CLIENT_SECRET
+             - name: GOOGLE_CALLBACK_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: main-gateway-production-config-secret
+                   key: GOOGLE_CALLBACK_URL
              - name: NODE_ENV
                valueFrom:
                  secretKeyRef:
