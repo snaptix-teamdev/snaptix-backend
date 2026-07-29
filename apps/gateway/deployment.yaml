@@ -85,6 +85,31 @@ spec:
                  secretKeyRef:
                    name: main-gateway-production-config-secret
                    key: FILES_STORAGE_BASE_URL
+             - name: MICROSERVICE_GEO_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: main-gateway-production-config-secret
+                   key: MICROSERVICE_GEO_HOST
+             - name: MICROSERVICE_GEO_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: main-gateway-production-config-secret
+                   key: MICROSERVICE_GEO_PORT
+             - name: GOOGLE_CLIENT_ID
+               valueFrom:
+                 secretKeyRef:
+                   name: main-gateway-production-config-secret
+                   key: GOOGLE_CLIENT_ID
+             - name: GOOGLE_CLIENT_SECRET
+               valueFrom:
+                 secretKeyRef:
+                   name: main-gateway-production-config-secret
+                   key: GOOGLE_CLIENT_SECRET
+             - name: GOOGLE_CALLBACK_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: main-gateway-production-config-secret
+                   key: GOOGLE_CALLBACK_URL
              - name: NODE_ENV
                valueFrom:
                  secretKeyRef:

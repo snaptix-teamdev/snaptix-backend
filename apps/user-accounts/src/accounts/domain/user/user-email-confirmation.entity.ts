@@ -45,11 +45,15 @@ export class UserEmailConfirmationEntity implements IUserEmailConfirmation {
     );
   }
 
-  confirmEmail(code: string): void {
+  confirmEmailByCode(code: string): void {
     if (!this.isEmailCanBeConfirmed())
       throw new Error(`email already confirmed or expired email code`);
     if (this.code !== code) throw new Error(`invalid email confirmation code`);
 
+    this.isVerified = true;
+  }
+
+  confirmEmailByOAuthProvider(): void {
     this.isVerified = true;
   }
 

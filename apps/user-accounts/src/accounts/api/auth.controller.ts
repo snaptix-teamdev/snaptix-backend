@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
+  CallbackGooglePayload,
   ForgotPasswordResponseDto,
   GetMePayload,
   GetMeResponseDto,
@@ -28,6 +29,7 @@ import { LoginUserCommand } from '../application/commands/auth-commands/login-us
 import { ResendEmailConfirmationCodeCommand } from '../application/commands/auth-commands/resend-email-confirmation-code.usecase';
 import { RefreshTokensCommand } from '../application/commands/auth-commands/refresh-tokens.usecase';
 import { LogoutUserCommand } from '../application/commands/auth-commands/logout-user.usecase';
+import { AuthenticateWithGoogleCommand } from '../application/commands/auth-commands/authenticate-with-google.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -89,6 +91,13 @@ export class AuthController {
         userAgent: payload.userAgent,
       }),
     );
+  }
+
+  @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.CALLBACK_GOOGLE)
+  async callbackGoogle(
+    @Payload() payload: CallbackGooglePayload,
+  ): Promise<AccessAndRefreshTokensDto> {
+    return this.commandBus.execute(new AuthenticateWithGoogleCommand(payload));
   }
 
   @MessagePattern(USER_ACCOUNTS_PATTERNS.AUTH.RESEND_EMAIL_CONFIRMATION_CODE)

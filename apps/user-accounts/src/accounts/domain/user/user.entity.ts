@@ -7,7 +7,7 @@ export class UserEntity implements IUser {
   id: string;
   username: string;
   email: string;
-  passwordHash: string;
+  passwordHash: string | null;
   updatedAt: Date;
   createdAt: Date;
   deletedAt: Date | null;
@@ -50,6 +50,10 @@ export class UserEntity implements IUser {
     return entity;
   }
 
+  isDeleted(): boolean {
+    return !!this.deletedAt;
+  }
+
   isEmailConfirmationCodeExpired(): boolean {
     return this.emailConfirmation.isEmailConfirmationCodeExpired();
   }
@@ -58,8 +62,12 @@ export class UserEntity implements IUser {
     return this.emailConfirmation.isEmailConfirmationCodeVerified();
   }
 
-  confirmEmail(code: string): void {
-    this.emailConfirmation.confirmEmail(code);
+  confirmEmailByCode(code: string): void {
+    this.emailConfirmation.confirmEmailByCode(code);
+  }
+
+  confirmEmailByOAuthProvider(): void {
+    this.emailConfirmation.confirmEmailByOAuthProvider();
   }
 
   createPasswordRecoveryCode(passwordResetCodeTtlHours: number): string {

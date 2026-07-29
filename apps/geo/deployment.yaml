@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: DEPLOYMENT_NAME
+  namespace: NAMESPACE
+  labels:
+    app: PROJECT
+spec:
+  selector:
+    matchLabels:
+      project: PROJECT
+  template:
+    metadata:
+      namespace: NAMESPACE
+      labels:
+        project: PROJECT
+    spec:
+      containers:
+         - name: PROJECT
+           image: REGISTRY_HOSTNAME/PROJECT:TAG_VERSION
+           securityContext:
+             allowPrivilegeEscalation: false
+             runAsNonRoot: true      # опционально, но хорошая практика
+             runAsUser: 1000         # опционально
+           ports:
+             - containerPort: PORT_CONTAINER
+           env:
+             - name: MICROSERVICE_GEO_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: geo-microservice-production-config-secret
+                   key: MICROSERVICE_GEO_HOST
+             - name: MICROSERVICE_GEO_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: geo-microservice-production-config-secret
+                   key: MICROSERVICE_GEO_PORT
+             - name: POSTGRES_GEO_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: geo-microservice-production-config-secret
+                   key: POSTGRES_GEO_URL
+             - name: NODE_ENV
+               valueFrom:
+                 secretKeyRef:
+                   name: geo-microservice-production-config-secret
+                   key: NODE_ENV

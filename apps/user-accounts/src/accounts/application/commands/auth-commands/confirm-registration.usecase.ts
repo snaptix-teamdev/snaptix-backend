@@ -32,7 +32,7 @@ export class ConfirmRegistrationUseCase implements ICommandHandler<ConfirmRegist
     if (user.isEmailVerified())
       throw new DomainException(USER_ACCOUNTS_ERRORS.EMAIL_ALREADY_CONFIRMED);
 
-    user.confirmEmail(dto.code);
+    user.confirmEmailByCode(dto.code);
 
     await this.usersRepository.update(user);
   }

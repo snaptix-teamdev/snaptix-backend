@@ -9,7 +9,10 @@ import { SecurityDevicesController } from './api/security-devices.controller';
 import { GatewayConfig } from './gateway.config';
 import { HomeController } from './api/home.controller';
 import { HomeService } from './application/home.service';
+import { GeoController } from './api/geo.controller';
 import { PostAggregationService } from './application/post-aggregation.service';
+import { GoogleStrategy } from '../../core/guards/google-oauth/google.strategy';
+import { GoogleAuthGuard } from '../../core/guards/google-oauth/google-auth.guard';
 
 @Module({
   imports: [
@@ -47,6 +50,17 @@ import { PostAggregationService } from './application/post-aggregation.service';
           },
         }),
       },
+      {
+        name: MICROSERVICE_NAME.GEO,
+        inject: [CoreConfig],
+        useFactory: (coreConfig: CoreConfig) => ({
+          transport: Transport.TCP,
+          options: {
+            host: coreConfig.microserviceGeoHost,
+            port: coreConfig.microserviceGeoPort,
+          },
+        }),
+      },
     ]),
   ],
   controllers: [
@@ -55,7 +69,15 @@ import { PostAggregationService } from './application/post-aggregation.service';
     PostsController,
     UsersController,
     HomeController,
+    GeoController,
   ],
-  providers: [GatewayConfig, HomeService, PostAggregationService],
+  providers: [
+    GatewayConfig,
+    HomeService,
+    PostAggregationService,
+    GoogleStrategy,
+    GoogleAuthGuard,
+  ],
+  exports: [GatewayConfig],
 })
 export class GatewayModule {}
