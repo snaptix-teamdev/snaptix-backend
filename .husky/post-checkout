@@ -7,7 +7,7 @@ case "$branch_name" in
 esac
 
 # Допустимые типы веток
-pattern='^(feature|bugfix|hotfix|chore|refactor|test)/SNAP-[0-9]+(-[a-zA-Z0-9._-]+)*$'
+pattern='^((feature|bugfix|hotfix|chore|refactor|test)/)?SNAP-[0-9]+(-[a-zA-Zа-яА-ЯёЁ0-9._-]+)*$'
 
 if ! echo "$branch_name" | grep -qE "$pattern";
 then
