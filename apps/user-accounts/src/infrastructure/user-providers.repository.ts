@@ -4,6 +4,7 @@ import { UserProviderEntity } from '../accounts/domain/user-provider/user-provid
 import { UserProviderConverter } from '../accounts/converters/user-provider.converter';
 import { OAuthProviderType } from '@snaptix/common';
 import { Prisma } from '../generated/prisma/client';
+import { USER_PROVIDER_INCLUDE } from './prisma/models/user-provider.prisma-model';
 
 @Injectable()
 export class UserProvidersRepository {
@@ -15,31 +16,10 @@ export class UserProvidersRepository {
   async findByEmail(email: string): Promise<UserProviderEntity | null> {
     const result = await this.prisma.userProvider.findFirst({
       where: { email },
-      include: {
-        user: {
-          include: {
-            emailConfirmation: true,
-            recoveryPassword: true,
-          },
-        },
-      },
+      include: USER_PROVIDER_INCLUDE,
     });
 
-    if (!result) {
-      return null;
-    }
-
-    if (!result.user.emailConfirmation) {
-      throw new Error('user email confirmation is missing');
-    }
-
-    return this.userProviderConverter.fromPrismaModelToEntity({
-      ...result,
-      user: {
-        ...result.user,
-        emailConfirmation: result.user.emailConfirmation,
-      },
-    });
+    return this.userProviderConverter.fromPrismaModelToEntityOrNull(result);
   }
 
   async findByProviderAndProviderId(
@@ -53,31 +33,10 @@ export class UserProvidersRepository {
           externalProviderId: providerId,
         },
       },
-      include: {
-        user: {
-          include: {
-            emailConfirmation: true,
-            recoveryPassword: true,
-          },
-        },
-      },
+      include: USER_PROVIDER_INCLUDE,
     });
 
-    if (!result) {
-      return null;
-    }
-
-    if (!result.user.emailConfirmation) {
-      throw new Error('user email confirmation is missing');
-    }
-
-    return this.userProviderConverter.fromPrismaModelToEntity({
-      ...result,
-      user: {
-        ...result.user,
-        emailConfirmation: result.user.emailConfirmation,
-      },
-    });
+    return this.userProviderConverter.fromPrismaModelToEntityOrNull(result);
   }
 
   async create(
@@ -85,39 +44,24 @@ export class UserProvidersRepository {
     tx?: Prisma.TransactionClient,
   ): Promise<void> {
     const client = tx ?? this.prisma;
-    const model = this.userProviderConverter.fromEntityToPrismaModel(entity);
+    const data = this.userProviderConverter.fromEntityToPrismaModel(entity);
 
-    await client.userProvider.create({
-      data: {
-        id: model.id,
-        provider: model.provider,
-        externalProviderId: model.externalProviderId,
-        email: model.email,
-        userId: model.user.id,
-        createdAt: model.createdAt,
-        updatedAt: model.updatedAt,
-        deletedAt: model.deletedAt,
-      },
-    });
+    await client.userProvider.create({ data });
   }
 
   async updateEmail(entity: UserProviderEntity): Promise<void> {
-    const model = this.userProviderConverter.fromEntityToPrismaModel(entity);
-
     await this.prisma.userProvider.update({
-      where: { id: model.id },
-      data: { email: model.email },
+      where: { id: entity.id },
+      data: { email: entity.email },
     });
   }
 
   async updateProviderIdAndEmail(entity: UserProviderEntity): Promise<void> {
-    const model = this.userProviderConverter.fromEntityToPrismaModel(entity);
-
     await this.prisma.userProvider.update({
-      where: { id: model.id },
+      where: { id: entity.id },
       data: {
-        email: model.email,
-        externalProviderId: model.externalProviderId,
+        email: entity.email,
+        externalProviderId: entity.externalProviderId,
       },
     });
   }
