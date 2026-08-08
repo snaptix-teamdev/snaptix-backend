@@ -4,6 +4,7 @@ import { IUser } from '@snaptix/common';
 import { UserConverter } from '../accounts/converters/user.converter';
 import { UserEntity } from '../accounts/domain/user/user.entity';
 import { Prisma } from '../generated/prisma/client';
+import { USER_INCLUDE } from './prisma/models/user.prisma-model';
 
 @Injectable()
 export class UsersRepository {
@@ -17,64 +18,24 @@ export class UsersRepository {
     tx?: Prisma.TransactionClient,
   ): Promise<UserEntity> {
     const client = tx ?? this.prisma;
-    const model = this.userConverter.fromEntityToPrismaModel(entity);
+    const data = this.userConverter.fromEntityToPrismaModel(entity);
 
     const result = await client.user.create({
-      data: {
-        ...model,
-        emailConfirmation: {
-          create: model.emailConfirmation,
-        },
-        recoveryPassword: {
-          create: model.recoveryPassword ?? undefined,
-        },
-      },
-      include: {
-        emailConfirmation: true,
-        recoveryPassword: true,
-      },
+      data,
+      include: USER_INCLUDE,
     });
 
-    if (!result.emailConfirmation) {
-      throw new Error('user email confirmation is missing');
-    }
-
-    return this.userConverter.fromPrismaModelToEntity({
-      ...result,
-      emailConfirmation: result.emailConfirmation,
-      recoveryPassword: result.recoveryPassword,
-    });
+    return this.userConverter.fromPrismaModelToEntity(result);
   }
 
   async update(entity: UserEntity): Promise<void> {
-    const model = this.userConverter.fromEntityToPrismaModel(entity);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { userId: ecUserId, ...emailConfirmation } = model.emailConfirmation;
-
-    const recoveryPassword = model.recoveryPassword
-      ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (({ userId, ...rest }) => rest)(model.recoveryPassword)
-      : null;
+    const data = this.userConverter.fromEntityToUpdateInput(entity);
 
     await this.prisma.user.update({
       where: {
-        id: model.id,
+        id: entity.id,
       },
-      data: {
-        ...model,
-        emailConfirmation: {
-          update: emailConfirmation,
-        },
-        recoveryPassword: recoveryPassword
-          ? {
-              upsert: {
-                create: recoveryPassword,
-                update: recoveryPassword,
-              },
-            }
-          : undefined,
-      },
+      data,
     });
   }
 
@@ -92,54 +53,20 @@ export class UsersRepository {
 
   async findById(id: string): Promise<UserEntity | null> {
     const result = await this.prisma.user.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        emailConfirmation: true,
-        recoveryPassword: true,
-      },
+      where: { id },
+      include: USER_INCLUDE,
     });
 
-    if (!result) {
-      return null;
-    }
-
-    if (!result.emailConfirmation) {
-      throw new Error('user email confirmation is missing');
-    }
-
-    return this.userConverter.fromPrismaModelToEntity({
-      ...result,
-      emailConfirmation: result.emailConfirmation,
-      recoveryPassword: result.recoveryPassword,
-    });
+    return this.userConverter.fromPrismaModelToEntityOrNull(result);
   }
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const result = await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
-      include: {
-        emailConfirmation: true,
-        recoveryPassword: true,
-      },
+      where: { email },
+      include: USER_INCLUDE,
     });
 
-    if (!result) {
-      return null;
-    }
-
-    if (!result.emailConfirmation) {
-      throw new Error('user email confirmation is missing');
-    }
-
-    return this.userConverter.fromPrismaModelToEntity({
-      ...result,
-      emailConfirmation: result.emailConfirmation,
-      recoveryPassword: result.recoveryPassword,
-    });
+    return this.userConverter.fromPrismaModelToEntityOrNull(result);
   }
 
   async findByEmailCode(code: string): Promise<UserEntity | null> {
@@ -149,25 +76,10 @@ export class UsersRepository {
           code,
         },
       },
-      include: {
-        emailConfirmation: true,
-        recoveryPassword: true,
-      },
+      include: USER_INCLUDE,
     });
 
-    if (!result) {
-      return null;
-    }
-
-    if (!result.emailConfirmation) {
-      throw new Error('user email confirmation is missing');
-    }
-
-    return this.userConverter.fromPrismaModelToEntity({
-      ...result,
-      emailConfirmation: result.emailConfirmation,
-      recoveryPassword: result.recoveryPassword,
-    });
+    return this.userConverter.fromPrismaModelToEntityOrNull(result);
   }
 
   async findByRecoveryPasswordCode(code: string): Promise<UserEntity | null> {
@@ -177,24 +89,9 @@ export class UsersRepository {
           code,
         },
       },
-      include: {
-        emailConfirmation: true,
-        recoveryPassword: true,
-      },
+      include: USER_INCLUDE,
     });
 
-    if (!result) {
-      return null;
-    }
-
-    if (!result.emailConfirmation) {
-      throw new Error('user email confirmation is missing');
-    }
-
-    return this.userConverter.fromPrismaModelToEntity({
-      ...result,
-      emailConfirmation: result.emailConfirmation,
-      recoveryPassword: result.recoveryPassword,
-    });
+    return this.userConverter.fromPrismaModelToEntityOrNull(result);
   }
 }
