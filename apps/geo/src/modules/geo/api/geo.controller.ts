@@ -2,14 +2,14 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { QueryBus } from '@nestjs/cqrs';
 import {
-  FindGeoMsResponseDto,
-  FindGeoPayload,
+  CheckGeoExistsMsResponseDto,
+  CheckGeoExistsPayload,
   GEO_PATTERNS,
   GetGeoMsResponseDto,
   GetGeoPayload,
 } from '@snaptix/contracts';
 import { GetGeoQuery } from '../application/queries/get-geo.query';
-import { FindGeoQuery } from '../application/queries/find-geo.query';
+import { CheckGeoExistsQuery } from '../application/queries/check-geo-exists.query';
 
 @Controller()
 export class GeoController {
@@ -20,8 +20,10 @@ export class GeoController {
     return this.queryBus.execute(new GetGeoQuery(payload));
   }
 
-  @MessagePattern(GEO_PATTERNS.FIND_GEO)
-  findGeo(@Payload() payload: FindGeoPayload): Promise<FindGeoMsResponseDto> {
-    return this.queryBus.execute(new FindGeoQuery(payload));
+  @MessagePattern(GEO_PATTERNS.CHECK_GEO_EXISTS)
+  checkGeoExists(
+    @Payload() payload: CheckGeoExistsPayload,
+  ): Promise<CheckGeoExistsMsResponseDto> {
+    return this.queryBus.execute(new CheckGeoExistsQuery(payload));
   }
 }

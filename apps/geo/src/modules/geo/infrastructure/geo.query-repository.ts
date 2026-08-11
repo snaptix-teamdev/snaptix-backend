@@ -42,34 +42,20 @@ export class GeoQueryRepository {
     }));
   }
 
-  async findGeo(payload: {
+  async checkGeoExists(payload: {
     countryId: number;
     regionId: number;
     cityId: number;
-  }) {
-    return this.prisma.country.findFirst({
+  }): Promise<boolean> {
+    const city = await this.prisma.city.findFirst({
       where: {
-        id: payload.countryId,
+        id: payload.cityId,
+        regionId: payload.regionId,
+        region: { countryId: payload.countryId },
       },
-      include: {
-        translations: true,
-        regions: {
-          where: {
-            id: payload.regionId,
-          },
-          include: {
-            translations: true,
-            cities: {
-              where: {
-                id: payload.cityId,
-              },
-              include: {
-                translations: true,
-              },
-            },
-          },
-        },
-      },
+      select: { id: true },
     });
+
+    return city !== null;
   }
 }
