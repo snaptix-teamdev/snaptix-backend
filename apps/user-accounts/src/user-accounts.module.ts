@@ -38,6 +38,11 @@ import { SessionsQueryRepository } from './infrastructure/query/sessions.query-r
 import { AuthenticateWithGoogleUseCase } from './accounts/application/commands/auth-commands/authenticate-with-google.usecase';
 import { UserProvidersRepository } from './infrastructure/user-providers.repository';
 import { UserProviderConverter } from './accounts/converters/user-provider.converter';
+import { ProfileSettingsController } from './accounts/api/profile-settings.controller';
+import { CompleteProfileUseCase } from './accounts/application/commands/profile-commands/complete-profile.usecase';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MICROSERVICE_NAME } from '@snaptix/contracts';
+import { CoreConfig } from './core/config/core.config';
 
 const authUseCases = [
   RegisterUserUseCase,
@@ -55,6 +60,7 @@ const sessionUseCases = [
   UpdateSessionUseCase,
   DeactivateSessionsExcludingCurrentUseCase,
 ];
+const profileUseCases = [CompleteProfileUseCase];
 
 @Module({
   imports: [
@@ -62,8 +68,26 @@ const sessionUseCases = [
     CoreModule,
     InfrastructureModule,
     CqrsModule.forRoot(),
+    ClientsModule.registerAsync([
+      {
+        name: MICROSERVICE_NAME.GEO,
+        inject: [CoreConfig],
+        useFactory: (coreConfig: CoreConfig) => ({
+          transport: Transport.TCP,
+          options: {
+            host: coreConfig.microserviceGeoHost,
+            port: coreConfig.microserviceGeoPort,
+          },
+        }),
+      },
+    ]),
   ],
-  controllers: [AuthController, SecurityDevicesController, UserController],
+  controllers: [
+    AuthController,
+    SecurityDevicesController,
+    UserController,
+    ProfileSettingsController,
+  ],
   providers: [
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
@@ -92,6 +116,7 @@ const sessionUseCases = [
     },
     ...authUseCases,
     ...sessionUseCases,
+    ...profileUseCases,
     CryptoService,
     AuthConfig,
     GetMeQueryHandler,

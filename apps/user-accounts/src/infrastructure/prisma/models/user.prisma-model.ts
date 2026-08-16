@@ -8,6 +8,7 @@ import {
 export const USER_INCLUDE = {
   emailConfirmation: true,
   recoveryPassword: true,
+  profile: true,
 } satisfies Prisma.UserInclude;
 
 /** Ровно то, что возвращает Prisma. Обязательные связи здесь ещё nullable. */
@@ -16,7 +17,7 @@ export type UserPrismaModel = Prisma.UserGetPayload<{
 }>;
 
 /** Связи, отсутствие которых означает нарушенную консистентность агрегата. */
-const USER_REQUIRED_RELATIONS = ['emailConfirmation'] as const;
+const USER_REQUIRED_RELATIONS = ['emailConfirmation', 'profile'] as const;
 
 /** Prisma-модель, прошедшая проверку консистентности. Совместима с `IUser`. */
 export type LoadedUserPrismaModel = WithLoadedRelations<

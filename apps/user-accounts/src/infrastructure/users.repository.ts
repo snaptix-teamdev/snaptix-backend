@@ -51,6 +51,13 @@ export class UsersRepository {
     });
   }
 
+  async checkUserByUsername(username: string) {
+    return this.prisma.user.findUnique({
+      where: { username },
+      select: { username: true },
+    });
+  }
+
   async findById(id: string): Promise<UserEntity | null> {
     const result = await this.prisma.user.findUnique({
       where: { id },

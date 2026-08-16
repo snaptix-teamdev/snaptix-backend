@@ -2,6 +2,8 @@ import { IUser } from '@snaptix/common';
 import { UserEmailConfirmationEntity } from './user-email-confirmation.entity';
 import { UserRecoveryPasswordEntity } from './user-recovery-password.entity';
 import { CreateUserDto } from './dto/user.dto';
+import { UserProfileEntity } from './user-profile.entity';
+import { UpdateUserProfileEntityDto } from './dto/user-update-profile.entity-dto';
 
 export class UserEntity implements IUser {
   id: string;
@@ -11,6 +13,7 @@ export class UserEntity implements IUser {
   updatedAt: Date;
   createdAt: Date;
   deletedAt: Date | null;
+  profile: UserProfileEntity;
   emailConfirmation: UserEmailConfirmationEntity;
   recoveryPassword: UserRecoveryPasswordEntity | null;
 
@@ -26,6 +29,7 @@ export class UserEntity implements IUser {
     entity.username = dto.username;
     entity.passwordHash = dto.passwordHash;
     entity.deletedAt = null;
+    entity.profile = UserProfileEntity.create();
     entity.emailConfirmation = UserEmailConfirmationEntity.create(
       emailConfirmationCodeLifetimeInHours,
     );
@@ -39,6 +43,7 @@ export class UserEntity implements IUser {
 
     Object.assign(entity, {
       ...model,
+      profile: UserProfileEntity.restore(model.profile),
       emailConfirmation: UserEmailConfirmationEntity.restore(
         model.emailConfirmation,
       ),
@@ -48,6 +53,14 @@ export class UserEntity implements IUser {
     });
 
     return entity;
+  }
+
+  changeUsername(username: string): void {
+    this.username = username;
+  }
+
+  updateProfile(dto: UpdateUserProfileEntityDto): void {
+    this.profile.update(dto);
   }
 
   isDeleted(): boolean {

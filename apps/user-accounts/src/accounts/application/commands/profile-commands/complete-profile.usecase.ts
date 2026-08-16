@@ -1,0 +1,99 @@
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { Inject } from '@nestjs/common';
+import {
+  CheckGeoExistsMsResponseDto,
+  CheckGeoExistsPayload,
+  GEO_PATTERNS,
+  MICROSERVICE_NAME,
+  USER_ACCOUNTS_ERRORS,
+} from '@snaptix/contracts';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
+import { DomainException } from '@snaptix/common';
+import { UsersRepository } from '../../../../infrastructure/users.repository';
+import { UserEntity } from '../../../domain/user/user.entity';
+
+class CompleteProfileCommandRequest {
+  userId: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  birthDate: string | undefined;
+  aboutMe: string | undefined;
+  countryId: number;
+  regionId: number;
+  cityId: number;
+}
+
+export class CompleteProfileCommand extends Command<void> {
+  constructor(public dto: CompleteProfileCommandRequest) {
+    super();
+  }
+}
+
+@CommandHandler(CompleteProfileCommand)
+export class CompleteProfileUseCase implements ICommandHandler<
+  CompleteProfileCommand,
+  void
+> {
+  constructor(
+    @Inject(MICROSERVICE_NAME.GEO) private geo: ClientProxy,
+    private usersRepository: UsersRepository,
+  ) {}
+
+  async execute({ dto }: CompleteProfileCommand): Promise<void> {
+    const {
+      userId,
+      username,
+      firstName,
+      lastName,
+      birthDate,
+      aboutMe,
+      countryId,
+      regionId,
+      cityId,
+    } = dto;
+
+    const result = await firstValueFrom(
+      this.geo.send<CheckGeoExistsMsResponseDto, CheckGeoExistsPayload>(
+        GEO_PATTERNS.CHECK_GEO_EXISTS,
+        {
+          countryId,
+          regionId,
+          cityId,
+        },
+      ),
+    );
+
+    if (!result.exists) {
+      throw new DomainException(USER_ACCOUNTS_ERRORS.INVALID_GEO_LOCATION);
+    }
+
+    const existsUser = await this.usersRepository.checkUserByUsername(username);
+
+    if (existsUser) {
+      throw new DomainException(
+        USER_ACCOUNTS_ERRORS.USER_USERNAME_ALREADY_EXISTS,
+      );
+    }
+
+    const user: UserEntity | null = await this.usersRepository.findById(userId);
+
+    if (!user) {
+      throw new DomainException(USER_ACCOUNTS_ERRORS.USER_NOT_FOUND);
+    }
+
+    user.changeUsername(username);
+    user.updateProfile({
+      firstName,
+      lastName,
+      birthDate: birthDate ? new Date(birthDate) : null,
+      aboutMe,
+      countryId,
+      regionId,
+      cityId,
+    });
+
+    await this.usersRepository.update(user);
+  }
+}

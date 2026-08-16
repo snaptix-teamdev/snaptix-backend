@@ -8,10 +8,23 @@ import {
 import { Prisma } from '../../generated/prisma/client';
 import { UserEmailConfirmationEntity } from '../domain/user/user-email-confirmation.entity';
 import { UserRecoveryPasswordEntity } from '../domain/user/user-recovery-password.entity';
+import { UserProfileEntity } from '../domain/user/user-profile.entity';
 
 const modelToEntity = (model: UserPrismaModel): UserEntity => {
   return UserEntity.restore(requireLoadedUser(model));
 };
+
+const profileData = (
+  entity: UserProfileEntity,
+): Prisma.UserProfileCreateWithoutUserInput => ({
+  firstName: entity.firstName,
+  lastName: entity.lastName,
+  birthDate: entity.birthDate,
+  countryId: entity.countryId,
+  regionId: entity.regionId,
+  cityId: entity.cityId,
+  aboutMe: entity.aboutMe,
+});
 
 const emailConfirmationData = (
   entity: UserEmailConfirmationEntity,
@@ -34,6 +47,9 @@ const entityToCreateInput = (entity: UserEntity): Prisma.UserCreateInput => ({
   username: entity.username,
   passwordHash: entity.passwordHash,
   deletedAt: entity.deletedAt,
+  profile: {
+    create: {},
+  },
   emailConfirmation: {
     create: emailConfirmationData(entity.emailConfirmation),
   },
@@ -62,6 +78,9 @@ export class UserConverter extends UniversalConverter<
       username: entity.username,
       passwordHash: entity.passwordHash,
       deletedAt: entity.deletedAt,
+      profile: {
+        update: profileData(entity.profile),
+      },
       emailConfirmation: {
         update: emailConfirmationData(entity.emailConfirmation),
       },

@@ -73,6 +73,12 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 403,
     field: null,
   },
+  INVALID_GEO_LOCATION: {
+    code: 'INVALID_GEO_LOCATION',
+    message: 'Invalid geographic location',
+    httpCode: 400,
+    field: null,
+  },
 } satisfies Record<
   string,
   IDomainError<IUser | IUserEmailConfirmation | IUserRecoveryPassword>
