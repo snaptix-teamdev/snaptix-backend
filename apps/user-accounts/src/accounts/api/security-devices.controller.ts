@@ -1,11 +1,14 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import {
+  DeactivateSessionByIdMsResponseDto,
+  DeactivateSessionByIdPayload,
   RefreshTokenPayload,
   USER_ACCOUNTS_PATTERNS,
 } from '@snaptix/contracts';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { DeactivateSessionsExcludingCurrentCommand } from '../application/commands/session-commands/deactivate-sessions-excluding-current.usecase';
+import { DeactivateSessionByIdCommand } from '../application/commands/session-commands/deactivate-session-by-id.usecase';
 import { GetActiveDevicesResponseDto } from '@snaptix/contracts/user-accounts/get-active-devices/get-active-devices.response-dto';
 import { GetActiveDevicesQuery } from '../application/queries/get-active-devices.query';
 
@@ -36,5 +39,19 @@ export class SecurityDevicesController {
     );
 
     return {};
+  }
+
+  @MessagePattern(
+    USER_ACCOUNTS_PATTERNS.SECURITY_DEVICES.DEACTIVATE_SESSION_BY_ID,
+  )
+  async deactivateSessionById(
+    @Payload() payload: DeactivateSessionByIdPayload,
+  ): Promise<DeactivateSessionByIdMsResponseDto> {
+    return this.commandBus.execute(
+      new DeactivateSessionByIdCommand({
+        refreshToken: payload.refreshToken,
+        deviceId: payload.deviceId,
+      }),
+    );
   }
 }

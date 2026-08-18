@@ -25,6 +25,7 @@ import { LogoutUserUseCase } from './accounts/application/commands/auth-commands
 import { CreateSessionUseCase } from './accounts/application/commands/session-commands/create-session.usecase';
 import { UpdateSessionUseCase } from './accounts/application/commands/session-commands/update-session.usecase';
 import { DeactivateSessionsExcludingCurrentUseCase } from './accounts/application/commands/session-commands/deactivate-sessions-excluding-current.usecase';
+import { DeactivateSessionByIdUseCase } from './accounts/application/commands/session-commands/deactivate-session-by-id.usecase';
 import { AuthConfig } from './accounts/config/auth.config';
 import { CryptoService } from './accounts/application/services/crypto.service';
 import { GetMeQueryHandler } from './accounts/application/queries/get-me.query';
@@ -54,6 +55,7 @@ const sessionUseCases = [
   CreateSessionUseCase,
   UpdateSessionUseCase,
   DeactivateSessionsExcludingCurrentUseCase,
+  DeactivateSessionByIdUseCase,
 ];
 
 @Module({
