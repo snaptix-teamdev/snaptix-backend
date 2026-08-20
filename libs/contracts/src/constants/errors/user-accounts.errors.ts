@@ -1,5 +1,6 @@
 import {
   IDomainError,
+  ISession,
   IUser,
   IUserEmailConfirmation,
   IUserRecoveryPassword,
@@ -66,6 +67,12 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 409,
     field: 'code',
   },
+  SESSION_NOT_FOUND: {
+    code: 'SESSION_NOT_FOUND',
+    message: 'Session not found',
+    httpCode: 404,
+    field: 'deviceId',
+  },
   USER_IS_DELETED: {
     code: 'USER_IS_DELETED',
     message:
@@ -75,5 +82,7 @@ export const USER_ACCOUNTS_ERRORS = {
   },
 } satisfies Record<
   string,
-  IDomainError<IUser | IUserEmailConfirmation | IUserRecoveryPassword>
+  IDomainError<
+    IUser | IUserEmailConfirmation | IUserRecoveryPassword | ISession
+  >
 >;
