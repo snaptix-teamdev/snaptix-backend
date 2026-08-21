@@ -21,6 +21,7 @@ import { firstValueFrom } from 'rxjs';
 import { ApiUnauthorizedCustomResponse } from '../../../core/swagger/unauthorized.swagger';
 import { ApiBadRequestCustomResponse } from '../../../core/swagger/bad-request.swagger';
 import { ApiConflictCustomResponse } from '../../../core/swagger/conflict.swagger';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller({ path: 'users/me/profile-settings', version: '1' })
 export class ProfileSettingsController {
@@ -32,6 +33,12 @@ export class ProfileSettingsController {
    */
   @Put()
   @UseGuards(AccessTokenAuthGuard)
+  @ApiOperation({
+    description:
+      'aboutMe: "Новый текст" → заменить/' +
+      'aboutMe: ""            → очистить/' +
+      'aboutMe: undefined (без явного указания поля)          → не изменять',
+  })
   @ApiUnauthorizedCustomResponse()
   @ApiBadRequestCustomResponse()
   @ApiConflictCustomResponse()

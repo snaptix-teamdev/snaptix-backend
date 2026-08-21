@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
 import { ProfileSchemas } from '@snaptix/contracts/schemas/profile.schemas';
-import { CommonSchemas } from '@snaptix/contracts';
+import { CommonSchemas } from '@snaptix/contracts/schemas';
 
 const completeProfileSchema = z.object({
   userId: CommonSchemas.uuid,

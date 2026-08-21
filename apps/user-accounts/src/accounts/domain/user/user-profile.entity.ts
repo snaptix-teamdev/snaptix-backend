@@ -1,5 +1,11 @@
-import { IUserProfile } from '@snaptix/common';
+import { DomainException, IUserProfile } from '@snaptix/common';
 import { UpdateUserProfileEntityDto } from './dto/user-update-profile.entity-dto';
+import { differenceInYears } from 'date-fns';
+import { USER_ACCOUNTS_ERRORS } from '@snaptix/contracts';
+
+const birthDateConstraints = {
+  minAgeYears: 13,
+};
 
 export class UserProfileEntity implements IUserProfile {
   id: string;
@@ -29,6 +35,14 @@ export class UserProfileEntity implements IUserProfile {
   }
 
   update(dto: UpdateUserProfileEntityDto): void {
+    if (
+      dto.birthDate &&
+      differenceInYears(new Date(), dto.birthDate) <
+        birthDateConstraints.minAgeYears
+    ) {
+      throw new DomainException(USER_ACCOUNTS_ERRORS.USER_UNDER_MIN_AGE);
+    }
+
     this.firstName = dto.firstName;
     this.lastName = dto.lastName;
     this.birthDate = dto.birthDate;

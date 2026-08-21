@@ -8,10 +8,12 @@ import {
   USER_ACCOUNTS_ERRORS,
 } from '@snaptix/contracts';
 import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
 import { DomainException } from '@snaptix/common';
 import { UsersRepository } from '../../../../infrastructure/users.repository';
 import { UserEntity } from '../../../domain/user/user.entity';
+import { parse } from 'date-fns';
+import { TransactionManager } from '../../../../infrastructure/prisma/transaction.manager';
+import { firstValueFrom } from 'rxjs';
 
 class CompleteProfileCommandRequest {
   userId: string;
@@ -39,7 +41,16 @@ export class CompleteProfileUseCase implements ICommandHandler<
   constructor(
     @Inject(MICROSERVICE_NAME.GEO) private geo: ClientProxy,
     private usersRepository: UsersRepository,
+    private transactionManager: TransactionManager,
   ) {}
+
+  private parseBirthDate(raw: string): Date {
+    const parsed = parse(raw, 'dd.MM.yyyy', new Date());
+
+    return new Date(
+      Date.UTC(parsed.getFullYear(), parsed.getMonth(), parsed.getDate()),
+    );
+  }
 
   async execute({ dto }: CompleteProfileCommand): Promise<void> {
     const {
@@ -69,31 +80,41 @@ export class CompleteProfileUseCase implements ICommandHandler<
       throw new DomainException(USER_ACCOUNTS_ERRORS.INVALID_GEO_LOCATION);
     }
 
-    const existsUser = await this.usersRepository.checkUserByUsername(username);
+    await this.transactionManager.run(async (tx) => {
+      const existsUser =
+        await this.usersRepository.checkUserByUsernameExcludingCurrent(
+          userId,
+          username,
+          tx,
+        );
 
-    if (existsUser) {
-      throw new DomainException(
-        USER_ACCOUNTS_ERRORS.USER_USERNAME_ALREADY_EXISTS,
+      if (existsUser) {
+        throw new DomainException(
+          USER_ACCOUNTS_ERRORS.USER_USERNAME_ALREADY_EXISTS,
+        );
+      }
+
+      const user: UserEntity | null = await this.usersRepository.findById(
+        userId,
+        tx,
       );
-    }
 
-    const user: UserEntity | null = await this.usersRepository.findById(userId);
+      if (!user) {
+        throw new DomainException(USER_ACCOUNTS_ERRORS.USER_NOT_FOUND);
+      }
 
-    if (!user) {
-      throw new DomainException(USER_ACCOUNTS_ERRORS.USER_NOT_FOUND);
-    }
+      user.changeUsername(username);
+      user.updateProfile({
+        firstName,
+        lastName,
+        birthDate: birthDate ? this.parseBirthDate(birthDate) : null,
+        aboutMe: aboutMe === '' ? null : aboutMe,
+        countryId,
+        regionId,
+        cityId,
+      });
 
-    user.changeUsername(username);
-    user.updateProfile({
-      firstName,
-      lastName,
-      birthDate: birthDate ? new Date(birthDate) : null,
-      aboutMe,
-      countryId,
-      regionId,
-      cityId,
+      await this.usersRepository.update(user);
     });
-
-    await this.usersRepository.update(user);
   }
 }
