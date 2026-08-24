@@ -29,6 +29,7 @@ pipeline {
                        nvm use
                        command -v pnpm || npm install -g pnpm@10.27.0
                        pnpm install
+                       pnpm user-accounts:prisma:generate
                        pnpm user-accounts:test
                     '''
                 }
@@ -43,6 +44,7 @@ pipeline {
                        nvm use
                        command -v pnpm || npm install -g pnpm@10.27.0
                        pnpm install
+                       pnpm user-accounts:prisma:generate
                        pnpm user-accounts:test:e2e
                     '''
                 }
