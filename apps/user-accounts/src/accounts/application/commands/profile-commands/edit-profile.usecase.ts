@@ -20,8 +20,8 @@ class EditProfileCommandRequest {
   username: string;
   firstName: string;
   lastName: string;
-  birthDate: string | undefined;
-  aboutMe: string | undefined;
+  birthDate: string | null;
+  aboutMe: string | null;
   countryId: number;
   regionId: number;
   cityId: number;
@@ -108,7 +108,7 @@ export class EditProfileUseCase implements ICommandHandler<
         firstName,
         lastName,
         birthDate: birthDate ? this.parseBirthDate(birthDate) : null,
-        aboutMe: aboutMe === '' ? null : aboutMe,
+        aboutMe: aboutMe ? aboutMe : null,
         countryId,
         regionId,
         cityId,

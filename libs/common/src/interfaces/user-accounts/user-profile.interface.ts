@@ -3,11 +3,11 @@ export interface IUserProfile {
   userId: string;
   firstName: string | null;
   lastName: string | null;
-  birthDate: Date | undefined | null;
+  birthDate: Date | null;
   countryId: number | null;
   regionId: number | null;
   cityId: number | null;
-  aboutMe: string | undefined | null;
+  aboutMe: string | null;
   avatarUrl: string | null;
   createdAt: Date;
   updatedAt: Date;

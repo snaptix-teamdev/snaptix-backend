@@ -27,14 +27,14 @@ export namespace ProfileSchemas {
       (v) => !isFuture(parse(v, 'dd.MM.yyyy', new Date())),
       'Birth date cannot be in the future',
     )
-    .optional();
+    .nullable();
 
   export const aboutMe = z
     .string()
     .trim()
     .max(200)
     .regex(/^[A-Za-zА-Яа-яЁё0-9\s\p{P}\p{S}]*$/u)
-    .optional();
+    .nullable();
 
   export const countryId = z.coerce.number().int().positive();
   export const regionId = z.coerce.number().int().positive();
