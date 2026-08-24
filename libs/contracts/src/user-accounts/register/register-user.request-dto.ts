@@ -1,13 +1,9 @@
 import { z } from 'zod';
 import { createZodDto } from 'nestjs-zod';
+import { UserAccountsSchemas } from '@snaptix/contracts/schemas/user-accounts.schemas';
 
 export const registerUserSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(6)
-    .max(30)
-    .regex(/^[0-9A-Za-z_-]+$/),
+  username: UserAccountsSchemas.username,
 
   email: z.string().trim().toLowerCase().email(),
 

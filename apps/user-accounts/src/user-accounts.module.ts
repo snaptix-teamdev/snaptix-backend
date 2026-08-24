@@ -40,7 +40,7 @@ import { AuthenticateWithGoogleUseCase } from './accounts/application/commands/a
 import { UserProvidersRepository } from './infrastructure/user-providers.repository';
 import { UserProviderConverter } from './accounts/converters/user-provider.converter';
 import { ProfileSettingsController } from './accounts/api/profile-settings.controller';
-import { CompleteProfileUseCase } from './accounts/application/commands/profile-commands/complete-profile.usecase';
+import { EditProfileUseCase } from './accounts/application/commands/profile-commands/edit-profile.usecase';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_NAME } from '@snaptix/contracts';
 import { CoreConfig } from './core/config/core.config';
@@ -62,7 +62,7 @@ const sessionUseCases = [
   DeactivateSessionsExcludingCurrentUseCase,
   DeactivateSessionByIdUseCase,
 ];
-const profileUseCases = [CompleteProfileUseCase];
+const profileUseCases = [EditProfileUseCase];
 
 @Module({
   imports: [

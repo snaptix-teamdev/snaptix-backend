@@ -34,14 +34,18 @@ export class UserProfileEntity implements IUserProfile {
     return entity;
   }
 
-  update(dto: UpdateUserProfileEntityDto): void {
+  private checkBirthDateOrThrow(birthDate: Date | null | undefined): void {
     if (
-      dto.birthDate &&
-      differenceInYears(new Date(), dto.birthDate) <
+      birthDate &&
+      differenceInYears(new Date(), birthDate) <
         birthDateConstraints.minAgeYears
     ) {
       throw new DomainException(USER_ACCOUNTS_ERRORS.USER_UNDER_MIN_AGE);
     }
+  }
+
+  update(dto: UpdateUserProfileEntityDto): void {
+    this.checkBirthDateOrThrow(dto.birthDate);
 
     this.firstName = dto.firstName;
     this.lastName = dto.lastName;

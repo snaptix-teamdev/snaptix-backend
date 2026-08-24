@@ -2,13 +2,6 @@ import z from 'zod';
 import { isFuture, isValid, parse } from 'date-fns';
 
 export namespace ProfileSchemas {
-  export const username = z
-    .string()
-    .trim()
-    .min(6)
-    .max(30)
-    .regex(/^[0-9A-Za-z_-]+$/);
-
   export const firstName = z
     .string()
     .trim()

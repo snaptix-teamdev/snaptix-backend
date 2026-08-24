@@ -15,7 +15,7 @@ import { parse } from 'date-fns';
 import { TransactionManager } from '../../../../infrastructure/prisma/transaction.manager';
 import { firstValueFrom } from 'rxjs';
 
-class CompleteProfileCommandRequest {
+class EditProfileCommandRequest {
   userId: string;
   username: string;
   firstName: string;
@@ -27,15 +27,15 @@ class CompleteProfileCommandRequest {
   cityId: number;
 }
 
-export class CompleteProfileCommand extends Command<void> {
-  constructor(public dto: CompleteProfileCommandRequest) {
+export class EditProfileCommand extends Command<void> {
+  constructor(public dto: EditProfileCommandRequest) {
     super();
   }
 }
 
-@CommandHandler(CompleteProfileCommand)
-export class CompleteProfileUseCase implements ICommandHandler<
-  CompleteProfileCommand,
+@CommandHandler(EditProfileCommand)
+export class EditProfileUseCase implements ICommandHandler<
+  EditProfileCommand,
   void
 > {
   constructor(
@@ -52,7 +52,7 @@ export class CompleteProfileUseCase implements ICommandHandler<
     );
   }
 
-  async execute({ dto }: CompleteProfileCommand): Promise<void> {
+  async execute({ dto }: EditProfileCommand): Promise<void> {
     const {
       userId,
       username,

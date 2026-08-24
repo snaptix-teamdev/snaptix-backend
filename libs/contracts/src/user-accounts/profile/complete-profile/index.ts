@@ -1,2 +1,2 @@
-export * from './complete-profile.request-dto';
-export * from './complete-profile.payload';
+export * from './edit-profile.request-dto';
+export * from './edit-profile.payload';

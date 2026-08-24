@@ -11,8 +11,8 @@ import { AccessTokenAuthGuard } from '../../../core/guards/bearer/access-token.g
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '@snaptix/common';
 import {
-  CompleteProfilePayload,
-  CompleteProfileRequestDto,
+  EditProfilePayload,
+  EditProfileRequestDto,
   MICROSERVICE_NAME,
   USER_ACCOUNTS_PATTERNS,
 } from '@snaptix/contracts';
@@ -43,12 +43,12 @@ export class ProfileSettingsController {
   @ApiBadRequestCustomResponse()
   @ApiConflictCustomResponse()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async completeProfile(
+  async editProfile(
     @ExtractUserFromRequest() user: UserContextDto,
-    @Body() body: CompleteProfileRequestDto,
+    @Body() body: EditProfileRequestDto,
   ): Promise<void> {
-    const result = this.userAccounts.send<void, CompleteProfilePayload>(
-      USER_ACCOUNTS_PATTERNS.PROFILE.COMPLETE_PROFILE,
+    const result = this.userAccounts.send<void, EditProfilePayload>(
+      USER_ACCOUNTS_PATTERNS.PROFILE.EDIT_PROFILE,
       {
         userId: user.userId,
         username: body.username,

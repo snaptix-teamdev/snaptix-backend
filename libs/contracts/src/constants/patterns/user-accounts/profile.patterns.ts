@@ -1,3 +1,3 @@
 export const PROFILE_PATTERNS = {
-  COMPLETE_PROFILE: 'profile.complete-profile',
+  EDIT_PROFILE: 'profile.edit-profile',
 } as const;

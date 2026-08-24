@@ -1,22 +1,17 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import {
-  CompleteProfilePayload,
-  USER_ACCOUNTS_PATTERNS,
-} from '@snaptix/contracts';
+import { EditProfilePayload, USER_ACCOUNTS_PATTERNS } from '@snaptix/contracts';
 import { CommandBus } from '@nestjs/cqrs';
-import { CompleteProfileCommand } from '../application/commands/profile-commands/complete-profile.usecase';
+import { EditProfileCommand } from '../application/commands/profile-commands/edit-profile.usecase';
 
 @Controller({ path: 'users/me/profile-settings' })
 export class ProfileSettingsController {
   constructor(private commandBus: CommandBus) {}
 
-  @MessagePattern(USER_ACCOUNTS_PATTERNS.PROFILE.COMPLETE_PROFILE)
-  async completeProfile(
-    @Payload() payload: CompleteProfilePayload,
-  ): Promise<object> {
+  @MessagePattern(USER_ACCOUNTS_PATTERNS.PROFILE.EDIT_PROFILE)
+  async editProfile(@Payload() payload: EditProfilePayload): Promise<object> {
     await this.commandBus.execute(
-      new CompleteProfileCommand({
+      new EditProfileCommand({
         userId: payload.userId,
         username: payload.username,
         firstName: payload.firstName,
