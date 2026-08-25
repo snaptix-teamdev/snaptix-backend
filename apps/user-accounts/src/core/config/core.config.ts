@@ -27,13 +27,13 @@ export class CoreConfig {
   @IsNumber(
     {},
     {
-      message: 'Set Env variable MICROSERVICE_POSTS_PORT, example: 3000',
+      message: 'Set Env variable MICROSERVICE_GEO_PORT, example: 3000',
     },
   )
   microserviceGeoPort: number;
 
   @IsNotEmpty({
-    message: 'Set Env variable MICROSERVICE_POSTS_HOST, example: 0.0.0.0',
+    message: 'Set Env variable MICROSERVICE_GEO_HOST, example: 0.0.0.0',
   })
   microserviceGeoHost: string;
 

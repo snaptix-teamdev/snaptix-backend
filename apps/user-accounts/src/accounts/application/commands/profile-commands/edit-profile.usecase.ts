@@ -22,9 +22,9 @@ class EditProfileCommandRequest {
   lastName: string;
   birthDate: string | null;
   aboutMe: string | null;
-  countryId: number;
-  regionId: number;
-  cityId: number;
+  countryId: number | null;
+  regionId: number | null;
+  cityId: number | null;
 }
 
 export class EditProfileCommand extends Command<void> {
@@ -52,18 +52,21 @@ export class EditProfileUseCase implements ICommandHandler<
     );
   }
 
-  async execute({ dto }: EditProfileCommand): Promise<void> {
-    const {
-      userId,
-      username,
-      firstName,
-      lastName,
-      birthDate,
-      aboutMe,
-      countryId,
-      regionId,
-      cityId,
-    } = dto;
+  private async validateGeoLocation(
+    countryId: number | null,
+    regionId: number | null,
+    cityId: number | null,
+  ): Promise<void> {
+    const allEmpty = !countryId && !regionId && !cityId;
+    const allFilled = countryId && regionId && cityId;
+
+    if (allEmpty) {
+      return;
+    }
+
+    if (!allFilled) {
+      throw new DomainException(USER_ACCOUNTS_ERRORS.INVALID_GEO_LOCATION);
+    }
 
     const result = await firstValueFrom(
       this.geo.send<CheckGeoExistsMsResponseDto, CheckGeoExistsPayload>(
@@ -79,6 +82,22 @@ export class EditProfileUseCase implements ICommandHandler<
     if (!result.exists) {
       throw new DomainException(USER_ACCOUNTS_ERRORS.INVALID_GEO_LOCATION);
     }
+  }
+
+  async execute({ dto }: EditProfileCommand): Promise<void> {
+    const {
+      userId,
+      username,
+      firstName,
+      lastName,
+      birthDate,
+      aboutMe,
+      countryId,
+      regionId,
+      cityId,
+    } = dto;
+
+    await this.validateGeoLocation(countryId, regionId, cityId);
 
     await this.transactionManager.run(async (tx) => {
       const existsUser =

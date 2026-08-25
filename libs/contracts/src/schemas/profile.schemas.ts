@@ -36,7 +36,7 @@ export namespace ProfileSchemas {
     .regex(/^[A-Za-zА-Яа-яЁё0-9\s\p{P}\p{S}]*$/u)
     .nullable();
 
-  export const countryId = z.coerce.number().int().positive();
-  export const regionId = z.coerce.number().int().positive();
-  export const cityId = z.coerce.number().int().positive();
+  export const countryId = z.coerce.number().int().positive().nullable();
+  export const regionId = z.coerce.number().int().positive().nullable();
+  export const cityId = z.coerce.number().int().positive().nullable();
 }
