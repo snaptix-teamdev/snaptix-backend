@@ -1,5 +1,6 @@
 import {
   IUserEmailConfirmation,
+  IUserProfile,
   IUserRecoveryPassword,
 } from '@snaptix/common/interfaces';
 
@@ -19,6 +20,7 @@ export interface IUser {
   updatedAt: Date;
   createdAt: Date;
   deletedAt: Date | null;
+  profile: IUserProfile;
   emailConfirmation: IUserEmailConfirmation;
   recoveryPassword: IUserRecoveryPassword | null;
 }

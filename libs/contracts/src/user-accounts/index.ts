@@ -10,3 +10,4 @@ export * from './get-active-devices/index';
 export * from './deactivate-session-by-id/index';
 export * from './get-registered-users-count/index';
 export * from './callback-google/index';
+export * from './profile/complete-profile/index';

@@ -3,6 +3,7 @@ import {
   ISession,
   IUser,
   IUserEmailConfirmation,
+  IUserProfile,
   IUserRecoveryPassword,
 } from '@snaptix/common';
 
@@ -80,9 +81,25 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 403,
     field: null,
   },
+  USER_UNDER_MIN_AGE: {
+    code: 'USER_UNDER_MIN_AGE',
+    message: 'A user under 13 cannot create a profile',
+    httpCode: 400,
+    field: 'birthDate',
+  },
+  INVALID_GEO_LOCATION: {
+    code: 'INVALID_GEO_LOCATION',
+    message: 'Invalid geographic location',
+    httpCode: 400,
+    field: null,
+  },
 } satisfies Record<
   string,
   IDomainError<
-    IUser | IUserEmailConfirmation | IUserRecoveryPassword | ISession
+    | IUser
+    | IUserEmailConfirmation
+    | IUserRecoveryPassword
+    | ISession
+    | IUserProfile
   >
 >;

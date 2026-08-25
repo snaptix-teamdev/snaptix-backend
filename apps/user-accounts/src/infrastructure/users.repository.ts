@@ -51,8 +51,26 @@ export class UsersRepository {
     });
   }
 
-  async findById(id: string): Promise<UserEntity | null> {
-    const result = await this.prisma.user.findUnique({
+  async checkUserByUsernameExcludingCurrent(
+    userId: string,
+    username: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<{ username: string } | null> {
+    const client = tx ?? this.prisma;
+
+    return client.user.findFirst({
+      where: { username, NOT: { id: userId } },
+      select: { username: true },
+    });
+  }
+
+  async findById(
+    id: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<UserEntity | null> {
+    const client = tx ?? this.prisma;
+
+    const result = await client.user.findUnique({
       where: { id },
       include: USER_INCLUDE,
     });
