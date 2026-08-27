@@ -1,5 +1,6 @@
 import z from 'zod';
-import { isFuture, isValid, parse } from 'date-fns';
+import { isFuture, parseISO } from 'date-fns';
+import { GeoSchemas } from '@snaptix/contracts/schemas/geo.schemas';
 
 export namespace ProfileSchemas {
   export const firstName = z
@@ -16,17 +17,9 @@ export namespace ProfileSchemas {
     .max(50)
     .regex(/^[А-Яа-яA-Za-zЁё]+$/);
 
-  export const birthDate = z
-    .string()
-    .regex(/^\d{2}\.\d{2}\.\d{4}$/, 'Expected format dd.mm.yyyy')
-    .refine(
-      (v) => isValid(parse(v, 'dd.MM.yyyy', new Date())),
-      'Invalid calendar date',
-    )
-    .refine(
-      (v) => !isFuture(parse(v, 'dd.MM.yyyy', new Date())),
-      'Birth date cannot be in the future',
-    )
+  export const birthDate = z.iso
+    .date()
+    .refine((v) => !isFuture(parseISO(v)), 'Birth date cannot be in the future')
     .nullable();
 
   export const aboutMe = z
@@ -36,7 +29,7 @@ export namespace ProfileSchemas {
     .regex(/^[A-Za-zА-Яа-яЁё0-9\s\p{P}\p{S}]*$/u)
     .nullable();
 
-  export const countryId = z.coerce.number().int().positive().nullable();
-  export const regionId = z.coerce.number().int().positive().nullable();
-  export const cityId = z.coerce.number().int().positive().nullable();
+  export const countryId = GeoSchemas.countryId.nullable();
+  export const regionId = GeoSchemas.regionId.nullable();
+  export const cityId = GeoSchemas.cityId.nullable();
 }

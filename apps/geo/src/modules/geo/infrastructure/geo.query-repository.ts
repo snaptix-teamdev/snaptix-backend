@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
 import { GeoLang } from '@snaptix/contracts';
 
+export type GeoTranslation = { lang: string; name: string };
+
 @Injectable()
 export class GeoQueryRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -40,6 +42,36 @@ export class GeoQueryRepository {
       id: t.cityId,
       name: t.name,
     }));
+  }
+
+  findCountryTranslations(
+    countryId: number,
+    langs: GeoLang[],
+  ): Promise<GeoTranslation[]> {
+    return this.prisma.countryTranslation.findMany({
+      where: { countryId, lang: { in: langs } },
+      select: { lang: true, name: true },
+    });
+  }
+
+  findRegionTranslations(
+    regionId: number,
+    langs: GeoLang[],
+  ): Promise<GeoTranslation[]> {
+    return this.prisma.regionTranslation.findMany({
+      where: { regionId, lang: { in: langs } },
+      select: { lang: true, name: true },
+    });
+  }
+
+  findCityTranslations(
+    cityId: number,
+    langs: GeoLang[],
+  ): Promise<GeoTranslation[]> {
+    return this.prisma.cityTranslation.findMany({
+      where: { cityId, lang: { in: langs } },
+      select: { lang: true, name: true },
+    });
   }
 
   async checkGeoExists(payload: {

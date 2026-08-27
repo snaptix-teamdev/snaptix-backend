@@ -1,10 +1,11 @@
 import z from 'zod';
 import { createZodDto } from 'nestjs-zod';
+import { GeoSchemas } from '@snaptix/contracts/schemas/geo.schemas';
 
 const payload = z.object({
-  countryId: z.coerce.number().int().positive(),
-  regionId: z.coerce.number().int().positive(),
-  cityId: z.coerce.number().int().positive(),
+  countryId: GeoSchemas.countryId,
+  regionId: GeoSchemas.regionId,
+  cityId: GeoSchemas.cityId,
 });
 
 export class CheckGeoExistsPayload extends createZodDto(payload) {}

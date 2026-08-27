@@ -84,13 +84,13 @@ export const USER_ACCOUNTS_ERRORS = {
   USER_UNDER_MIN_AGE: {
     code: 'USER_UNDER_MIN_AGE',
     message: 'A user under 13 cannot create a profile',
-    httpCode: 400,
+    httpCode: 409,
     field: 'birthDate',
   },
   INVALID_GEO_LOCATION: {
     code: 'INVALID_GEO_LOCATION',
     message: 'Invalid geographic location',
-    httpCode: 400,
+    httpCode: 409,
     field: null,
   },
 } satisfies Record<

@@ -11,7 +11,7 @@ import { ClientProxy } from '@nestjs/microservices';
 import { DomainException } from '@snaptix/common';
 import { UsersRepository } from '../../../../infrastructure/users.repository';
 import { UserEntity } from '../../../domain/user/user.entity';
-import { parse } from 'date-fns';
+import { parseBirthDate } from '../../helpers/birth-date.helper';
 import { TransactionManager } from '../../../../infrastructure/prisma/transaction.manager';
 import { firstValueFrom } from 'rxjs';
 
@@ -43,14 +43,6 @@ export class EditProfileUseCase implements ICommandHandler<
     private usersRepository: UsersRepository,
     private transactionManager: TransactionManager,
   ) {}
-
-  private parseBirthDate(raw: string): Date {
-    const parsed = parse(raw, 'dd.MM.yyyy', new Date());
-
-    return new Date(
-      Date.UTC(parsed.getFullYear(), parsed.getMonth(), parsed.getDate()),
-    );
-  }
 
   private async validateGeoLocation(
     countryId: number | null,
@@ -126,7 +118,7 @@ export class EditProfileUseCase implements ICommandHandler<
       user.updateProfile({
         firstName,
         lastName,
-        birthDate: birthDate ? this.parseBirthDate(birthDate) : null,
+        birthDate: birthDate ? parseBirthDate(birthDate) : null,
         aboutMe: aboutMe ? aboutMe : null,
         countryId,
         regionId,

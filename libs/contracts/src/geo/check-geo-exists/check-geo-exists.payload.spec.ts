@@ -40,6 +40,7 @@ describe('CheckGeoExistsPayload', () => {
     ['отрицательное число', -1],
     ['дробное число', 1.5],
     ['нечисловую строку', 'abc'],
+    ['значение за пределом Postgres integer', 2_147_483_648],
   ])('отклоняет %s в cityId', (_case, cityId) => {
     const result = schema.safeParse({ ...valid, cityId });
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { requireLoadedRelations } from '../prisma/helpers/loaded-relations.helper';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -12,6 +13,22 @@ export class UsersQueryRepository {
         emailConfirmation: { isVerified: true },
       },
     });
+  }
+
+  async findByIdWithProfile(id: string) {
+    const result = await this.prisma.user.findUnique({
+      where: {
+        id,
+        deletedAt: null,
+      },
+      include: {
+        profile: true,
+      },
+    });
+
+    if (!result) return null;
+
+    return requireLoadedRelations(result, ['profile'], 'User');
   }
 
   async findById(id: string) {

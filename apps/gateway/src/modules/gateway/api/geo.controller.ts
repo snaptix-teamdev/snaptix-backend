@@ -9,10 +9,10 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import {
   GEO_PATTERNS,
-  GetGeoMsResponseDto,
-  GetGeoPayload,
-  GetGeoQueryRequestDto,
-  GetGeoResponseDto,
+  GetGeoListMsResponseDto,
+  GetGeoListPayload,
+  GetGeoListQueryRequestDto,
+  GetGeoListResponseDto,
   GeoLang,
   MICROSERVICE_NAME,
 } from '@snaptix/contracts';
@@ -36,16 +36,19 @@ export class GeoController {
 \n- \`?countryId&regionId\` → города региона
 \n\nЯзык названий берётся из cookie \`locale\` (значения: \`en\`, \`ru\`).`,
   })
-  getGeo(
-    @Query() query: GetGeoQueryRequestDto,
+  getGeoList(
+    @Query() query: GetGeoListQueryRequestDto,
     @ExtractLangFromCookie() lang: GeoLang,
-  ): Promise<GetGeoResponseDto> {
+  ): Promise<GetGeoListResponseDto> {
     return firstValueFrom(
-      this.geo.send<GetGeoMsResponseDto, GetGeoPayload>(GEO_PATTERNS.GET_GEO, {
-        countryId: query.countryId,
-        regionId: query.regionId,
-        lang,
-      }),
+      this.geo.send<GetGeoListMsResponseDto, GetGeoListPayload>(
+        GEO_PATTERNS.GET_GEO_LIST,
+        {
+          countryId: query.countryId,
+          regionId: query.regionId,
+          lang,
+        },
+      ),
     );
   }
 }
