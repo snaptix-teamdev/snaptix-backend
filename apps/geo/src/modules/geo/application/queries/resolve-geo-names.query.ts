@@ -46,10 +46,6 @@ export class ResolveGeoNamesQueryHandler implements IQueryHandler<
     };
   }
 
-  /**
-   * Берёт перевод на запрошенном языке, при его отсутствии — на языке по умолчанию.
-   * Возвращает null, если записи нет ни на одном языке.
-   */
   private toGeoName(
     id: number | null,
     translations: GeoTranslation[],
