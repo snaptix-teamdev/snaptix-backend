@@ -4,7 +4,7 @@ export const POSTS_ERRORS = {
   POST_MEDIA_COUNT_INVALID: {
     code: 'POST_MEDIA_COUNT_INVALID',
     message: 'Post must have between 1 and 10 media',
-    httpCode: 400,
+    httpCode: 409,
     field: 'media',
   },
   POST_NOT_FOUND: {

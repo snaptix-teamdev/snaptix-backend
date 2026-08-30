@@ -14,6 +14,7 @@ import { PostAggregationService } from './application/post-aggregation.service';
 import { GoogleStrategy } from '../../core/guards/google-oauth/google.strategy';
 import { GoogleAuthGuard } from '../../core/guards/google-oauth/google-auth.guard';
 import { ProfileSettingsController } from './api/profile-settings.controller';
+import { ProfileSettingsAggregationService } from './application/profile-settings-aggregation.service';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { ProfileSettingsController } from './api/profile-settings.controller';
     GatewayConfig,
     HomeService,
     PostAggregationService,
+    ProfileSettingsAggregationService,
     GoogleStrategy,
     GoogleAuthGuard,
   ],

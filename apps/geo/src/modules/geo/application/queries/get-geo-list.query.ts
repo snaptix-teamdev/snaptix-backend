@@ -1,21 +1,23 @@
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
-import { GetGeoMsResponseDto, GetGeoPayload } from '@snaptix/contracts';
+import { GetGeoListMsResponseDto, GetGeoListPayload } from '@snaptix/contracts';
 import { GeoQueryRepository } from '../../infrastructure/geo.query-repository';
 
-export class GetGeoQuery extends Query<GetGeoMsResponseDto> {
-  constructor(public readonly payload: GetGeoPayload) {
+export class GetGeoListQuery extends Query<GetGeoListMsResponseDto> {
+  constructor(public readonly payload: GetGeoListPayload) {
     super();
   }
 }
 
-@QueryHandler(GetGeoQuery)
-export class GetGeoQueryHandler implements IQueryHandler<
-  GetGeoQuery,
-  GetGeoMsResponseDto
+@QueryHandler(GetGeoListQuery)
+export class GetGeoListQueryHandler implements IQueryHandler<
+  GetGeoListQuery,
+  GetGeoListMsResponseDto
 > {
   constructor(private readonly repo: GeoQueryRepository) {}
 
-  async execute({ payload }: GetGeoQuery): Promise<GetGeoMsResponseDto> {
+  async execute({
+    payload,
+  }: GetGeoListQuery): Promise<GetGeoListMsResponseDto> {
     const { countryId, regionId, lang } = payload;
 
     if (regionId && !countryId) return { result: [] };

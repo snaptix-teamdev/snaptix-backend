@@ -3,9 +3,8 @@ import { createZodDto } from 'nestjs-zod';
 import { GeoSchemas } from '@snaptix/contracts/schemas/geo.schemas';
 
 const payload = z.object({
-  countryId: GeoSchemas.countryId,
-  regionId: GeoSchemas.regionId,
-  cityId: GeoSchemas.cityId,
+  countryId: GeoSchemas.countryId.optional(),
+  regionId: GeoSchemas.regionId.optional(),
 });
 
-export class CheckGeoExistsPayload extends createZodDto(payload) {}
+export class GetGeoListQueryRequestDto extends createZodDto(payload) {}

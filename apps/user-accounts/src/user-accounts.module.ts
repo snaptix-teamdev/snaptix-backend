@@ -41,6 +41,7 @@ import { UserProvidersRepository } from './infrastructure/user-providers.reposit
 import { UserProviderConverter } from './accounts/converters/user-provider.converter';
 import { ProfileSettingsController } from './accounts/api/profile-settings.controller';
 import { EditProfileUseCase } from './accounts/application/commands/profile-commands/edit-profile.usecase';
+import { GetProfileSettingsQueryHandler } from './accounts/application/queries/get-profile-settings.query';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_NAME } from '@snaptix/contracts';
 import { CoreConfig } from './core/config/core.config';
@@ -131,6 +132,7 @@ const profileUseCases = [EditProfileUseCase];
     UsersQueryRepository,
     GetActiveDevicesQueryHandler,
     GetRegisteredUsersCountQueryHandler,
+    GetProfileSettingsQueryHandler,
     SessionsQueryRepository,
     UserProvidersRepository,
     UserProviderConverter,
