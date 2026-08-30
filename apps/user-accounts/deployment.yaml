@@ -16,72 +16,82 @@ spec:
         project: PROJECT
     spec:
       containers:
-         - name: PROJECT
-           image: REGISTRY_HOSTNAME/PROJECT:TAG_VERSION
-           securityContext:
-             allowPrivilegeEscalation: false
-             runAsNonRoot: true      # опционально, но хорошая практика
-             runAsUser: 1000         # опционально
-           ports:
-             - containerPort: PORT_CONTAINER
-           env:
-             - name: MICROSERVICE_USER_ACCOUNTS_HOST
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: MICROSERVICE_USER_ACCOUNTS_HOST
-             - name: MICROSERVICE_USER_ACCOUNTS_PORT
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: MICROSERVICE_USER_ACCOUNTS_PORT
-             - name: CORS_ALLOWED_ORIGINS
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: CORS_ALLOWED_ORIGINS
-             - name: RABBITMQ_URI
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: RABBITMQ_URI
-             - name: EMAIL_CONFIRMATION_CODE_TTL_HOURS
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: EMAIL_CONFIRMATION_CODE_TTL_HOURS
-             - name: PASSWORD_RESET_CODE_TTL_HOURS
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: PASSWORD_RESET_CODE_TTL_HOURS
-             - name: ACCESS_TOKEN_SECRET
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: ACCESS_TOKEN_SECRET
-             - name: ACCESS_TOKEN_EXPIRE_IN
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: ACCESS_TOKEN_EXPIRE_IN
-             - name: REFRESH_TOKEN_SECRET
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: REFRESH_TOKEN_SECRET
-             - name: REFRESH_TOKEN_EXPIRE_IN
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: REFRESH_TOKEN_EXPIRE_IN
-             - name: POSTGRES_USER_ACCOUNTS_URL
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: POSTGRES_USER_ACCOUNTS_URL
-             - name: NODE_ENV
-               valueFrom:
-                 secretKeyRef:
-                   name: user-accounts-microservice-production-config-secret
-                   key: NODE_ENV
+        - name: PROJECT
+          image: REGISTRY_HOSTNAME/PROJECT:TAG_VERSION
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true      # опционально, но хорошая практика
+            runAsUser: 1000         # опционально
+          ports:
+            - containerPort: PORT_CONTAINER
+          env:
+            - name: MICROSERVICE_USER_ACCOUNTS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: MICROSERVICE_USER_ACCOUNTS_HOST
+            - name: MICROSERVICE_USER_ACCOUNTS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: MICROSERVICE_USER_ACCOUNTS_PORT
+            - name: CORS_ALLOWED_ORIGINS
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: CORS_ALLOWED_ORIGINS
+            - name: RABBITMQ_URI
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: RABBITMQ_URI
+            - name: EMAIL_CONFIRMATION_CODE_TTL_HOURS
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: EMAIL_CONFIRMATION_CODE_TTL_HOURS
+            - name: PASSWORD_RESET_CODE_TTL_HOURS
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: PASSWORD_RESET_CODE_TTL_HOURS
+            - name: ACCESS_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: ACCESS_TOKEN_SECRET
+            - name: ACCESS_TOKEN_EXPIRE_IN
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: ACCESS_TOKEN_EXPIRE_IN
+            - name: REFRESH_TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: REFRESH_TOKEN_SECRET
+            - name: REFRESH_TOKEN_EXPIRE_IN
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: REFRESH_TOKEN_EXPIRE_IN
+            - name: POSTGRES_USER_ACCOUNTS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: POSTGRES_USER_ACCOUNTS_URL
+            - name: MICROSERVICE_GEO_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: MICROSERVICE_GEO_HOST
+            - name: MICROSERVICE_GEO_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: MICROSERVICE_GEO_PORT
+            - name: NODE_ENV
+              valueFrom:
+                secretKeyRef:
+                  name: user-accounts-microservice-production-config-secret
+                  key: NODE_ENV

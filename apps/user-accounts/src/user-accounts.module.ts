@@ -25,6 +25,7 @@ import { LogoutUserUseCase } from './accounts/application/commands/auth-commands
 import { CreateSessionUseCase } from './accounts/application/commands/session-commands/create-session.usecase';
 import { UpdateSessionUseCase } from './accounts/application/commands/session-commands/update-session.usecase';
 import { DeactivateSessionsExcludingCurrentUseCase } from './accounts/application/commands/session-commands/deactivate-sessions-excluding-current.usecase';
+import { DeactivateSessionByIdUseCase } from './accounts/application/commands/session-commands/deactivate-session-by-id.usecase';
 import { AuthConfig } from './accounts/config/auth.config';
 import { CryptoService } from './accounts/application/services/crypto.service';
 import { GetMeQueryHandler } from './accounts/application/queries/get-me.query';
@@ -38,6 +39,12 @@ import { SessionsQueryRepository } from './infrastructure/query/sessions.query-r
 import { AuthenticateWithGoogleUseCase } from './accounts/application/commands/auth-commands/authenticate-with-google.usecase';
 import { UserProvidersRepository } from './infrastructure/user-providers.repository';
 import { UserProviderConverter } from './accounts/converters/user-provider.converter';
+import { ProfileSettingsController } from './accounts/api/profile-settings.controller';
+import { EditProfileUseCase } from './accounts/application/commands/profile-commands/edit-profile.usecase';
+import { GetProfileSettingsQueryHandler } from './accounts/application/queries/get-profile-settings.query';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MICROSERVICE_NAME } from '@snaptix/contracts';
+import { CoreConfig } from './core/config/core.config';
 
 const authUseCases = [
   RegisterUserUseCase,
@@ -54,7 +61,9 @@ const sessionUseCases = [
   CreateSessionUseCase,
   UpdateSessionUseCase,
   DeactivateSessionsExcludingCurrentUseCase,
+  DeactivateSessionByIdUseCase,
 ];
+const profileUseCases = [EditProfileUseCase];
 
 @Module({
   imports: [
@@ -62,8 +71,26 @@ const sessionUseCases = [
     CoreModule,
     InfrastructureModule,
     CqrsModule.forRoot(),
+    ClientsModule.registerAsync([
+      {
+        name: MICROSERVICE_NAME.GEO,
+        inject: [CoreConfig],
+        useFactory: (coreConfig: CoreConfig) => ({
+          transport: Transport.TCP,
+          options: {
+            host: coreConfig.microserviceGeoHost,
+            port: coreConfig.microserviceGeoPort,
+          },
+        }),
+      },
+    ]),
   ],
-  controllers: [AuthController, SecurityDevicesController, UserController],
+  controllers: [
+    AuthController,
+    SecurityDevicesController,
+    UserController,
+    ProfileSettingsController,
+  ],
   providers: [
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
@@ -92,6 +119,7 @@ const sessionUseCases = [
     },
     ...authUseCases,
     ...sessionUseCases,
+    ...profileUseCases,
     CryptoService,
     AuthConfig,
     GetMeQueryHandler,
@@ -104,6 +132,7 @@ const sessionUseCases = [
     UsersQueryRepository,
     GetActiveDevicesQueryHandler,
     GetRegisteredUsersCountQueryHandler,
+    GetProfileSettingsQueryHandler,
     SessionsQueryRepository,
     UserProvidersRepository,
     UserProviderConverter,

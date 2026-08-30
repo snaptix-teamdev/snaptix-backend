@@ -13,6 +13,8 @@ import { GeoController } from './api/geo.controller';
 import { PostAggregationService } from './application/post-aggregation.service';
 import { GoogleStrategy } from '../../core/guards/google-oauth/google.strategy';
 import { GoogleAuthGuard } from '../../core/guards/google-oauth/google-auth.guard';
+import { ProfileSettingsController } from './api/profile-settings.controller';
+import { ProfileSettingsAggregationService } from './application/profile-settings-aggregation.service';
 
 @Module({
   imports: [
@@ -70,11 +72,13 @@ import { GoogleAuthGuard } from '../../core/guards/google-oauth/google-auth.guar
     UsersController,
     HomeController,
     GeoController,
+    ProfileSettingsController,
   ],
   providers: [
     GatewayConfig,
     HomeService,
     PostAggregationService,
+    ProfileSettingsAggregationService,
     GoogleStrategy,
     GoogleAuthGuard,
   ],

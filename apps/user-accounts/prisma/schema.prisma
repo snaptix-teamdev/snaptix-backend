@@ -48,7 +48,8 @@ model User {
   emailConfirmation UserEmailConfirmation? @relation("UserEmailConfirmation")
   recoveryPassword  UserRecoveryPassword?  @relation("UserRecoveryPassword")
   sessions          Session[]              @relation("Session")
-  UserProvider      UserProvider[]         @relation("UserProvider")
+  userProvider      UserProvider[]         @relation("UserProvider")
+  profile           UserProfile?           @relation("UserProfile")
 
   @@map("users")
 }
@@ -77,6 +78,27 @@ model UserRecoveryPassword {
   user              User     @relation(fields: [userId], references: [id], name: "UserRecoveryPassword")
 
   @@map("user_recovery_password")
+}
+
+model UserProfile {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  firstName String?   @map("first_name")
+  lastName  String?   @map("last_name")
+  birthDate DateTime? @map("birth_date") @db.Date
+  countryId Int?      @map("country_id")
+  regionId  Int?      @map("region_id")
+  cityId    Int?      @map("city_id")
+  aboutMe   String?   @map("about_me")
+  avatarUrl String?   @map("avatar_url")
+
+  userId String @unique @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], name: "UserProfile")
+
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz()
+
+  @@map("user_profile")
 }
 
 model UserProvider {

@@ -1,7 +1,9 @@
 import {
   IDomainError,
+  ISession,
   IUser,
   IUserEmailConfirmation,
+  IUserProfile,
   IUserRecoveryPassword,
 } from '@snaptix/common';
 
@@ -66,6 +68,12 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 409,
     field: 'code',
   },
+  SESSION_NOT_FOUND: {
+    code: 'SESSION_NOT_FOUND',
+    message: 'Session not found',
+    httpCode: 404,
+    field: 'deviceId',
+  },
   USER_IS_DELETED: {
     code: 'USER_IS_DELETED',
     message:
@@ -73,7 +81,25 @@ export const USER_ACCOUNTS_ERRORS = {
     httpCode: 403,
     field: null,
   },
+  USER_UNDER_MIN_AGE: {
+    code: 'USER_UNDER_MIN_AGE',
+    message: 'A user under 13 cannot create a profile',
+    httpCode: 409,
+    field: 'birthDate',
+  },
+  INVALID_GEO_LOCATION: {
+    code: 'INVALID_GEO_LOCATION',
+    message: 'Invalid geographic location',
+    httpCode: 409,
+    field: null,
+  },
 } satisfies Record<
   string,
-  IDomainError<IUser | IUserEmailConfirmation | IUserRecoveryPassword>
+  IDomainError<
+    | IUser
+    | IUserEmailConfirmation
+    | IUserRecoveryPassword
+    | ISession
+    | IUserProfile
+  >
 >;
