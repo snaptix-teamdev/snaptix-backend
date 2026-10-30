@@ -5,4 +5,5 @@ export const MICROSERVICE_NAME = {
   FILES: 'files',
   POSTS: 'posts',
   GEO: 'geo',
+  BILLING: 'billing',
 };
