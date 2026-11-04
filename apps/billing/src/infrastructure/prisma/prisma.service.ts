@@ -7,7 +7,7 @@ import { PrismaConfig } from './prisma.config';
 export class PrismaService extends PrismaClient {
   constructor(prismaConfig: PrismaConfig) {
     const adapter = new PrismaPg({
-      connectionString: prismaConfig.postgresBillingUrl,
+      connectionString: prismaConfig.POSTGRES_BILLING_URL,
     });
     super({ adapter });
   }

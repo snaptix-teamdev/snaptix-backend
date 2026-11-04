@@ -11,7 +11,7 @@ import { CoreConfig } from '../../core/config/core.config';
       imports: [CoreModule],
       inject: [CoreConfig],
       useFactory: (coreConfig: CoreConfig) => ({
-        uri: coreConfig.rabbitmqUri,
+        uri: coreConfig.RABBITMQ_URI,
         exchanges: [
           {
             name: BILLING_EXCHANGE,

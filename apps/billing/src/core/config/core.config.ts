@@ -1,38 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
-import { configValidationUtility, Environments } from '@snaptix/common';
+import { z } from 'zod';
+import { Environments, zodConfigValidationUtility } from '@snaptix/common';
+
+const coreSchema = z.object({
+  PORT: z.coerce.number().min(1),
+  NODE_ENV: z.enum(Environments),
+  RABBITMQ_URI: z.string().min(1),
+});
+
+type CoreSchemaType = z.infer<typeof coreSchema>;
 
 @Injectable()
-export class CoreConfig {
-  @IsNumber(
-    {},
-    {
-      message: 'Set Env variable PORT, example: 3000',
-    },
-  )
-  port: number;
+export class CoreConfig implements CoreSchemaType {
+  PORT: number;
+  NODE_ENV: Environments;
+  RABBITMQ_URI: string;
 
-  @IsEnum(Environments, {
-    message:
-      'Set correct NODE_ENV value, available values: ' +
-      configValidationUtility.getEnumValues(Environments).join(', '),
-  })
-  env: Environments;
-
-  @IsNotEmpty({
-    message:
-      'Set Env variable RABBITMQ_URI, example: amqp://username:password@localhost:5672',
-  })
-  rabbitmqUri: string;
-
-  constructor(private configService: ConfigService<any, true>) {
-    this.port = parseInt(this.configService.get<string>('PORT'));
-
-    this.env = this.configService.get('NODE_ENV');
-
-    this.rabbitmqUri = this.configService.get('RABBITMQ_URI');
-
-    configValidationUtility.validateConfig(this);
+  constructor() {
+    Object.assign(this, zodConfigValidationUtility(coreSchema));
   }
 }

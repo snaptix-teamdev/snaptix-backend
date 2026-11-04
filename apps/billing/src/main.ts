@@ -14,8 +14,8 @@ async function bootstrap() {
 
   initSetup(app);
 
-  await app.listen(coreConfig.port, () => {
-    logger.log(`✅  Server running on port: ${coreConfig.port}`);
+  await app.listen(coreConfig.PORT, () => {
+    logger.log(`✅  Server running on port: ${coreConfig.PORT}`);
   });
 }
 void bootstrap();

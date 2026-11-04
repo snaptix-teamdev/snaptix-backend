@@ -1,19 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { IsNotEmpty } from 'class-validator';
-import { ConfigService } from '@nestjs/config';
-import { configValidationUtility } from '@snaptix/common/utils/config-validation.utility';
+import { z } from 'zod';
+import { zodConfigValidationUtility } from '@snaptix/common';
+
+const prismaSchema = z.object({
+  POSTGRES_BILLING_URL: z.string().min(1),
+});
+
+type PrismaSchemaType = z.infer<typeof prismaSchema>;
 
 @Injectable()
-export class PrismaConfig {
-  @IsNotEmpty({
-    message:
-      'Set Env variable POSTGRES_BILLING_URL, example: postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public',
-  })
-  postgresBillingUrl: string;
+export class PrismaConfig implements PrismaSchemaType {
+  POSTGRES_BILLING_URL: string;
 
-  constructor(private configService: ConfigService<any, true>) {
-    this.postgresBillingUrl = this.configService.get('POSTGRES_BILLING_URL');
-
-    configValidationUtility.validateConfig(this);
+  constructor() {
+    Object.assign(this, zodConfigValidationUtility(prismaSchema));
   }
 }
