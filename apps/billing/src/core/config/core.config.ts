@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
-import { Environments, zodConfigValidationUtility } from '@snaptix/common';
+import {
+  Environments,
+  envNodeEnv,
+  envPort,
+  envString,
+  zodConfigValidationUtility,
+} from '@snaptix/common';
 
 const coreSchema = z.object({
-  PORT: z.coerce.number().min(1),
-  NODE_ENV: z.enum(Environments),
-  RABBITMQ_URI: z.string().min(1),
+  PORT: envPort,
+  NODE_ENV: envNodeEnv,
+  RABBITMQ_URI: envString('amqp://username:password@localhost:5672'),
 });
 
 type CoreSchemaType = z.infer<typeof coreSchema>;

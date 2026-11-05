@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
-import { zodConfigValidationUtility } from '@snaptix/common';
+import { envString, zodConfigValidationUtility } from '@snaptix/common';
 
 const prismaSchema = z.object({
-  POSTGRES_BILLING_URL: z.string().min(1),
+  POSTGRES_BILLING_URL: envString(
+    'postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public',
+  ),
 });
 
 type PrismaSchemaType = z.infer<typeof prismaSchema>;

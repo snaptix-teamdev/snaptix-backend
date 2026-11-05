@@ -6,7 +6,7 @@ import * as countries from 'i18n-iso-countries';
 import { PrismaClient } from '../../apps/geo/src/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { GeoLang } from '../../libs/contracts/src/geo/enums/geo-lang.enum';
-import { envFilePath } from '../../libs/common/src/index';
+import { envFilePath } from '../../libs/common/src/utils/env-file-path';
 
 config({ path: envFilePath('apps/geo') });
 
@@ -250,7 +250,7 @@ async function main() {
   for (const file of required) {
     if (!fs.existsSync(path.join(DATA_DIR, file))) {
       console.error(`Missing file: scripts/geo/data/${file}`);
-      console.error('Download from https://download.geonames.org/export/dump/');
+      console.error('Download data first: pnpm geo:data:download');
       process.exit(1);
     }
   }

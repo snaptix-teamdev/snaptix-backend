@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import { execSync } from 'child_process';
 import * as process from 'node:process';
-import { envFilePath } from '../../libs/common/src/index';
+import { envFilePath } from '../../libs/common/src/utils/env-file-path';
 
 const pathToEnvFile = process.argv[2];
 const prismaCommand = process.argv[3];
