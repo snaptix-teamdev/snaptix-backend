@@ -483,7 +483,7 @@
     log(`POST ${base}/api/v1/files/upload-put-url  (${fileName}, ${mimeType}, ${contentLengthBytes} bytes)`);
 
     try {
-      const res = await fetch(`${base}/api/v1/posts/photo/get-upload-url`, {
+      const res = await fetch(`${base}/api/v1/users/me/profile-settings/avatar/get-upload-url`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -591,10 +591,10 @@
     const btn = document.getElementById('btnConfirm');
     btn.disabled = true;
     btn.textContent = 'Подтверждение...';
-    log(`POST ${base}/api/v1/posts/photo/${fileId}/confirm`);
+    log(`POST ${base}/api/v1/users/me/profile-settings/avatar/${fileId}/confirm`);
 
     try {
-      const res = await fetch(`${base}/api/v1/posts/photo/${fileId}/confirm`, {
+      const res = await fetch(`${base}/api/v1/users/me/profile-settings/avatar/${fileId}/confirm`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });

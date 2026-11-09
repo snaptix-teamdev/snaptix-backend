@@ -1,4 +1,3 @@
-import { IUser, IUserProfile } from '@snaptix/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { randomUUID } from 'crypto';
 
@@ -10,11 +9,7 @@ class GetProfileSettingsGeoDto {
   name: string;
 }
 
-export class GetProfileSettingsResponseDto
-  implements
-    Pick<IUserProfile, 'userId' | 'firstName' | 'lastName' | 'aboutMe'>,
-    Pick<IUser, 'username'>
-{
+export class GetProfileSettingsResponseDto {
   @ApiProperty({ example: randomUUID() })
   userId: string;
 
@@ -26,6 +21,14 @@ export class GetProfileSettingsResponseDto
 
   @ApiProperty({ example: 'Ivanov', nullable: true })
   lastName: string | null;
+
+  @ApiProperty({
+    example:
+      'https://storage.yandexcloud.net/snaptix-files/' +
+      '9b9cec64-9a28-47b2-8c81-f4e553689b97/user_avatar/2f1c...c8e.png',
+    nullable: true,
+  })
+  avatarUrl: string | null;
 
   @ApiProperty({
     example: '1990-03-15',

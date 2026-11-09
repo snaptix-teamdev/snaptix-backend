@@ -13,6 +13,7 @@ import { BulkLinkFilesToEntityUseCase } from './application/commands/bulk-link-f
 import { DeletePostFilesUseCase } from './application/commands/delete-post-files.use-case';
 import { PostDeletedHandler } from './events/post-deleted.handler';
 import { PostDeletedDeadLetterHandler } from './events/post-deleted-dead-letter.handler';
+import { DeleteAvatarUseCase } from './application/commands/delete-avatar.use-case';
 
 @Module({
   imports: [S3Module],
@@ -29,6 +30,7 @@ import { PostDeletedDeadLetterHandler } from './events/post-deleted-dead-letter.
     LinkFileToEntityUseCase,
     BulkLinkFilesToEntityUseCase,
     DeletePostFilesUseCase,
+    DeleteAvatarUseCase,
     PostDeletedHandler,
     PostDeletedDeadLetterHandler,
   ],

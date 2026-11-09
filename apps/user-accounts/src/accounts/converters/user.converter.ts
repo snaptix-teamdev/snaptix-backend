@@ -24,6 +24,7 @@ const profileData = (
   regionId: entity.regionId,
   cityId: entity.cityId,
   aboutMe: entity.aboutMe,
+  storageKey: entity.storageKey,
 });
 
 const emailConfirmationData = (
