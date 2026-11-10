@@ -1,17 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
+  AddAvatarMsResponseDto,
+  AddAvatarPayload,
+  AddAvatarResponseDto,
   GEO_PATTERNS,
   GeoLang,
-  ResolveGeoNamesMsResponseDto,
-  ResolveGeoNamesPayload,
   GetProfileSettingsMsResponseDto,
   GetProfileSettingsPayload,
   GetProfileSettingsResponseDto,
   MICROSERVICE_NAME,
+  ResolveGeoNamesMsResponseDto,
+  ResolveGeoNamesPayload,
   USER_ACCOUNTS_PATTERNS,
 } from '@snaptix/contracts';
 import { firstValueFrom } from 'rxjs';
+import { GatewayConfig } from '../gateway.config';
 
 const EMPTY_GEO_NAMES: ResolveGeoNamesMsResponseDto = {
   country: null,
@@ -24,6 +28,7 @@ export class ProfileSettingsAggregationService {
   constructor(
     @Inject(MICROSERVICE_NAME.USER_ACCOUNTS) private userAccounts: ClientProxy,
     @Inject(MICROSERVICE_NAME.GEO) private geo: ClientProxy,
+    private gatewayConfig: GatewayConfig,
   ) {}
 
   async getProfileSettings(payload: {
@@ -46,17 +51,38 @@ export class ProfileSettingsAggregationService {
       lang: payload.lang,
     });
 
+    // TODO: Вынести в отдельный mapper по аналогии с постами
     return {
       userId: profile.userId,
       username: profile.username,
       firstName: profile.firstName,
       lastName: profile.lastName,
+      avatarUrl: profile.storageKey
+        ? this.buildFileUrl(profile.storageKey)
+        : null,
       birthDate: profile.birthDate,
       aboutMe: profile.aboutMe,
       country: geoNames.country,
       region: geoNames.region,
       city: geoNames.city,
     };
+  }
+
+  async addAvatar(payload: {
+    userId: string;
+    fileId: string;
+  }): Promise<AddAvatarResponseDto> {
+    const { storageKey } = await firstValueFrom(
+      this.userAccounts.send<AddAvatarMsResponseDto, AddAvatarPayload>(
+        USER_ACCOUNTS_PATTERNS.PROFILE.ADD_AVATAR,
+        {
+          userId: payload.userId,
+          fileId: payload.fileId,
+        },
+      ),
+    );
+
+    return { avatarUrl: this.buildFileUrl(storageKey) };
   }
 
   private resolveGeoNames(
@@ -74,5 +100,9 @@ export class ProfileSettingsAggregationService {
         payload,
       ),
     );
+  }
+
+  private buildFileUrl(storageKey: string): string {
+    return `${this.gatewayConfig.filesStorageBaseUrl}/${storageKey}`;
   }
 }

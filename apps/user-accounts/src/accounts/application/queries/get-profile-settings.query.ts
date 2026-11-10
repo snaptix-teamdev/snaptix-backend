@@ -19,6 +19,7 @@ class GetProfileSettingsQueryResponse
       | 'countryId'
       | 'regionId'
       | 'cityId'
+      | 'storageKey'
     >,
     Pick<IUser, 'username'>
 {
@@ -26,6 +27,7 @@ class GetProfileSettingsQueryResponse
   username: string;
   firstName: string | null;
   lastName: string | null;
+  storageKey: string | null;
   birthDate: string | null;
   aboutMe: string | null;
   countryId: number | null;
@@ -64,6 +66,7 @@ export class GetProfileSettingsQueryHandler implements IQueryHandler<
       username: user.username,
       firstName: profile.firstName,
       lastName: profile.lastName,
+      storageKey: profile.storageKey,
       birthDate: formatBirthDate(profile.birthDate),
       aboutMe: profile.aboutMe,
       countryId: profile.countryId,

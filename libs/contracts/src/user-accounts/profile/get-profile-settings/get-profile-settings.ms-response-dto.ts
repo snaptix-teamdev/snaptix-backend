@@ -11,6 +11,7 @@ export class GetProfileSettingsMsResponseDto
       | 'countryId'
       | 'regionId'
       | 'cityId'
+      | 'storageKey'
     >,
     Pick<IUser, 'username'>
 {
@@ -18,6 +19,7 @@ export class GetProfileSettingsMsResponseDto
   username: string;
   firstName: string | null;
   lastName: string | null;
+  storageKey: string | null;
   birthDate: string | null;
   aboutMe: string | null;
   countryId: number | null;

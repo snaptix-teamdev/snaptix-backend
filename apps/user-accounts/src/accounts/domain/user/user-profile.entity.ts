@@ -17,7 +17,7 @@ export class UserProfileEntity implements IUserProfile {
   regionId: number | null;
   cityId: number | null;
   aboutMe: string | null;
-  avatarUrl: string | null;
+  storageKey: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -34,14 +34,12 @@ export class UserProfileEntity implements IUserProfile {
     return entity;
   }
 
-  private checkBirthDateOrThrow(birthDate: Date | null | undefined): void {
-    if (
-      birthDate &&
-      differenceInYears(new Date(), birthDate) <
-        birthDateConstraints.minAgeYears
-    ) {
-      throw new DomainException(USER_ACCOUNTS_ERRORS.USER_UNDER_MIN_AGE);
-    }
+  setAvatar(storageKey: string): void {
+    this.storageKey = storageKey;
+  }
+
+  removeAvatar(): void {
+    this.storageKey = null;
   }
 
   update(dto: UpdateUserProfileEntityDto): void {
@@ -54,5 +52,15 @@ export class UserProfileEntity implements IUserProfile {
     this.countryId = dto.countryId;
     this.regionId = dto.regionId;
     this.cityId = dto.cityId;
+  }
+
+  private checkBirthDateOrThrow(birthDate: Date | null | undefined): void {
+    if (
+      birthDate &&
+      differenceInYears(new Date(), birthDate) <
+        birthDateConstraints.minAgeYears
+    ) {
+      throw new DomainException(USER_ACCOUNTS_ERRORS.USER_UNDER_MIN_AGE);
+    }
   }
 }
