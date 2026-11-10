@@ -8,7 +8,7 @@ export interface IUserProfile {
   regionId: number | null;
   cityId: number | null;
   aboutMe: string | null;
-  avatarUrl: string | null;
+  storageKey: string | null;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

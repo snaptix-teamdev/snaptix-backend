@@ -45,6 +45,8 @@ import { GetProfileSettingsQueryHandler } from './accounts/application/queries/g
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_NAME } from '@snaptix/contracts';
 import { CoreConfig } from './core/config/core.config';
+import { AddAvatarUseCase } from './accounts/application/commands/profile-commands/add-avatar.usecase';
+import { DeleteUserAvatarUseCase } from './accounts/application/commands/profile-commands/delete-user-avatar.use-case';
 
 const authUseCases = [
   RegisterUserUseCase,
@@ -63,7 +65,11 @@ const sessionUseCases = [
   DeactivateSessionsExcludingCurrentUseCase,
   DeactivateSessionByIdUseCase,
 ];
-const profileUseCases = [EditProfileUseCase];
+const profileUseCases = [
+  EditProfileUseCase,
+  AddAvatarUseCase,
+  DeleteUserAvatarUseCase,
+];
 
 @Module({
   imports: [
@@ -80,6 +86,17 @@ const profileUseCases = [EditProfileUseCase];
           options: {
             host: coreConfig.microserviceGeoHost,
             port: coreConfig.microserviceGeoPort,
+          },
+        }),
+      },
+      {
+        name: MICROSERVICE_NAME.FILES,
+        inject: [CoreConfig],
+        useFactory: (coreConfig: CoreConfig) => ({
+          transport: Transport.TCP,
+          options: {
+            host: coreConfig.microserviceFilesHost,
+            port: coreConfig.microserviceFilesPort,
           },
         }),
       },

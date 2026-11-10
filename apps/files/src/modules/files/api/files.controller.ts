@@ -16,6 +16,9 @@ import { ConfirmUploadFileCommand } from '../application/commands/confirm-upload
 import { ConfirmUploadFileMsResponseDto } from '@snaptix/contracts/files/confirm-upload-file/confirm-upload-file.ms-response-dto';
 import { LinkFileToEntityCommand } from '../application/commands/link-file-to-entity.use-case';
 import { BulkLinkFilesToEntityCommand } from '../application/commands/bulk-link-files-to-entity.use-case';
+import { DeleteAvatarCommand } from '../application/commands/delete-avatar.use-case';
+import { DeleteAvatarPayload } from '@snaptix/contracts/files/delete-avatar/delete-avatar.payload';
+import { DeleteAvatarMsResponseDto } from '@snaptix/contracts/files/delete-avatar/delete-avatar.ms-response-dto';
 
 @Controller()
 export class FilesController {
@@ -48,5 +51,13 @@ export class FilesController {
     @Payload() payload: BulkLinkFilesToEntityPayload,
   ): Promise<BulkLinkFilesToEntityMsResponseDto> {
     return this.commandBus.execute(new BulkLinkFilesToEntityCommand(payload));
+  }
+
+  @MessagePattern(FILES_MICROSERVICE_PATTERNS.FILES.DELETE_USER_AVATAR)
+  async deleteUserAvatar(
+    @Payload() payload: DeleteAvatarPayload,
+  ): Promise<DeleteAvatarMsResponseDto> {
+    await this.commandBus.execute(new DeleteAvatarCommand(payload));
+    return {};
   }
 }

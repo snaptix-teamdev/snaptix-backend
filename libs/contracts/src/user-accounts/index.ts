@@ -12,3 +12,5 @@ export * from './get-registered-users-count/index';
 export * from './callback-google/index';
 export * from './profile/complete-profile/index';
 export * from './profile/get-profile-settings/index';
+export * from './profile/add-avatar/index';
+export * from './profile/delete-user-avatar/index';

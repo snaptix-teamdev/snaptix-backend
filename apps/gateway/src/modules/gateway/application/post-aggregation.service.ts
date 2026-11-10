@@ -78,6 +78,7 @@ export class PostAggregationService {
       userInfo: {
         userId: userInfo.id,
         username: userInfo.username,
+        // TODO: view avatar
         avatar: null,
       },
     });

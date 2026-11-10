@@ -59,6 +59,14 @@ export class UserEntity implements IUser {
     this.username = username;
   }
 
+  setAvatar(storageKey: string): void {
+    this.profile.setAvatar(storageKey);
+  }
+
+  removeAvatar(): void {
+    this.profile.removeAvatar();
+  }
+
   updateProfile(dto: UpdateUserProfileEntityDto): void {
     this.profile.update(dto);
   }
