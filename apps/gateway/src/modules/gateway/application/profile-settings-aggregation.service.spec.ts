@@ -7,6 +7,7 @@ import {
   MICROSERVICE_NAME,
   USER_ACCOUNTS_PATTERNS,
 } from '@snaptix/contracts';
+import { GatewayConfig } from '../gateway.config';
 import { ProfileSettingsAggregationService } from './profile-settings-aggregation.service';
 
 describe('ProfileSettingsAggregationService.getProfileSettings', () => {
@@ -49,6 +50,13 @@ describe('ProfileSettingsAggregationService.getProfileSettings', () => {
           provide: MICROSERVICE_NAME.GEO,
           useValue: { send: geoSend } as unknown as ClientProxy,
         },
+        {
+          provide: GatewayConfig,
+          useValue: {
+            filesStorageBaseUrl:
+              'https://storage.yandexcloud.net/snaptix-files',
+          },
+        },
       ],
     }).compile();
 
@@ -78,6 +86,7 @@ describe('ProfileSettingsAggregationService.getProfileSettings', () => {
       username: 'some-username',
       firstName: 'Ivan',
       lastName: 'Ivanov',
+      avatarUrl: null,
       birthDate: '1990-03-15',
       aboutMe: 'Пара слов о себе',
       country: { id: 1, name: 'Беларусь' },
