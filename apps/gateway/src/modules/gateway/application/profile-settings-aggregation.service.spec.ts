@@ -112,4 +112,20 @@ describe('ProfileSettingsAggregationService.getProfileSettings', () => {
       city: null,
     });
   });
+
+  it('should build avatarUrl from files storage base url and storageKey', async () => {
+    userAccountsSend.mockReturnValue(
+      of({
+        ...profile,
+        storageKey: `${userId}/user_avatar/535c0ef9-9ed0-4e50-9d72-9a8568d645bd.png`,
+      }),
+    );
+
+    await expect(
+      service.getProfileSettings({ userId, lang: GeoLang.RU }),
+    ).resolves.toMatchObject({
+      avatarUrl:
+        'https://storage.yandexcloud.net/snaptix-files/0199b0e8-0000-7000-8000-000000000001/user_avatar/535c0ef9-9ed0-4e50-9d72-9a8568d645bd.png',
+    });
+  });
 });
