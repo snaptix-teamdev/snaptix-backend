@@ -25,7 +25,7 @@ ReCaptcha testing
   const button = document.getElementById("reset-password-button")
 
   function onSubmit(recaptchaValue) {
-    fetch('http://localhost:9000/api/auth/password-recovery', {
+    fetch('http://localhost:9000/api/v1/auth/password/forgot', {
       headers: {
         'Content-Type': 'application/json'
       },

@@ -455,6 +455,8 @@ export class CreateSessionOnLoginHandler implements IEventHandler<UserLoggedInEv
 - Оптимизирован для чтения: может делать JOIN-ы, выбирать только нужные поля, применять пагинацию.
 - Не использует конвертер — нет смысла строить полную сущность ради чтения.
 
+**Доменный интерфейс (IUser, ISession) не используется как тип Prisma-модели в конвертере. Для чтения конвертер принимает тип, выведенный из include (Prisma.XGetPayload), для записи — Prisma.XCreateInput / Prisma.XUpdateInput. Проверки консистентности агрегата (обязательные связи) живут в конвертере, а не в репозитории.**
+
 ```ts
 // UsersRepository (write) — ПРАВИЛЬНО
 export class UsersRepository {

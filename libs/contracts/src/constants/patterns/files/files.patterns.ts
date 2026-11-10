@@ -3,4 +3,5 @@ export const FILES_PATTERNS = {
   CONFIRM_UPLOAD_FILE: 'files.confirm-upload-file',
   LINK_FILE_TO_ENTITY: 'files.link-file-to-entity',
   BULK_LINK_FILES_TO_ENTITY: 'files.bulk-link-files-to-entity',
+  DELETE_USER_AVATAR: 'files.delete-user-avatar',
 } as const;

@@ -68,12 +68,27 @@ export class FilesRepository {
     return result.map((f) => this.converter.fromPrismaModelToEntity(f));
   }
 
+  async findByEntityId(entityId: string): Promise<FileEntity | null> {
+    const result = await this.prisma.file.findFirst({
+      where: { entityId, deletedAt: null },
+    });
+
+    return result ? this.converter.fromPrismaModelToEntity(result) : null;
+  }
+
   async findManyByEntityId(entityId: string): Promise<FileEntity[]> {
     const result = await this.prisma.file.findMany({
       where: { entityId, deletedAt: null },
     });
 
     return result.map((f) => this.converter.fromPrismaModelToEntity(f));
+  }
+
+  async softDeleteById(id: string): Promise<void> {
+    await this.prisma.file.update({
+      where: { id, deletedAt: null },
+      data: { deletedAt: new Date() },
+    });
   }
 
   async softDeleteManyByEntityId(entityId: string): Promise<void> {

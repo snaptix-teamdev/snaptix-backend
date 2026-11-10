@@ -1,39 +1,40 @@
 import { IConverter } from '@snaptix/common/interfaces/converter/converter.interface';
 
-export class UniversalConverter<Entity, Model> implements IConverter<
+export class UniversalConverter<
   Entity,
-  Model
-> {
-  private readonly entityFactory: (model: Model) => Entity;
-  private readonly modelFactory: (entity: Entity) => Model;
+  ReadModel,
+  WriteModel = ReadModel,
+> implements IConverter<Entity, ReadModel, WriteModel> {
+  private readonly entityFactory: (model: ReadModel) => Entity;
+  private readonly modelFactory: (entity: Entity) => WriteModel;
 
   constructor(
-    entityFactory: (model: Model) => Entity,
-    modelFactory: (entity: Entity) => Model,
+    entityFactory: (model: ReadModel) => Entity,
+    modelFactory: (entity: Entity) => WriteModel,
   ) {
     this.entityFactory = entityFactory;
     this.modelFactory = modelFactory;
   }
 
-  fromPrismaModelToEntity(prismaModel: Model): Entity {
+  fromPrismaModelToEntity(prismaModel: ReadModel): Entity {
     return this.entityFactory(prismaModel);
   }
 
-  fromPrismaModelToEntityOrNull(prismaModel: null | Model): null | Entity {
+  fromPrismaModelToEntityOrNull(prismaModel: null | ReadModel): null | Entity {
     return prismaModel != null
       ? this.fromPrismaModelToEntity(prismaModel)
       : null;
   }
 
-  fromPrismaModelsToEntities(prismaModels: Model[]): Entity[] {
+  fromPrismaModelsToEntities(prismaModels: ReadModel[]): Entity[] {
     return prismaModels.map((model) => this.fromPrismaModelToEntity(model));
   }
 
-  fromEntityToPrismaModel(entity: Entity): Model {
+  fromEntityToPrismaModel(entity: Entity): WriteModel {
     return this.modelFactory(entity);
   }
 
-  fromEntitiesToPrismaModels(entities: Entity[]): Model[] {
+  fromEntitiesToPrismaModels(entities: Entity[]): WriteModel[] {
     return entities.map((entity) => this.fromEntityToPrismaModel(entity));
   }
 }

@@ -122,6 +122,7 @@ export class PostsController {
   @ApiNotFoundCustomResponse()
   @ApiBadRequestCustomResponse()
   @ApiUnauthorizedCustomResponse()
+  @ApiConflictCustomResponse()
   async confirmUploadPhoto(
     @ExtractUserFromRequest() user: UserContextDto,
     @Param('fileId', UUIDValidationOrBadRequestPipe) fileId: string,
