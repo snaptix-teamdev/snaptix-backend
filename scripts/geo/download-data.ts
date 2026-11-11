@@ -6,7 +6,7 @@ import { execSync } from 'child_process';
  * Скачивает полные дампы GeoNames из GitHub Release и распаковывает их
  * в scripts/geo/data. Файлы намеренно не хранятся в git (см. .gitignore) —
  * это ~780 МБ данных. После загрузки запускай:
- *   pnpm geo:prisma:reset:dev && pnpm geo:import:dev
+ *   pnpm geo:import:dev
  *
  * Репозиторий приватный, поэтому качаем через `gh release download` — он
  * использует авторизацию GitHub CLI (прямой https-URL ассета для приватного
@@ -69,7 +69,7 @@ function main(): void {
 
   console.log('\n=== Done ===');
   for (const f of REQUIRED) console.log('  -', f);
-  console.log('\nNext: pnpm geo:prisma:reset:dev && pnpm geo:import:dev');
+  console.log('\nNext: pnpm geo:import:dev');
 }
 
 try {

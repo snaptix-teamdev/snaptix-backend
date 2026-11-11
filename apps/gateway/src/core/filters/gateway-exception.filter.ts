@@ -7,32 +7,14 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import {
+  getDomainErrorHttpStatus,
+  getDomainErrorPayload,
   HttpStatus,
-  IBulkDomainExceptionPayload,
   IDomainError,
 } from '@snaptix/common';
-import { COMMON_ERRORS, ERRORS } from '@snaptix/contracts';
+import { COMMON_ERRORS } from '@snaptix/contracts';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
-
-function isDomainException(exception: unknown): exception is IDomainError {
-  return (
-    typeof exception === 'object' &&
-    exception !== null &&
-    (exception as IDomainError).code in ERRORS
-  );
-}
-
-function isBulkDomainException(
-  exception: unknown,
-): exception is IBulkDomainExceptionPayload {
-  return (
-    typeof exception === 'object' &&
-    exception !== null &&
-    (exception as IBulkDomainExceptionPayload).isBulk &&
-    Array.isArray((exception as IBulkDomainExceptionPayload).errors)
-  );
-}
 
 @Catch()
 export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
@@ -92,11 +74,16 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
       return;
     }
 
-    if (isBulkDomainException(exception)) {
-      this.logger.error({ type: 'BulkDomainException', exception });
+    const domainError = getDomainErrorPayload(exception);
 
-      response.status(HttpStatus.CONFLICT).json({
-        errors: exception.errors.map(({ itemId, error }) => ({
+    if (domainError && 'isBulk' in domainError) {
+      this.logger.error({
+        type: 'BulkDomainException',
+        exception: domainError,
+      });
+
+      response.status(getDomainErrorHttpStatus(domainError)).json({
+        errors: domainError.errors.map(({ itemId, error }) => ({
           status: error.httpCode,
           code: error.code,
           field: error.field,
@@ -107,16 +94,16 @@ export class GatewayExceptionFilter implements ExceptionFilter<HttpException> {
       return;
     }
 
-    if (isDomainException(exception)) {
-      this.logger.error({ type: 'DomainException', exception });
+    if (domainError) {
+      this.logger.error({ type: 'DomainException', exception: domainError });
 
-      response.status(exception.httpCode).json({
+      response.status(getDomainErrorHttpStatus(domainError)).json({
         errors: [
           {
-            status: exception.httpCode,
-            code: exception.code,
-            field: exception.field,
-            message: exception.message,
+            status: domainError.httpCode,
+            code: domainError.code,
+            field: domainError.field,
+            message: domainError.message,
           },
         ],
       });
