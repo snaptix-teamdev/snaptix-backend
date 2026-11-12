@@ -7,3 +7,41 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum PlanTier {
+  BUSINESS
+}
+
+enum BillingPeriod {
+  ONE_DAY
+  SEVEN_DAYS
+  ONE_MONTH
+}
+
+enum Currency {
+  USD
+}
+
+//тариф
+model SubscriptionPlan {
+  id               String                @id @default(uuid(7)) @db.Uuid
+  tier             PlanTier              @default(BUSINESS)
+  billingPeriod    BillingPeriod         @map("billing_period")
+  priceCents       Int                   @map("price_cents") @db.Integer
+  currency         Currency              @default(USD)
+
+  stripePriceId    String?               @unique @map("stripe_price_id")
+
+  // Изменение цены — новая строка.
+  // У старой версии isActive = false.
+  isActive          Boolean              @default(true) @map("is_active")
+
+  // subscriptions     UserSubscription[]   @relation("PlanSubscriptions")
+  // nextSubscriptions UserSubscription[]   @relation("NextPlanSubscriptions")
+  // periods           SubscriptionPeriod[] @relation("PlanPeriods")
+
+  createdAt         DateTime             @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime             @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("subscription_plans")
+}
