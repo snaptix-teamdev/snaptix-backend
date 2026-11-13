@@ -53,13 +53,13 @@ enum Currency {
 
 //тариф
 model SubscriptionPlan {
-  id               String                @id @default(uuid(7)) @db.Uuid
-  tier             PlanTier              @default(BUSINESS)
-  billingPeriod    BillingPeriod         @map("billing_period")
-  priceCents       Int                   @map("price_cents") @db.Integer
-  currency         Currency              @default(USD)
-
-  stripePriceId    String?               @unique @map("stripe_price_id")
+  id                     String                @id @default(uuid(7)) @db.Uuid
+  tier                   PlanTier              @default(BUSINESS)
+  billingPeriod          BillingPeriod         @map("billing_period")
+  priceCents             Int                   @map("price_cents") @db.Integer
+  currency               Currency              @default(USD)
+ 
+  externalProvaiderId    String?               @unique @map("stripe_price_id")
 
   // Изменение цены — новая строка.
   // У старой версии isActive = false.
