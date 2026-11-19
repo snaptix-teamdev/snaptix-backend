@@ -113,7 +113,3 @@ Swagger: <http://localhost:9000/api/v1/swagger>.
 4. **Прод.** В `apps/<service>/deployment.yaml` каждая переменная перечислена явно и берётся из Kubernetes Secret через `secretKeyRef` (имя секрета указано там же). Добавьте новую переменную по образцу соседних и заведите ключ в самом секрете. Без этого шага переменная до контейнера не дойдёт.
 
    `PORT` HTTP-сервисов в `deployment.yaml` нет: его задаёт `Dockerfile` из build-аргумента `port`.
-
-## Лицензия
-
-MIT

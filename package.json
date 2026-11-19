@@ -4,7 +4,7 @@
   "description": "",
   "author": "",
   "private": true,
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "start:dev:all": "pnpm run --workspace-concurrency=Infinity \"/^(gateway|user-accounts|notifications|files|posts|geo|billing):start:dev$/\"",
     "--------------------": "",
@@ -120,7 +120,14 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/gateway/test/jest-e2e.json",
-    "prepare": "husky || true"
+    "prepare": "husky || true",
+    "prisma:generate:all": "pnpm run \"/^(user-accounts|files|posts|geo|billing):prisma:generate$/\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "build:all": "pnpm run \"/^(gateway|user-accounts|notifications|files|posts|geo|billing):build$/\"",
+    "skills:sync": "ts-node scripts/ci/skills-sync.ts",
+    "skills:check": "ts-node scripts/ci/skills-sync.ts --check",
+    "verify": "pnpm skills:check && pnpm prisma:generate:all && pnpm typecheck && pnpm lint:check && pnpm build:all && pnpm test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1033.0",
