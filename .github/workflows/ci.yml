@@ -34,13 +34,23 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Тот же набор проверок, что и локально: prisma generate, typecheck, lint, build, unit-тесты, CRAP
+      # Тот же набор проверок, что и локально: prisma generate, typecheck, lint, build, unit-тесты, CRAP, мутации
       - run: pnpm verify
         env:
-          # В PR функции сравниваются с целевой веткой PR, при push — с origin/dev
-          CRAP_BASE: origin/${{ github.base_ref || 'dev' }}
+          # CRAP и мутации проверяют только изменённый код: в PR — относительно целевой ветки PR, при push — относительно origin/dev
+          CHANGES_BASE: origin/${{ github.base_ref || 'dev' }}
 
       # Шаги ниже выполняются и при красном verify (например, покрытие ниже порога), но не при отмене
+
+      # HTML-отчёт мутационного тестирования изменённых строк (есть, только если в PR менялся код в apps/ или libs/)
+      - name: Upload mutation report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report
+          path: reports/mutation
+          retention-days: 5
+          if-no-files-found: ignore
 
       # HTML-отчёт покрытия как файл прогона: скачать, распаковать, открыть index.html
       - name: Upload coverage report

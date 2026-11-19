@@ -9,19 +9,18 @@
  *   ts-node scripts/ci/crap.ts            # report: riskiest functions in the whole codebase
  *   ts-node scripts/ci/crap.ts --changed  # gate: fail if a function touched since the base branch is above the threshold
  *
- * Env: CRAP_THRESHOLD (default 30), CRAP_BASE — branch to compare with in --changed mode (default origin/dev),
- *      CRAP_REPORT_LIMIT — how many functions the report lists (default 15).
+ * Env: CRAP_THRESHOLD (default 30), CRAP_REPORT_LIMIT — how many functions the report lists (default 15),
+ *      CHANGES_BASE — branch to compare with in --changed mode (default origin/dev, see git-changes.ts).
  */
-import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { relative } from 'node:path';
 import * as process from 'node:process';
 import { ESLint } from 'eslint';
 import { parser } from 'typescript-eslint';
+import { CHANGES_BASE, ChangedLines, changedLines } from './git-changes';
 
 const COVERAGE_FILE = 'coverage/coverage-final.json';
 const THRESHOLD = Number(process.env['CRAP_THRESHOLD'] ?? 30);
-const BASE = process.env['CRAP_BASE'] ?? 'origin/dev';
 const REPORT_LIMIT = Number(process.env['CRAP_REPORT_LIMIT'] ?? 15);
 
 type Position = { line: number; column: number | null };
@@ -155,56 +154,7 @@ async function measure(
   return risks.sort((a, b) => b.crap - a.crap);
 }
 
-/** Changed line numbers per file since the merge base with BASE (committed + uncommitted + untracked). */
-function changedLines(): Map<string, Set<number> | 'all'> {
-  try {
-    execSync(`git rev-parse --verify --quiet ${BASE}`, { stdio: 'ignore' });
-  } catch {
-    console.error(
-      `Base branch "${BASE}" not found. Run "git fetch origin" or set CRAP_BASE.`,
-    );
-    process.exit(1);
-  }
-  const mergeBase = execSync(`git merge-base ${BASE} HEAD`, {
-    encoding: 'utf8',
-  }).trim();
-  const diff = execSync(`git diff -U0 --no-color ${mergeBase} -- '*.ts'`, {
-    encoding: 'utf8',
-    maxBuffer: 64 * 1024 * 1024,
-  });
-  const changes = new Map<string, Set<number> | 'all'>();
-  let current: Set<number> | undefined;
-  for (const line of diff.split('\n')) {
-    const file = /^\+\+\+ b\/(.+)$/.exec(line);
-    if (file) {
-      current = new Set();
-      changes.set(file[1], current);
-      continue;
-    }
-    const hunk = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/.exec(line);
-    if (hunk && current) {
-      const start = Number(hunk[1]);
-      const count = hunk[2] === undefined ? 1 : Number(hunk[2]);
-      for (let i = 0; i < count; i++) current.add(start + i);
-    }
-  }
-  const untracked = execSync(
-    `git ls-files --others --exclude-standard -- '*.ts'`,
-    {
-      encoding: 'utf8',
-    },
-  );
-  untracked
-    .split('\n')
-    .filter(Boolean)
-    .forEach((file) => changes.set(file, 'all'));
-  return changes;
-}
-
-const touched = (
-  risk: FunctionRisk,
-  changes: Map<string, Set<number> | 'all'>,
-): boolean => {
+const touched = (risk: FunctionRisk, changes: ChangedLines): boolean => {
   const lines = changes.get(risk.file);
   if (!lines) return false;
   if (lines === 'all') return true;
@@ -234,7 +184,7 @@ async function main(): Promise<void> {
   const changed = risks.filter((risk) => touched(risk, changes));
   const failing = changed.filter((risk) => risk.crap > THRESHOLD);
   console.log(
-    `CRAP check against ${BASE}: ${changed.length} changed functions, ${failing.length} above ${THRESHOLD}.`,
+    `CRAP check against ${CHANGES_BASE}: ${changed.length} changed functions, ${failing.length} above ${THRESHOLD}.`,
   );
   if (failing.length > 0) {
     failing.forEach((risk) => console.error(format(risk)));

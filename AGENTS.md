@@ -52,16 +52,23 @@ pnpm format:check             # Prettier check without writing (used by verify)
 pnpm typecheck                # tsc --noEmit
 ```
 
-On commit, lint-staged runs (sequentially) `prettier --write` + `eslint --fix` on staged `*.{ts,js}`, `prettier --write` on `*.{json,md}`, and `pnpm skills:check --staged` when skills are staged — the same tools and file types that `verify` checks. Type checks, build, tests and CRAP run only in `verify` (too slow for every commit).
+On commit, lint-staged runs (sequentially) `prettier --write` + `eslint --fix` on staged `*.{ts,js}`, `prettier --write` on `*.{json,md}`, and `pnpm skills:check --staged` when skills are staged — the same tools and file types that `verify` checks. Type checks, build, tests, CRAP and mutation testing run only in `verify` (too slow for every commit).
 
 ### Verify (required before a task is done)
 
 ```bash
-pnpm verify   # skills check → format check → prisma generate → typecheck → lint (no fix, complexity limits) → build all apps → unit tests with coverage thresholds → CRAP check
-pnpm crap     # report: riskiest functions in the codebase (needs `pnpm test:cov` first)
+pnpm verify     # skills check → format check → prisma generate → typecheck → lint (no fix, complexity limits) → build all apps → unit tests with coverage thresholds → CRAP check → mutation check
+pnpm crap       # report: riskiest functions in the codebase (needs `pnpm test:cov` first)
+pnpm mutation   # full mutation report of the whole codebase → reports/mutation/index.html (~2 min)
 ```
 
+CRAP and mutation checks look only at code changed since `origin/dev` (`CHANGES_BASE` overrides the base branch).
+
 CRAP check (`pnpm crap:check`): every function changed since `origin/dev` must have CRAP ≤ 30 (CRAP = complexity² × (1 − coverage)³ + complexity). If it fails, add unit tests for the listed function or reduce its complexity — do not raise the threshold.
+
+Mutation check (`pnpm mutation:check`): Stryker mutates the changed lines in `apps/` and `libs/` (e.g. `>` → `>=`, `&&` → `||`, removes a block) and runs the unit tests; at least 70% of the mutants must make a test fail. Lines that no test runs count as missed. If it fails, it lists each missed mutant (file:line, what was changed): add or strengthen unit tests so they assert the behaviour that mutant breaks — do not lower the threshold or weaken the mutation config.
+
+Stryker memory is capped in `stryker.config.json` so a run stays under ~4 GB RAM on any machine: 3 test-runner processes (`concurrency`), each limited to a 768 MB V8 heap (`testRunnerNodeArgs`) and restarted after 30 runs (`maxTestRunnerReuse`), with ts-jest transpiling without type checks (`jest.stryker.config.js`). Without these limits a full run spawned one process per CPU core at up to 4 GB each and exhausted 61 GB of RAM. Do not raise `concurrency` or remove the limits.
 
 Run `pnpm verify` and get exit code 0 before reporting a task as done and before opening a PR. Run the full script — not a subset of tests or a single service. If it fails, fix and re-run; do not open a PR on a red `verify`. CI (`.github/workflows/ci.yml`) runs the same `pnpm verify` on every PR to `dev` and `main`.
 
