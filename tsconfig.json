@@ -25,5 +25,6 @@
       "@snaptix/core": ["libs/core/src"],
       "@snaptix/core/*": ["libs/core/src/*"]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist", "coverage", "reports", ".stryker-tmp"]
 }
