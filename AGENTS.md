@@ -55,7 +55,7 @@ pnpm format                   # Prettier
 pnpm verify   # prisma generate (all services) → typecheck → lint (no fix) → build all apps → unit tests
 ```
 
-Run `pnpm verify` and get exit code 0 before reporting a task as done and before opening a PR. Run the full script — not a subset of tests or a single service. If it fails, fix and re-run; do not open a PR on a red `verify`. CI (`.github/workflows/ci.yml`) runs the same `pnpm verify` on every PR to `main`.
+Run `pnpm verify` and get exit code 0 before reporting a task as done and before opening a PR. Run the full script — not a subset of tests or a single service. If it fails, fix and re-run; do not open a PR on a red `verify`. CI (`.github/workflows/ci.yml`) runs the same `pnpm verify` on every PR to `dev` and `main`.
 
 Skills are edited only in `.agents/skills/` (read by Codex). `.claude/skills/` (read by Claude Code) is a copy: after changing a skill run `pnpm skills:sync`. `verify` fails if the two folders differ.
 
