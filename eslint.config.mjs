@@ -2,6 +2,7 @@
 import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import { readdirSync } from 'fs';
+import sonarjs from 'eslint-plugin-sonarjs';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -69,6 +70,16 @@ export default tseslint.config(
     files: ['libs/**/*.ts'],
     rules: {
       '@typescript-eslint/no-namespace': 'off',
+    },
+  },
+  {
+    // Complexity limits for production code (thresholds chosen from a baseline: max cyclomatic 9, max cognitive 15)
+    files: ['apps/**/*.ts', 'libs/**/*.ts'],
+    ignores: ['**/*.spec.ts', '**/*.e2e-spec.ts', '**/test/**'],
+    plugins: { sonarjs },
+    rules: {
+      complexity: ['error', 10],
+      'sonarjs/cognitive-complexity': ['error', 15],
     },
   },
   {

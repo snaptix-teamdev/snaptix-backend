@@ -14,6 +14,10 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # По умолчанию токен в репозитории только на чтение; писать комментарий в PR нужно явно разрешить
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -29,3 +33,45 @@ jobs:
 
       # Тот же набор проверок, что и локально: prisma generate, typecheck, lint, build, unit-тесты
       - run: pnpm verify
+
+      # Шаги ниже выполняются и при красном verify (например, покрытие ниже порога), но не при отмене
+
+      # HTML-отчёт покрытия как файл прогона: скачать, распаковать, открыть index.html
+      - name: Upload coverage report
+        id: upload-coverage
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/lcov-report
+          retention-days: 5
+          if-no-files-found: warn
+
+      # Итог покрытия на странице прогона (вкладка Summary) и в coverage/summary.md для комментария
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: pnpm coverage:summary
+        env:
+          ARTIFACT_URL: ${{ steps.upload-coverage.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      # Один комментарий в PR с покрытием и ссылкой на отчёт; на каждый push он обновляется, а не дублируется.
+      # Только для PR из этого же репозитория: у PR из форков токен не может писать комментарии.
+      - name: Coverage comment in PR
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- coverage-report -->';
+            const body = fs.readFileSync('coverage/summary.md', 'utf8');
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+            const existing = comments.find((c) => c.user?.type === 'Bot' && c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }

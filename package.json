@@ -118,6 +118,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
+    "posttest:cov": "node -e \"console.log('Coverage report: ' + require('url').pathToFileURL('coverage/lcov-report/index.html').href)\"",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/gateway/test/jest-e2e.json",
     "prepare": "husky || true",
@@ -125,9 +126,10 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "build:all": "pnpm run \"/^(gateway|user-accounts|notifications|files|posts|geo|billing):build$/\"",
+    "coverage:summary": "ts-node scripts/ci/coverage-summary.ts",
     "skills:sync": "ts-node scripts/ci/skills-sync.ts",
     "skills:check": "ts-node scripts/ci/skills-sync.ts --check",
-    "verify": "pnpm skills:check && pnpm prisma:generate:all && pnpm typecheck && pnpm lint:check && pnpm build:all && pnpm test"
+    "verify": "pnpm skills:check && pnpm prisma:generate:all && pnpm typecheck && pnpm lint:check && pnpm build:all && pnpm test:cov"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1033.0",
@@ -195,6 +197,7 @@
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
+    "eslint-plugin-sonarjs": "^3.0.7",
     "globals": "^16.0.0",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
@@ -232,9 +235,29 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "apps/**/*.ts",
+      "libs/**/*.ts",
+      "!**/generated/**",
+      "!**/*.module.ts",
+      "!**/main.ts",
+      "!**/*.spec.ts",
+      "!**/*.e2e-spec.ts",
+      "!**/test/**"
     ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 25,
+        "statements": 25,
+        "branches": 23,
+        "functions": 8
+      }
+    },
     "coverageDirectory": "./coverage",
+    "coverageReporters": [
+      "text-summary",
+      "json-summary",
+      "lcov"
+    ],
     "testEnvironment": "node",
     "roots": [
       "<rootDir>/apps/",
