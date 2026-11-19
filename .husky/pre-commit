@@ -1,1 +1,2 @@
-pnpm lint-staged
+# Sequential: the skills check (last rule) must run after prettier has rewritten SKILL.md files
+pnpm lint-staged --concurrent false

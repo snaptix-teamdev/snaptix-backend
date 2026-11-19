@@ -107,29 +107,32 @@
     "docker:up": "docker compose -f docker-compose.yml up -d --wait",
     "docker:stop": "docker compose -f docker-compose.yml stop",
     "docker:down": "docker compose -f docker-compose.yml down -v --remove-orphans",
-    "build": "nest build",
-    "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+    "build": "pnpm run \"/^(gateway|user-accounts|notifications|files|posts|geo|billing):build$/\"",
+    "prisma:generate:all": "pnpm run \"/^(user-accounts|files|posts|geo|billing):prisma:generate$/\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "prestart:dev:all": "pnpm docker:up",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/gateway/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "prepare": "husky || true",
+    "----------------------------": "",
+    "format": "prettier --write \"**/*.{ts,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md}\"",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test:cov": "jest --coverage --json --outputFile=coverage/test-results.json",
     "posttest:cov": "node -e \"console.log('Coverage report: ' + require('url').pathToFileURL('coverage/lcov-report/index.html').href)\"",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/gateway/test/jest-e2e.json",
-    "prepare": "husky || true",
-    "prisma:generate:all": "pnpm run \"/^(user-accounts|files|posts|geo|billing):prisma:generate$/\"",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "build:all": "pnpm run \"/^(gateway|user-accounts|notifications|files|posts|geo|billing):build$/\"",
     "coverage:summary": "ts-node scripts/ci/coverage-summary.ts",
+    "crap": "ts-node scripts/ci/crap.ts",
+    "crap:check": "ts-node scripts/ci/crap.ts --changed",
     "skills:sync": "ts-node scripts/ci/skills-sync.ts",
     "skills:check": "ts-node scripts/ci/skills-sync.ts --check",
-    "verify": "pnpm skills:check && pnpm prisma:generate:all && pnpm typecheck && pnpm lint:check && pnpm build:all && pnpm test:cov"
+    "verify": "pnpm skills:check && pnpm format:check && pnpm prisma:generate:all && pnpm typecheck && pnpm lint:check && pnpm build && pnpm test:cov && pnpm crap:check"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1033.0",
@@ -218,9 +221,15 @@
     "node": "22.x"
   },
   "lint-staged": {
-    "*.{ts,js,json,md}": [
+    "*.{ts,js}": [
       "prettier --write",
       "eslint --fix"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ],
+    ".{agents,claude}/skills/**": [
+      "pnpm skills:check --staged"
     ]
   },
   "jest": {
@@ -256,6 +265,7 @@
     "coverageReporters": [
       "text-summary",
       "json-summary",
+      "json",
       "lcov"
     ],
     "testEnvironment": "node",

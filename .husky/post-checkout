@@ -1,4 +1,5 @@
-branch_name=$(git symbolic-ref --short HEAD)
+# Not on a branch (checkout of a commit, git worktree add --detach, rebase in progress): nothing to check
+branch_name=$(git symbolic-ref --short -q HEAD) || exit 0
 
 case "$branch_name" in
   main|dev|develop|master)

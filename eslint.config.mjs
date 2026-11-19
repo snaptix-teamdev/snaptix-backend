@@ -30,7 +30,8 @@ const crossServiceRules = MICROSERVICES.map((app) => ({
 
 export default tseslint.config(
   {
-    ignores: ['eslint.config.mjs', '**/generated/**'],
+    // The set of linted files is defined here (scripts run `eslint .`)
+    ignores: ['eslint.config.mjs', '**/generated/**', 'dist/**', 'coverage/**'],
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,

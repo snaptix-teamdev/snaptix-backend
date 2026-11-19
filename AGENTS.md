@@ -45,15 +45,23 @@ pnpm test -- --testPathPattern=user.repository
 ### Lint & Format
 
 ```bash
-pnpm lint                     # ESLint with autofix
-pnpm format                   # Prettier
+pnpm lint                     # ESLint with autofix (files: everything not ignored in eslint.config.mjs)
+pnpm lint:check               # ESLint without fixing (used by verify)
+pnpm format                   # Prettier: **/*.{ts,js,json,md}
+pnpm format:check             # Prettier check without writing (used by verify)
+pnpm typecheck                # tsc --noEmit
 ```
+
+On commit, lint-staged runs (sequentially) `prettier --write` + `eslint --fix` on staged `*.{ts,js}`, `prettier --write` on `*.{json,md}`, and `pnpm skills:check --staged` when skills are staged — the same tools and file types that `verify` checks. Type checks, build, tests and CRAP run only in `verify` (too slow for every commit).
 
 ### Verify (required before a task is done)
 
 ```bash
-pnpm verify   # prisma generate (all services) → typecheck → lint (no fix) → build all apps → unit tests
+pnpm verify   # skills check → format check → prisma generate → typecheck → lint (no fix, complexity limits) → build all apps → unit tests with coverage thresholds → CRAP check
+pnpm crap     # report: riskiest functions in the codebase (needs `pnpm test:cov` first)
 ```
+
+CRAP check (`pnpm crap:check`): every function changed since `origin/dev` must have CRAP ≤ 30 (CRAP = complexity² × (1 − coverage)³ + complexity). If it fails, add unit tests for the listed function or reduce its complexity — do not raise the threshold.
 
 Run `pnpm verify` and get exit code 0 before reporting a task as done and before opening a PR. Run the full script — not a subset of tests or a single service. If it fails, fix and re-run; do not open a PR on a red `verify`. CI (`.github/workflows/ci.yml`) runs the same `pnpm verify` on every PR to `dev` and `main`.
 

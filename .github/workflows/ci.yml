@@ -19,7 +19,10 @@ jobs:
       contents: read
       pull-requests: write
     steps:
+      # Полная история: проверке CRAP нужна ветка, с которой сравниваются изменённые функции (origin/dev)
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Версия pnpm берётся из поля packageManager в package.json
       - uses: pnpm/action-setup@v4
@@ -31,8 +34,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Тот же набор проверок, что и локально: prisma generate, typecheck, lint, build, unit-тесты
+      # Тот же набор проверок, что и локально: prisma generate, typecheck, lint, build, unit-тесты, CRAP
       - run: pnpm verify
+        env:
+          # В PR функции сравниваются с целевой веткой PR, при push — с origin/dev
+          CRAP_BASE: origin/${{ github.base_ref || 'dev' }}
 
       # Шаги ниже выполняются и при красном verify (например, покрытие ниже порога), но не при отмене
 
